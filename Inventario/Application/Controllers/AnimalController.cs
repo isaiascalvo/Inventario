@@ -16,10 +16,10 @@ namespace Application
     [Route("api/animals")]
     public class AnimalController: Controller
     {
-        private readonly IAnimalUseCases _animalUseCases;
+        private readonly IProductUseCases _animalUseCases;
         private readonly IMapper _mapper;
 
-        public AnimalController(IAnimalUseCases animalUseCases, IMapper mapper)
+        public AnimalController(IProductUseCases animalUseCases, IMapper mapper)
         {
             _animalUseCases = animalUseCases;
             _mapper = mapper;
@@ -29,16 +29,16 @@ namespace Application
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<AnimalDto> animalsDto = await _animalUseCases.GetAll();
-            IEnumerable<AnimalViewModel> animalsVM = _mapper.Map<IEnumerable<AnimalDto>, IEnumerable<AnimalViewModel>>(animalsDto);
+            IEnumerable<ProductDto> animalsDto = await _animalUseCases.GetAll();
+            IEnumerable<AnimalViewModel> animalsVM = _mapper.Map<IEnumerable<ProductDto>, IEnumerable<AnimalViewModel>>(animalsDto);
             return Ok(animalsVM);
         }
 
         [HttpGet("{raceId}/ByRace")]
         public async Task<IActionResult> GetBySpecies(Guid raceId)
         {
-            IEnumerable<AnimalDto> animalsDto = await _animalUseCases.GetByRace(raceId);
-            IEnumerable<AnimalViewModel> animalsVM = _mapper.Map<IEnumerable<AnimalDto>, IEnumerable<AnimalViewModel>>(animalsDto);
+            IEnumerable<ProductDto> animalsDto = await _animalUseCases.GetByRace(raceId);
+            IEnumerable<AnimalViewModel> animalsVM = _mapper.Map<IEnumerable<ProductDto>, IEnumerable<AnimalViewModel>>(animalsDto);
             return Ok(animalsVM);
         }
 
@@ -48,7 +48,7 @@ namespace Application
             try
             {
                 var animalDto = await _animalUseCases.GetOne(animalId);
-                var animalVM = _mapper.Map<AnimalDto, AnimalViewModel>(animalDto);
+                var animalVM = _mapper.Map<ProductDto, AnimalViewModel>(animalDto);
                 return Ok(animalVM);
             }
             catch (KeyNotFoundException)
@@ -60,9 +60,9 @@ namespace Application
         [HttpPost]
         public async Task<IActionResult> Add(AnimalForCreationVM animalForCreationVM)
         {
-            var animalForCreationDto = _mapper.Map<AnimalForCreationVM, AnimalForCreationDto>(animalForCreationVM);
+            var animalForCreationDto = _mapper.Map<AnimalForCreationVM, ProductForCreationDto>(animalForCreationVM);
             var animal = await _animalUseCases.Create(animalForCreationDto);
-            var animalVm = _mapper.Map<AnimalDto, AnimalViewModel>(animal);
+            var animalVm = _mapper.Map<ProductDto, AnimalViewModel>(animal);
 
             return CreatedAtRoute(
                 "GetAnimal",
@@ -90,7 +90,7 @@ namespace Application
         {
             try
             {
-                var animalDto = _mapper.Map<AnimalViewModel, AnimalDto>(animalVM);
+                var animalDto = _mapper.Map<AnimalViewModel, ProductDto>(animalVM);
                 await _animalUseCases.Update(animalId, animalDto);
                 return Ok("Animal successfully updated");
             }

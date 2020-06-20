@@ -16,10 +16,10 @@ namespace Application.Controllers
     [Route("api/diseases")]
     public class DiseaseController : Controller
     {
-        private readonly IDiseaseUseCases _diseaseUseCases;
+        private readonly IClientUseCases _diseaseUseCases;
         private readonly IMapper _mapper;
 
-        public DiseaseController(IDiseaseUseCases diseaseUseCases, IMapper mapper)
+        public DiseaseController(IClientUseCases diseaseUseCases, IMapper mapper)
         {
             _diseaseUseCases = diseaseUseCases;
             _mapper = mapper;
@@ -29,8 +29,8 @@ namespace Application.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<DiseaseDto> diseaseDto = await _diseaseUseCases.GetAll();
-            IEnumerable<DiseaseViewModel> diseaseVM = _mapper.Map<IEnumerable<DiseaseDto>, IEnumerable<DiseaseViewModel>>(diseaseDto);
+            IEnumerable<ClientDto> diseaseDto = await _diseaseUseCases.GetAll();
+            IEnumerable<DiseaseViewModel> diseaseVM = _mapper.Map<IEnumerable<ClientDto>, IEnumerable<DiseaseViewModel>>(diseaseDto);
             return Ok(diseaseVM);
         }
 
@@ -40,7 +40,7 @@ namespace Application.Controllers
             try
             {
                 var diseaseDto = await _diseaseUseCases.GetOne(diseaseId);
-                var diseaseVM = _mapper.Map<DiseaseDto, DiseaseViewModel>(diseaseDto);
+                var diseaseVM = _mapper.Map<ClientDto, DiseaseViewModel>(diseaseDto);
                 return Ok(diseaseVM);
             }
             catch (KeyNotFoundException)
@@ -52,9 +52,9 @@ namespace Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(DiseaseForCreationViewModel diseaseForCreationVM)
         {
-            var diseaseForCreationDto = _mapper.Map<DiseaseForCreationViewModel, DiseaseForCreationDto>(diseaseForCreationVM);
+            var diseaseForCreationDto = _mapper.Map<DiseaseForCreationViewModel, ClientForCreationDto>(diseaseForCreationVM);
             var diseaseDto = await _diseaseUseCases.Create(diseaseForCreationDto);
-            var diseaseVm = _mapper.Map<DiseaseDto, DiseaseViewModel>(diseaseDto);
+            var diseaseVm = _mapper.Map<ClientDto, DiseaseViewModel>(diseaseDto);
 
             return CreatedAtRoute(
                 "GetDisease",
@@ -82,7 +82,7 @@ namespace Application.Controllers
         {
             try
             {
-                var diseaseDto = _mapper.Map<DiseaseViewModel, DiseaseDto>(diseaseVM);
+                var diseaseDto = _mapper.Map<DiseaseViewModel, ClientDto>(diseaseVM);
                 await _diseaseUseCases.Update(diseaseId, diseaseDto);
                 return Ok("Disease successfully updated.");
             }

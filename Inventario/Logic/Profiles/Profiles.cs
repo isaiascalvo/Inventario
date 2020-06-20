@@ -12,24 +12,24 @@ namespace Logic.Profiles
     {
         public Profiles()
         {
-            CreateMap<AnimalDto, Product>();
-            CreateMap<Product, AnimalDto>();
+            CreateMap<ProductDto, Product>();
+            CreateMap<Product, ProductDto>();
             //.ForMember(
             //    dest => dest.Name,
             //    opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}")
             //);
 
-            CreateMap<RaceDto, Data.Category>();
-            CreateMap<Data.Category, RaceDto>();
+            CreateMap<CategoryDto, Category>();
+            CreateMap<Category, CategoryDto>();
 
-            CreateMap<DiseaseDto, Client>();
-            CreateMap<Client, DiseaseDto>();
+            CreateMap<ClientDto, Client>();
+            CreateMap<Client, ClientDto>();
 
-            CreateMap<PregnancyDto, Vendor>();
-            CreateMap<Vendor, PregnancyDto>();
+            CreateMap<VendorDto, Vendor>();
+            CreateMap<Vendor, VendorDto>();
 
-            CreateMap<AnimalDiseaseDto, Price>();
-            CreateMap<Price, AnimalDiseaseDto>();
+            CreateMap<PriceDto, Price>();
+            CreateMap<Price, PriceDto>();
         }
     }
 }

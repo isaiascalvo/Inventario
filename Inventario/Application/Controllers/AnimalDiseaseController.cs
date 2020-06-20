@@ -16,10 +16,10 @@ namespace Application.Controllers
     [Route("api/animals-diseases")]
     public class AnimalDiseaseController : Controller
     {
-        private readonly IAnimalDiseaseUseCases _animalDiseaseUseCases;
+        private readonly IPriceUseCases _animalDiseaseUseCases;
         private readonly IMapper _mapper;
 
-        public AnimalDiseaseController(IAnimalDiseaseUseCases animalDiseaseUseCases, IMapper mapper)
+        public AnimalDiseaseController(IPriceUseCases animalDiseaseUseCases, IMapper mapper)
         {
             _animalDiseaseUseCases = animalDiseaseUseCases;
             _mapper = mapper;
@@ -28,8 +28,8 @@ namespace Application.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<AnimalDiseaseDto> animalDiseaseDto = await _animalDiseaseUseCases.GetAll();
-            IEnumerable<AnimalDiseaseViewModel> animalDiseaseVM = _mapper.Map<IEnumerable<AnimalDiseaseDto>, IEnumerable<AnimalDiseaseViewModel>>(animalDiseaseDto);
+            IEnumerable<PriceDto> animalDiseaseDto = await _animalDiseaseUseCases.GetAll();
+            IEnumerable<AnimalDiseaseViewModel> animalDiseaseVM = _mapper.Map<IEnumerable<PriceDto>, IEnumerable<AnimalDiseaseViewModel>>(animalDiseaseDto);
             return Ok(animalDiseaseVM);
         }
 
@@ -39,7 +39,7 @@ namespace Application.Controllers
             try
             {
                 var animalDiseaseDto = await _animalDiseaseUseCases.GetOne(animalDiseaseId);
-                var animalDiseaseVM = _mapper.Map<AnimalDiseaseDto, AnimalDiseaseViewModel>(animalDiseaseDto);
+                var animalDiseaseVM = _mapper.Map<PriceDto, AnimalDiseaseViewModel>(animalDiseaseDto);
                 return Ok(animalDiseaseVM);
             }
             catch (KeyNotFoundException)
@@ -51,9 +51,9 @@ namespace Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AnimalDiseaseForCreationViewModel animalDiseaseForCreationVM)
         {
-            var animalDiseaseForCreationDto = _mapper.Map<AnimalDiseaseForCreationViewModel, AnimalDiseaseForCreationDto>(animalDiseaseForCreationVM);
+            var animalDiseaseForCreationDto = _mapper.Map<AnimalDiseaseForCreationViewModel, PriceForCreationDto>(animalDiseaseForCreationVM);
             var animalDiseaseDto = await _animalDiseaseUseCases.Create(animalDiseaseForCreationDto);
-            var animalDiseaseVM = _mapper.Map<AnimalDiseaseDto, AnimalDiseaseViewModel>(animalDiseaseDto);
+            var animalDiseaseVM = _mapper.Map<PriceDto, AnimalDiseaseViewModel>(animalDiseaseDto);
 
             return CreatedAtRoute(
                 "GetAnimalDisease",
@@ -81,7 +81,7 @@ namespace Application.Controllers
         {
             try
             {
-                var animalDiseaseDto = _mapper.Map<AnimalDiseaseViewModel, AnimalDiseaseDto>(animalDiseaseVM);
+                var animalDiseaseDto = _mapper.Map<AnimalDiseaseViewModel, PriceDto>(animalDiseaseVM);
                 await _animalDiseaseUseCases.Update(animalDiseaseId, animalDiseaseDto);
                 return Ok("AnimalDisease successfully updated.");
             }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Logic
 {
-    public class CategoryUseCases : IRaceUseCases
+    public class CategoryUseCases : ICategoryUseCases
     {
         private readonly ICategoryRepository __categoryRepositoryRepository;
         private readonly IMapper _mapper;
@@ -21,46 +21,46 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<RaceDto> Create(RaceForCreationDto raceForCreationDto)
+        public async Task<CategoryDto> Create(CategoryForCreationDto categoryForCreationDto)
         {
             var race = new Data.Category()
             {
-                Name = raceForCreationDto.Name,
-                Description = raceForCreationDto.Description
+                Name = categoryForCreationDto.Name,
+                Description = categoryForCreationDto.Description
             };
 
-            return _mapper.Map<Data.Category, RaceDto>(await __categoryRepositoryRepository.Add(race));
+            return _mapper.Map<Data.Category, CategoryDto>(await __categoryRepositoryRepository.Add(race));
         }
 
         public async Task Delete(Guid id)
         {
-            var race = await __categoryRepositoryRepository.Delete(id);
-            if (race == null)
-                throw new KeyNotFoundException($"Race with id: {id} not found.");
+            var category = await __categoryRepositoryRepository.Delete(id);
+            if (category == null)
+                throw new KeyNotFoundException($"Category with id: {id} not found.");
         }
 
-        public async Task<IEnumerable<RaceDto>> GetAll()
+        public async Task<IEnumerable<CategoryDto>> GetAll()
         {
-            var races = await __categoryRepositoryRepository.GetAll();
-            var racesDto = _mapper.Map<IEnumerable<Data.Category>, IEnumerable<RaceDto>>(races);
-            return racesDto;
+            var categories = await __categoryRepositoryRepository.GetAll();
+            var categoriesDto = _mapper.Map<IEnumerable<Data.Category>, IEnumerable<CategoryDto>>(categories);
+            return categoriesDto;
         }
 
-        public async Task<RaceDto> GetOne(Guid id)
+        public async Task<CategoryDto> GetOne(Guid id)
         {
-            var race = await __categoryRepositoryRepository.GetById(id);
-            if (race == null)
-                throw new KeyNotFoundException($"Race with id: {id} not found.");
+            var category = await __categoryRepositoryRepository.GetById(id);
+            if (category == null)
+                throw new KeyNotFoundException($"Category with id: {id} not found.");
 
-            return _mapper.Map<Data.Category, RaceDto>(race);
+            return _mapper.Map<Data.Category, CategoryDto>(category);
         }
 
-        public async Task Update(Guid id, RaceDto raceDto)
+        public async Task Update(Guid id, CategoryDto categoryDto)
         {
-            var race = await __categoryRepositoryRepository.GetById(id);
-            race.Name = raceDto.Name;
-            race.Description = raceDto.Description;
-            await __categoryRepositoryRepository.Update(race);
+            var category = await __categoryRepositoryRepository.GetById(id);
+            category.Name = categoryDto.Name;
+            category.Description = categoryDto.Description;
+            await __categoryRepositoryRepository.Update(category);
         }
     }
 }

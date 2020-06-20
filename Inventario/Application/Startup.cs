@@ -48,18 +48,18 @@ namespace Application
                     .AllowAnyHeader());
             });
 
-            services.AddScoped<IAnimalUseCases, AnimalUseCases>();
-            services.AddScoped<IAnimalDiseaseUseCases, AnimalDiseaseUseCases>();
-            services.AddScoped<IDiseaseUseCases, DiseaseUseCases>();
-            services.AddScoped<IPregnancyUseCases, PregnancyUseCases>();
-            services.AddScoped<IRaceUseCases, Logic.CategoryUseCases>();
+            services.AddScoped<IProductUseCases, ProductUseCases>();
+            services.AddScoped<IPriceUseCases, PriceUseCases>();
+            services.AddScoped<IClientUseCases, ClientUseCases>();
+            services.AddScoped<IVendorUseCases, VendorUseCases>();
+            services.AddScoped<ICategoryUseCases, Logic.CategoryUseCases>();
 
 
-            services.AddScoped<IAnimalRepository, AnimalRepository>();
-            services.AddScoped<IAnimalDiseaseRepository, AnimalDiseaseRepository>();
-            services.AddScoped<IDiseaseRepository, DiseaseRepository>();
-            services.AddScoped<IPregnancyRepository, PregnancyRepository>();
-            services.AddScoped<ICategoryRepository, RaceRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IPriceRepository, PriceRepository>();
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IVendorRepository, VendorRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
