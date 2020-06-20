@@ -1,23 +1,20 @@
-﻿using System;
+﻿using Data;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Logic.Dtos
 {
-    public class PriceDto
+    public class PriceDto: Entity
     {
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? LastModificationAt { get; set; }
-        public bool IsDeleted { get; set; }
-        public DateTime? DeletedAt { get; set; }
-        public Guid AnimalId { get; set; }
-        public ProductDto Animal { get; set; }
-        public Guid DiseaseId { get; set; }
-        public ClientDto Disease { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public string Treatement { get; set; }
-        public string Observations { get; set; }
+        //public Guid Id { get; set; }
+        //public DateTime CreatedAt { get; set; }
+        //public DateTime? LastModificationAt { get; set; }
+        //public bool IsDeleted { get; set; }
+        //public DateTime? DeletedAt { get; set; }
+        public double Value { get; set; }
+        public Guid ProductId { get; set; }
+        public ProductDto Product { get; set; }
+        public DateTime DateTime { get; set; }
     }
 }
