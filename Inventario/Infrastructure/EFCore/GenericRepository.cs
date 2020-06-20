@@ -82,5 +82,10 @@ namespace Infrastructure.EFCore
             }
             return query.Where(e => !e.IsDeleted);
         }
+
+        public async Task<List<TEntity>> FindDeleted(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await context.Set<TEntity>().Where(predicate).Where(e => e.IsDeleted).ToListAsync();
+        }
     }
 }

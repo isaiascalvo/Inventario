@@ -17,5 +17,6 @@ namespace Infrastructure.EFCore
         Task<T> Update(T entity);
         Task<T> Delete(Guid id);
         IQueryable<T> AllIncluding(params Expression<Func<T, object>>[] includeProperties);
+        Task<List<T>> FindDeleted(Expression<Func<T, bool>> predicate);
     }
 }
