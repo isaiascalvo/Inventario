@@ -12,31 +12,31 @@ namespace Application.Profiles
     {
         public Profiles()
         {
-            CreateMap<AnimalViewModel, ProductDto>();
-            CreateMap<ProductDto, AnimalViewModel>()
-                .ForMember(aVM => aVM.MotherName, aDto => aDto.MapFrom(src => src.Mother.Name))
-                .ForMember(aVM => aVM.FatherName, aDto => aDto.MapFrom(src => src.Father.Name));
-            CreateMap <AnimalForCreationVM, ProductForCreationDto>();
+            CreateMap<ProductViewModel, ProductDto>();
+            CreateMap<ProductDto, ProductViewModel>();
+                //.ForMember(aVM => aVM.MotherName, aDto => aDto.MapFrom(src => src.Mother.Name))
+                //.ForMember(aVM => aVM.FatherName, aDto => aDto.MapFrom(src => src.Father.Name));
+            CreateMap <ProductForCreationViewModel, ProductForCreationDto>();
             //.ForMember(
             //    dest => dest.Name,
             //    opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}")
             //);
 
-            CreateMap<RaceViewModel, CategoryDto>();
-            CreateMap<CategoryDto, RaceViewModel>();
-            CreateMap<RaceForCreationViewModel, CategoryForCreationDto>();
+            CreateMap<CategoryViewModel, CategoryDto>();
+            CreateMap<CategoryDto, CategoryViewModel>();
+            CreateMap<CategoryForCreationViewModel, CategoryForCreationDto>();
 
-            CreateMap<DiseaseViewModel, ClientDto>();
-            CreateMap<ClientDto, DiseaseViewModel>();
-            CreateMap<DiseaseForCreationViewModel, ClientForCreationDto>();
+            CreateMap<VendorViewModel, VendorDto>();
+            CreateMap<VendorDto, VendorViewModel>();
+            CreateMap<VendorForCreationViewModel, VendorForCreationDto>();
 
-            CreateMap<PregnancyViewModel, VendorDto>();
-            CreateMap<VendorDto, PregnancyViewModel>();
-            CreateMap<PregnancyForCreationViewModel, VendorForCreationDto>();
+            CreateMap<ClientViewModel, ClientDto>();
+            CreateMap<ClientDto, ClientViewModel>();
+            CreateMap<ClientForCreationViewModel, ClientForCreationDto>();
 
-            CreateMap<AnimalDiseaseViewModel, PriceDto>();
-            CreateMap<PriceDto, AnimalDiseaseViewModel>();
-            CreateMap<AnimalDiseaseForCreationViewModel, PriceForCreationDto>();
+            CreateMap<PriceViewModel, PriceDto>();
+            CreateMap<PriceDto, PriceViewModel>();
+            CreateMap<PriceForCreationViewModel, PriceForCreationDto>();
         }
     }
 }

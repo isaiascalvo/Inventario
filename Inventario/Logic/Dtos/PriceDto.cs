@@ -14,7 +14,6 @@ namespace Logic.Dtos
         //public DateTime? DeletedAt { get; set; }
         public double Value { get; set; }
         public Guid ProductId { get; set; }
-        public ProductDto Product { get; set; }
         public DateTime DateTime { get; set; }
     }
 }

@@ -24,6 +24,9 @@ namespace Infrastructure.EFCore
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Category
+            modelBuilder.Entity<Category>()
+                 .HasIndex(c => c.Name).IsUnique();
             //Product
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
@@ -33,13 +36,18 @@ namespace Infrastructure.EFCore
                 .HasOne(p => p.Vendor)
                 .WithMany()
                 .HasForeignKey(p => p.VendorId);
+            modelBuilder.Entity<Product>()
+                 .HasIndex(p => p.Code).IsUnique();
             //modelBuilder.Entity<Product>()
             //    .HasOne(a => a.Brand)
             //    .WithMany()
             //    .HasForeignKey(a => a.BrandId);
 
             //Vendor
-            //modelBuilder.Entity<Vendor>()
+            modelBuilder.Entity<Vendor>()
+                .HasIndex(v => v.CUIL).IsUnique();
+            modelBuilder.Entity<Vendor>()
+                .HasIndex(v => v.Mail).IsUnique();
             //    .HasOne(p => p.City)
             //    .WithMany()
             //    .HasForeignKey(p => p.CityId);
@@ -51,10 +59,13 @@ namespace Infrastructure.EFCore
                 .HasForeignKey(p => p.ProductId);
 
             //Client
-            //modelBuilder.Entity<Client>()
-            //    .HasOne(p => p.City)
-            //    .WithMany()
-            //    .HasForeignKey(p => p.CityId);
+            modelBuilder.Entity<Client>()
+                .HasIndex(c => c.Dni).IsUnique();
+            modelBuilder.Entity<Client>()
+                .HasIndex(c => c.Mail).IsUnique();
+            //.hasone(p => p.city)
+            //.withmany()
+            //.hasforeignkey(p => p.cityid);
 
             //StockMovement
             modelBuilder.Entity<StockMovement>()

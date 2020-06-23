@@ -5,17 +5,13 @@ using System.Text;
 
 namespace Logic.Dtos
 {
-    public class VendorDto
-    {
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? LastModificationAt { get; set; }
-        public bool IsDeleted { get; set; }
-        public DateTime? DeletedAt { get; set; }
-        public Guid AnimalId { get; set; }
-        public Guid? ProgenitorId { get; set; }
-        public DateTime Date { get; set; }
-        public string Observations { get; set; }
-        public bool Finished { get; set; }
+    public class VendorDto: Entity
+        { 
+        public string Name { get; set; }
+        public string CUIL { get; set; }
+        public string Phone { get; set; }
+        public string Mail { get; set; }
+        public bool Active { get; set; }
+        public string Descripton { get; set; }
     }
 }

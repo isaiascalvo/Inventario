@@ -12,92 +12,64 @@ namespace Logic
 {
     public class VendorUseCases : IVendorUseCases
     {
-        private readonly IVendorRepository _pregnancyRepository;
-        private readonly IProductRepository _animalRepository;
+        private readonly IVendorRepository _vendorRepository;
         private readonly IMapper _mapper;
 
-        public VendorUseCases(IVendorRepository pregnancyRepository, IProductRepository animalRepository, IMapper mapper)
+        public VendorUseCases(IVendorRepository vendorRepository, IMapper mapper)
         {
-            _pregnancyRepository = pregnancyRepository;
-            _animalRepository = animalRepository;
+            _vendorRepository = vendorRepository;
             _mapper = mapper;
         }
 
-        public async Task<VendorDto> Create(VendorForCreationDto pregnancyForCreationDto)
+        public async Task<VendorDto> Create(VendorForCreationDto vendorForCreationDto)
         {
-            var animal = await _animalRepository.GetById(pregnancyForCreationDto.AnimalId);
-            if (animal == null)
-                throw new KeyNotFoundException($"Animal with id: { pregnancyForCreationDto.ProgenitorId.Value } not found.");
-
-            Product progenitor = null;
-            if (pregnancyForCreationDto.ProgenitorId.HasValue)
+            var vendor = new Vendor()
             {
-                progenitor = await _animalRepository.GetById(pregnancyForCreationDto.ProgenitorId.Value);
-                if (progenitor == null)
-                    throw new KeyNotFoundException($"Progenitor with id: { pregnancyForCreationDto.ProgenitorId.Value } not found.");
-            }
-
-            var pregnancy = new Vendor()
-            {
-                AnimalId = pregnancyForCreationDto.AnimalId,
-                Animal = animal,
-                ProgenitorId = pregnancyForCreationDto.ProgenitorId,
-                Progenitor = progenitor,
-                Date = pregnancyForCreationDto.Date,
-                Observations = pregnancyForCreationDto.Observations,
-                Finished = pregnancyForCreationDto.Finished
+                Name = vendorForCreationDto.Name,
+                CUIL = vendorForCreationDto.CUIL,
+                Phone = vendorForCreationDto.Phone,
+                Mail = vendorForCreationDto.Mail,
+                Active = vendorForCreationDto.Active,
+                Descripton = vendorForCreationDto.Descripton
             };
 
-            return _mapper.Map<Vendor, VendorDto>(await _pregnancyRepository.Add(pregnancy));
+            return _mapper.Map<Vendor, VendorDto>(await _vendorRepository.Add(vendor));
         }
 
         public async Task Delete(Guid id)
         {
-            var pregnancy = await _pregnancyRepository.Delete(id);
-            if (pregnancy == null)
-                throw new KeyNotFoundException($"Pregnancy with id: {id} not found.");
+            var vendor = await _vendorRepository.Delete(id);
+            if (vendor == null)
+                throw new KeyNotFoundException($"Vendor with id: {id} not found.");
         }
 
         public async Task<IEnumerable<VendorDto>> GetAll()
         {
-            var pregnancy = await _pregnancyRepository.GetAll();
-            var pregnancyDto = _mapper.Map<IEnumerable<Vendor>, IEnumerable<VendorDto>>(pregnancy);
-            return pregnancyDto;
+            var vendor = await _vendorRepository.GetAll();
+            var vendorDto = _mapper.Map<IEnumerable<Vendor>, IEnumerable<VendorDto>>(vendor);
+            return vendorDto;
         }
 
         public async Task<VendorDto> GetOne(Guid id)
         {
-            var pregnancy = await _pregnancyRepository.GetById(id);
-            if (pregnancy == null)
-                throw new KeyNotFoundException($"Pregnancy with id: {id} not found.");
+            var vendor = await _vendorRepository.GetById(id);
+            if (vendor == null)
+                throw new KeyNotFoundException($"Vendor with id: {id} not found.");
 
-            return _mapper.Map<Vendor, VendorDto>(pregnancy);
+            return _mapper.Map<Vendor, VendorDto>(vendor);
         }
 
-        public async Task Update(Guid id, VendorDto pregnancyDto)
+        public async Task Update(Guid id, VendorDto vendorDto)
         {
-            var animal = await _animalRepository.GetById(pregnancyDto.AnimalId);
-            if (animal == null)
-                throw new KeyNotFoundException($"Animal with id: { pregnancyDto.ProgenitorId.Value } not found.");
+            var vendor = await _vendorRepository.GetById(id);
+            vendor.Name = vendorDto.Name;
+            vendor.CUIL = vendorDto.CUIL;
+            vendor.Phone = vendorDto.Phone;
+            vendor.Mail = vendorDto.Mail;
+            vendor.Active = vendorDto.Active;
+            vendor.Descripton = vendorDto.Descripton;
 
-            Product progenitor = null;
-            if (pregnancyDto.ProgenitorId.HasValue)
-            {
-                progenitor = await _animalRepository.GetById(pregnancyDto.ProgenitorId.Value);
-                if (progenitor == null)
-                    throw new KeyNotFoundException($"Progenitor with id: { pregnancyDto.ProgenitorId.Value } not found.");
-            }
-
-            var pregnancy = await _pregnancyRepository.GetById(id);
-            pregnancy.AnimalId = pregnancyDto.AnimalId;
-            pregnancy.Animal = animal;
-            pregnancy.ProgenitorId = pregnancyDto.ProgenitorId;
-            pregnancy.Progenitor = progenitor;
-            pregnancy.Date = pregnancyDto.Date;
-            pregnancy.Observations = pregnancyDto.Observations;
-            pregnancy.Finished = pregnancyDto.Finished;
-
-            await _pregnancyRepository.Update(pregnancy);
+            await _vendorRepository.Update(vendor);
         }
     }
 }

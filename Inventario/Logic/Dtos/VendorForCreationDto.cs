@@ -6,10 +6,11 @@ namespace Logic.Dtos
 {
     public class VendorForCreationDto
     {
-        public Guid AnimalId { get; set; }
-        public Guid? ProgenitorId { get; set; }
-        public DateTime Date { get; set; }
-        public string Observations { get; set; }
-        public bool Finished { get; set; }
+        public string Name { get; set; }
+        public string CUIL { get; set; }
+        public string Phone { get; set; }
+        public string Mail { get; set; }
+        public bool Active { get; set; }
+        public string Descripton { get; set; }
     }
 }

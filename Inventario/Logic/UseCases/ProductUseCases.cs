@@ -36,14 +36,25 @@ namespace Logic
                 CategoryId = productForCreationDto.CategoryId,
                 VendorId = productForCreationDto.VendorId,
                 Brand = productForCreationDto.Brand,
+                Stock = productForCreationDto.Stock,
+                UnitOfMeasurement = productForCreationDto.UnitOfMeasurement,
                 Active = productForCreationDto.Active,
                 Available = productForCreationDto.Available
             };
 
+            var productDto = await _productRepository.Add(product);
 
             //Price
+            var price = new Price()
+            {
+                Value = productForCreationDto.Price.Value,
+                DateTime = DateTime.Now,
+                ProductId = productDto.Id
+            };
 
-            return _mapper.Map<Product, ProductDto>(await _productRepository.Add(product));
+            await _priceRepository.Add(price);
+
+            return _mapper.Map<Product, ProductDto>(productDto);
         }
 
         public async Task Delete(Guid id)
@@ -98,17 +109,31 @@ namespace Logic
         {
             var product = await _productRepository.GetById(id);
             product.Name = productDto.Name;
-            product.Name = productDto.Name;
             product.Description = productDto.Description;
             product.Code = productDto.Code;
             product.CategoryId = productDto.CategoryId;
             product.VendorId = productDto.VendorId;
             product.Brand = productDto.Brand;
+            product.Stock = productDto.Stock;
+            product.UnitOfMeasurement = productDto.UnitOfMeasurement;
             product.Active = productDto.Active;
             product.Available = productDto.Available;
             await _productRepository.Update(product);
 
             //Price
+            var lastPrice = (await _priceRepository.Find(x => x.ProductId == productDto.Id)).OrderByDescending(x => x.DateTime).FirstOrDefault();
+            
+            if (lastPrice == null || lastPrice.Value != productDto.Price.Value)
+            {
+                var price = new Price()
+                {
+                    Value = productDto.Price.Value,
+                    DateTime = DateTime.Now,
+                    ProductId = productDto.Id
+                };
+
+                await _priceRepository.Add(price);
+            }
         }
     }
 }

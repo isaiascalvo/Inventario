@@ -23,6 +23,8 @@ namespace Logic.Dtos
         public Guid? VendorId { get; set; }
         public Vendor Vendor { get; set; }
         public string Brand { get; set; }
+        public double Stock { get; set; }
+        public string UnitOfMeasurement { get; set; }
         public bool Active { get; set; }
         public bool Available { get; set; }
         public PriceDto Price { get; set; }
