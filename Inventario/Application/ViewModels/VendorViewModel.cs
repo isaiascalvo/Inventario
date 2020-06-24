@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Application.ViewModels
 {
-    public class VendorViewModel: Entity
+    public class VendorViewModel
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string CUIL { get; set; }
         public string Phone { get; set; }
         public string Mail { get; set; }
         public bool Active { get; set; }
-        public string Descripton { get; set; }
+        public string Description { get; set; }
     }
 }

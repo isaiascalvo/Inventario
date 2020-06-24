@@ -1,9 +1,6 @@
 import { Category } from "./category";
-// import { Unit } from "./unit";
-// import { Currency } from "./currency";
-// import { Customer } from "./customer";
-// import { Activity } from "./activity";
-// import { Partner } from "./partner";
+import { Vendor } from "./vendor";
+import { Price } from './price';
 
 export class ProductForCreation {
   public name!: string;
@@ -15,17 +12,23 @@ export class ProductForCreation {
   public categoryId!: string;
   public category?: Category;
   public vendorId?: string;
-  public price!: number;
+  public vendor?: Vendor;
+  public price?: Price;
 
-  // public sourceLanguage?: Language;
-  // public targetLanguage?: Language;
-  // public unit?: Unit;
-  // public currency?: Currency;
-  // public activity?: Activity;
-  // public partner?: Partner;
-  // public customer?: Customer;
+  constructor() {
+    this.name = "";
+    this.description = "";
+    this.code = "";
+    this.brand = "";
+    this.active = true;
+    this.available = true;
+    this.categoryId = "";
+    this.vendorId = "";
+    this.price = new Price();
+  }
 }
 
 export class Product extends ProductForCreation {
   public id!: string;
 }
+

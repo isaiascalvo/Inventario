@@ -12,6 +12,6 @@ namespace Logic.Dtos
         public string Phone { get; set; }
         public string Mail { get; set; }
         public bool Active { get; set; }
-        public string Descripton { get; set; }
+        public string Description { get; set; }
     }
 }

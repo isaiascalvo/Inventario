@@ -30,7 +30,7 @@ namespace Logic
                 Phone = vendorForCreationDto.Phone,
                 Mail = vendorForCreationDto.Mail,
                 Active = vendorForCreationDto.Active,
-                Descripton = vendorForCreationDto.Descripton
+                Description = vendorForCreationDto.Description
             };
 
             return _mapper.Map<Vendor, VendorDto>(await _vendorRepository.Add(vendor));
@@ -45,9 +45,16 @@ namespace Logic
 
         public async Task<IEnumerable<VendorDto>> GetAll()
         {
-            var vendor = await _vendorRepository.GetAll();
-            var vendorDto = _mapper.Map<IEnumerable<Vendor>, IEnumerable<VendorDto>>(vendor);
-            return vendorDto;
+            try
+            {
+                var vendor = await _vendorRepository.GetAll();
+                var vendorDto = _mapper.Map<IEnumerable<Vendor>, IEnumerable<VendorDto>>(vendor);
+                return vendorDto;
+            }
+            catch(Exception e) 
+            {
+                throw e;
+            }
         }
 
         public async Task<VendorDto> GetOne(Guid id)
@@ -67,7 +74,7 @@ namespace Logic
             vendor.Phone = vendorDto.Phone;
             vendor.Mail = vendorDto.Mail;
             vendor.Active = vendorDto.Active;
-            vendor.Descripton = vendorDto.Descripton;
+            vendor.Description = vendorDto.Description;
 
             await _vendorRepository.Update(vendor);
         }

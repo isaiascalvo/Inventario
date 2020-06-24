@@ -51,6 +51,25 @@ const routes: Array<RouteConfig> = [
       import("../views/category/edit-category.vue"),
     props: true
   },
+  {
+    path: "/vendor-list",
+    name: "VendorList",
+    component: () =>
+      import("../views/vendor/vendor-list.vue"),
+  },
+  {
+    path: "/vendor/new",
+    name: "NewVendor",
+    component: () =>
+      import("../views/vendor/edit-vendor.vue"),
+  },
+  {
+    path: "/vendor/modify/:id",
+    name: "ModifyVendor",
+    component: () =>
+      import("../views/vendor/edit-vendor.vue"),
+    props: true
+  },
 ];
 
 const router = new VueRouter({

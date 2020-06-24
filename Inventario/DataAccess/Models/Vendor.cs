@@ -15,6 +15,6 @@ namespace Data
         public string Mail { get; set; }
         [Required]
         public bool Active { get; set; }
-        public string Descripton { get; set; }
+        public string Description { get; set; }
     }
 }

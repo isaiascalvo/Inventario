@@ -4,5 +4,5 @@ export class CategoryForCreation {
 }
   
 export class Category extends CategoryForCreation {
-public id!: string;
+    public id!: string;
 }

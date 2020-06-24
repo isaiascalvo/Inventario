@@ -18,5 +18,6 @@ namespace Application.ViewModels
         public string UnitOfMeasurement { get; set; }
         public bool Active { get; set; }
         public bool Available { get; set; }
+        public PriceForCreationViewModel Price { get; set; }
     }
 }

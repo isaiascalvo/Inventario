@@ -22,6 +22,10 @@ namespace Application.Profiles
             //    opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}")
             //);
 
+            CreateMap<PriceViewModel, PriceDto>();
+            CreateMap<PriceDto, PriceViewModel>();
+            CreateMap<PriceForCreationViewModel, PriceForCreationDto>();
+
             CreateMap<CategoryViewModel, CategoryDto>();
             CreateMap<CategoryDto, CategoryViewModel>();
             CreateMap<CategoryForCreationViewModel, CategoryForCreationDto>();
