@@ -1,53 +1,66 @@
 <template>
   <div>
-    <b-card :title="id ? 'Editar Categoría' : 'Crear Categoría'">
-      <!-- <v-card-title>{{ id ? "Update" : "Create" }} Category</v-card-title> -->
-      <b-form @submit.prevent="submit">
-        <b-form-group id="input-group-1" label="Nombre:" label-for="name-input">
-          <b-form-input
-            id="name-input"
-            v-model="name"
-            :state="nameState()"
-            type="text"
-            required
-            placeholder="Ingrese el nombre de la categoría"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="nameState()">
-            El nombre es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+    <div class="card">
+      <div class="card-content">
+        <div class="media">
+          <div class="media-content">
+            <p class="title is-4">
+              {{ category.id ? "Editar Categoría" : "Crear Categoría" }}
+            </p>
+          </div>
+        </div>
+        <div class="content">
+          <section>
+            <b-field
+              label="Nombre:"
+              :type="fieldState(category.name) ? 'is-success' : 'is-danger'"
+              :message="
+                fieldState(category.name) ? '' : 'Debe ingresar un nombre'
+              "
+            >
+              <b-input
+                v-model="category.name"
+                placeholder="Ingrese el nombre de la categoría"
+              ></b-input>
+            </b-field>
 
-        <b-form-group
-          id="input-group-2"
-          label="Descripción:"
-          label-for="description-input"
-        >
-          <b-form-input
-            id="description-input"
-            v-model="description"
-            :state="descriptionState()"
-            type="text"
-            required
-            placeholder="Ingrese la descripción de la categoría"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="descriptionState()">
-            La descripción es requerida
-          </b-form-invalid-feedback>
-        </b-form-group>
+            <b-field
+              label="Descripción:"
+              :type="
+                fieldState(category.description) ? 'is-success' : 'is-danger'
+              "
+              :message="
+                fieldState(category.description)
+                  ? ''
+                  : 'Debe ingresar una descripción'
+              "
+            >
+              <b-input
+                v-model="category.description"
+                placeholder="Ingrese la descripción de la categoría"
+                type="textarea"
+              ></b-input>
+            </b-field>
 
-        <b-button type="submit" variant="primary" :disabled="!formValid()">
-          {{ id ? "Editar" : "Crear" }}
-        </b-button>
-        <b-button
-          type="button"
-          variant="danger"
-          @click="$router.push('/category-list')"
-        >
-          Cancelar
-        </b-button>
-      </b-form>
-    </b-card>
-
+            <b-button
+              type="submit"
+              class="is-success mr-1"
+              :disabled="!formValid()"
+              @click="submit"
+            >
+              {{ category.id ? "Editar" : "Crear" }}
+            </b-button>
+            <b-button
+              type="button"
+              class="is-danger"
+              @click="$router.push('/category-list')"
+            >
+              Cancelar
+            </b-button>
+          </section>
+        </div>
+      </div>
+    </div>
     <!-- <ErrorDialog
       :error="errorMsg"
       v-if="errorDialog"
@@ -60,8 +73,10 @@
 import { Vue, Component } from "vue-property-decorator";
 import { NavigatorCategoryService } from "../../services/category-service";
 import { Category, CategoryForCreation } from "../../models/category";
-// import { DialogMsg } from "../../models/dialogMsg";
-// import ErrorDialog from "../../components/dialogs/error-dialog.vue";
+import {
+  fieldStateValidation,
+  formValidation
+} from "../../utils/common-functions";
 
 @Component({
   components: {
@@ -71,25 +86,24 @@ import { Category, CategoryForCreation } from "../../models/category";
 export default class EditCategory extends Vue {
   public errorDialog = false;
   //   public errorMsg = new DialogMsg();
-  public id!: string;
-  public name = "";
-  public description = "";
+  // public id!: string;
+  // public name = "";
+  // public description = "";
+  public category: Category = new Category();
+
   public categoryService: NavigatorCategoryService = new NavigatorCategoryService();
 
-  nameState() {
-    return this.name.length > 0 ? true : false;
-  }
-
-  descriptionState() {
-    return this.description.length > 0 ? true : false;
+  fieldState(field: unknown) {
+    return fieldStateValidation(field);
   }
 
   formValid() {
-    return this.nameState() && this.descriptionState();
+    const result = formValidation(this.category as never);
+    return result === "";
   }
 
   public submit() {
-    if (!this.id) {
+    if (!this.category.id) {
       this.newCategory();
     } else {
       this.updateCategory();
@@ -98,8 +112,8 @@ export default class EditCategory extends Vue {
 
   public newCategory() {
     const category: CategoryForCreation = {
-      name: this.name,
-      description: this.description
+      name: this.category.name,
+      description: this.category.description
     };
     this.categoryService
       .addCategory(category)
@@ -113,15 +127,15 @@ export default class EditCategory extends Vue {
         // };
         // this.errorDialog = true;
         console.log("error: ", e);
-        this.$router.push({ name: "CategoryList" });
+        // this.$router.push({ name: "CategoryList" });
       });
   }
 
   public updateCategory() {
     const category: Category = {
-      id: this.id,
-      name: this.name,
-      description: this.description
+      id: this.category.id,
+      name: this.category.name,
+      description: this.category.description
     };
     this.categoryService
       .updateCategory(category)
@@ -140,15 +154,19 @@ export default class EditCategory extends Vue {
   }
 
   created() {
-    this.id = this.$route.params.id;
-    if (this.id) {
-      this.categoryService.getCategory(this.id).then(response => {
-        this.name = response.name;
-        this.description = response.description;
+    this.category.id = this.$route.params.id;
+    if (this.category.id) {
+      this.categoryService.getCategory(this.category.id).then(response => {
+        this.category.name = response.name;
+        this.category.description = response.description;
       });
     }
   }
 }
 </script>
 
-<style></style>
+<style>
+.mr-1 {
+  margin-right: 1em;
+}
+</style>

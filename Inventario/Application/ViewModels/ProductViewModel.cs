@@ -14,6 +14,8 @@ namespace Application.ViewModels
         //public DateTime? LastModificationAt { get; set; }
         //public bool IsDeleted { get; set; }
         //public DateTime? DeletedAt { get; set; }
+        public string Name { get; set; }
+
         public string Description { get; set; }
         public string Code { get; set; }
         public Guid CategoryId { get; set; }

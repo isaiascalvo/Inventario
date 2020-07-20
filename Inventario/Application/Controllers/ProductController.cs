@@ -29,9 +29,16 @@ namespace Application
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<ProductDto> productsDto = await _productUseCases.GetAll();
-            IEnumerable<ProductViewModel> productsVM = _mapper.Map<IEnumerable<ProductDto>, IEnumerable<ProductViewModel>>(productsDto);
-            return Ok(productsVM);
+            try
+            {
+                IEnumerable<ProductDto> productsDto = await _productUseCases.GetAll();
+                IEnumerable<ProductViewModel> productsVM = _mapper.Map<IEnumerable<ProductDto>, IEnumerable<ProductViewModel>>(productsDto);
+                return Ok(productsVM);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
 
         [HttpGet("{categoryId}/ByCategory")]

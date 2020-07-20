@@ -1,130 +1,130 @@
 <template>
-  <b-card title="Proveedores">
-    <b-button class="mb-2" to="/vendor/new">
-      Nuevo Proveedor
-    </b-button>
+  <div>
+    <section class="hero is-light">
+      <div class="hero-head">
+        <div class="container level">
+          <div>
+            <h1 class="title">Proveedores</h1>
+            <h2 class="subtitle">
+              Lista de proveedores
+            </h2>
+          </div>
+          <div>
+            <b-button
+              type="is-info"
+              tag="router-link"
+              to="/vendor/new"
+              class="mx-1"
+            >
+              Nuevo Proveedor
+            </b-button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <b-table
       striped
-      hover
-      :items="vendors"
-      :fields="headers"
+      hoverable
+      :data="vendors"
       id="my-table"
+      :paginated="true"
       :per-page="perPage"
-      :current-page="currentPage"
+      :current-page.sync="currentPage"
+      aria-next-label="Next page"
+      aria-previous-label="Previous page"
+      aria-page-label="Page"
+      aria-current-label="Current page"
     >
-      <template v-slot:cell(active)="data">
-        {{ data.value ? "Si" : "No" }}
-      </template>
+      <template slot-scope="props">
+        <b-table-column field="name" label="Nombre">
+          {{ props.row.name }}
+        </b-table-column>
+        <b-table-column field="cuil" label="CUIL">
+          {{ props.row.cuil }}
+        </b-table-column>
+        <b-table-column field="phone" label="Teléfono">
+          {{ props.row.phone }}
+        </b-table-column>
+        <b-table-column field="mail" label="Mail">
+          {{ props.row.mail }}
+        </b-table-column>
+        <b-table-column field="description" label="Descripción">
+          {{ props.row.description }}
+        </b-table-column>
+        <b-table-column field="active" label="Activo">
+          {{ props.row.active ? "Si" : "No" }}
+        </b-table-column>
 
-      <template v-slot:cell(action)="data">
-        <b-icon
-          class="clickeable mr-2"
-          icon="pencil"
-          @click="$router.push('/vendor/modify/' + data.item.id)"
-        ></b-icon>
-        <b-icon
-          class="clickeable"
-          icon="trash"
-          @click="openDeleteDialog(item.id)"
-        ></b-icon>
+        <b-table-column field="action" label="Acciones">
+          <b-button tag="router-link" :to="'/vendor/modify/' + props.row.id">
+            <b-icon icon="pencil"></b-icon>
+          </b-button>
+          <b-button @click="deleteVendor(props.row)">
+            <b-icon icon="delete"></b-icon>
+          </b-button>
+        </b-table-column>
       </template>
     </b-table>
 
-    <b-pagination
-      v-model="currentPage"
-      :total-rows="vendors.length"
-      :per-page="perPage"
-      aria-controls="my-table"
-      align="center"
-    ></b-pagination>
-
-    <!-- <ErrorDialog
-      :error="errorMsg"
-      v-if="errorDialog"
-      @close:dialog="errorDialog = $event"
-    />
-
-    <ConfirmDialog
-      :msgDialog="confirmMsg"
-      v-if="confirmDialog"
-      @close:dialog="onClose"
-    /> -->
-  </b-card>
+    <b-loading is-full-page :active.sync="isLoading"></b-loading>
+  </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import { Vendor } from "../../models/vendor";
 import { NavigatorVendorService } from "../../services/vendor-service";
-// import ConfirmDialog from "../../components/dialogs/confirm-dialog.vue";
-// import { DialogMsg } from "../../models/dialogMsg";
-// import ErrorDialog from "../../components/dialogs/error-dialog.vue";
 
-@Component({
-  components: {} //ConfirmDialog, ErrorDialog
-})
+@Component
 export default class VendorList extends Vue {
   public vendors: Vendor[] = [];
   public vendorService: NavigatorVendorService = new NavigatorVendorService();
 
   public currentPage = 1;
-  public perPage = 1;
+  public perPage = 10;
   public errorDialog = false;
   public confirmDialog = false;
-  // public errorMsg = new DialogMsg();
-  // public confirmMsg = new DialogMsg();
-  public headers = [
-    { key: "name", label: "Nombre" },
-    { key: "CUIL", label: "CUIL" },
-    { key: "phone", label: "Teléfono" },
-    { key: "mail", label: "Mail" },
-    { key: "description", label: "Descripción" },
-    { key: "active", label: "Activo" },
-    { key: "action", label: "Acciones" }
-  ];
+  public isLoading = true;
 
   deleteVendor(vendor: Vendor) {
-    this.vendorService
-      .deleteVendor(vendor.id)
-      .then(() => {
-        this.vendors.splice(this.vendors.indexOf(vendor), 1);
-      })
-      .catch(e => {
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
-        // this.errorDialog = true;
-        console.log("error: ", e);
-      });
-  }
-
-  onClose(elemId: string) {
-    this.confirmDialog = false;
-    if (elemId.trim() !== "") {
-      const vendor = this.vendors.find(x => x.id === elemId);
-      if (vendor) {
-        this.deleteVendor(vendor);
+    this.$buefy.dialog.confirm({
+      title: "Eliminando Proveedor",
+      message:
+        "Estás seguro que deseas <b>eliminar</b> el proveedor? Esta acción no podrá dehacerse.",
+      confirmText: "Eliminar Proveedor",
+      cancelText: "Cancelar",
+      type: "is-danger",
+      hasIcon: true,
+      onConfirm: () => {
+        this.vendorService
+          .deleteVendor(vendor.id)
+          .then(() => {
+            this.vendors.splice(this.vendors.indexOf(vendor), 1);
+          })
+          .catch(e => {
+            // this.errorMsg = {
+            //   title: "Error",
+            //   msg: "An unexpected error has occurred. please try again later."
+            // };
+            // this.errorDialog = true;
+            console.log("error: ", e);
+          });
+        this.$buefy.toast.open("Proveedor eliminado!");
       }
-    }
-  }
-
-  openDeleteDialog(elemId: string) {
-    // this.confirmMsg = {
-    //   elemId: elemId,
-    //   title: "Warning",
-    //   msg: "Are you sure you want to delete the vendor?"
-    // };
-    // this.confirmDialog = true;
+    });
   }
 
   created() {
+    this.isLoading = true;
     this.vendorService
       .getVendors()
       .then(response => {
         this.vendors = response as Vendor[];
+        this.isLoading = false;
       })
       .catch(e => {
+        this.isLoading = false;
         // this.errorMsg = {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
@@ -137,19 +137,21 @@ export default class VendorList extends Vue {
 </script>
 
 <style>
-/* table,
-table.bordered td,
-table.bordered th {
-  border: 1px black solid;
-  margin: auto;
-  margin-bottom: 10px;
-}
-
-.align-center {
-  text-align: center;
-} */
-
 .clickeable {
   cursor: pointer;
+}
+
+th {
+  /* background-color: #dbdbdb; */
+  background-color: #384caf4a;
+}
+
+.ml-1 {
+  margin-left: 1em;
+}
+
+table {
+  font-size: 13px;
+  border: 0px !important;
 }
 </style>

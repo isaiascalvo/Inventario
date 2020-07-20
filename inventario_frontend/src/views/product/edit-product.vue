@@ -1,165 +1,146 @@
 <template>
   <div>
-    <b-card :title="product.id ? 'Editar Producto' : 'Crear Producto'">
-      <!-- <v-card-title>{{ id ? "Update" : "Create" }} Product</v-card-title> -->
-      <b-form @submit.prevent="submit">
-        <b-form-group id="input-group-1" label="Nombre:" label-for="name-input">
-          <b-form-input
-            id="name-input"
-            v-model="product.name"
-            :state="fieldState(product.name)"
-            type="text"
-            required
-            placeholder="Ingrese el nombre del producto"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(product.name)">
-            El nombre es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+    <div class="card">
+      <div class="card-content">
+        <div class="media">
+          <div class="media-content">
+            <p class="title is-4">
+              {{ product.id ? "Editar Producto" : "Crear Producto" }}
+            </p>
+          </div>
+        </div>
 
-        <b-form-group
-          id="input-group-2"
-          label="Descripción:"
-          label-for="description-input"
-        >
-          <b-form-input
-            id="description-input"
-            v-model="product.description"
-            :state="fieldState(product.description)"
-            type="text"
-            required
-            placeholder="Ingrese la descripción del producto"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(product.description)">
-            La descripción es requerida
-          </b-form-invalid-feedback>
-        </b-form-group>
-
-        <b-form-group
-          id="input-group-2"
-          label="Categoría:"
-          label-for="description-input"
-        >
-          <b-form-select v-model="product.categoryId" class="mb-3">
-            <!-- This slot appears above the options from 'options' prop -->
-            <template v-slot:first>
-              <b-form-select-option :value="null" disabled>
-                -- Por favor seleccione una categoría --
-              </b-form-select-option>
-            </template>
-
-            <!-- These options will appear after the ones from 'options' prop -->
-            <b-form-select-option
-              v-for="category in categories"
-              :key="category.id"
-              :value="category.id"
-              >{{ category.name }}</b-form-select-option
+        <div class="content">
+          <section>
+            <b-field
+              label="Nombre:"
+              :type="fieldState(product.name) ? 'is-success' : 'is-danger'"
             >
-          </b-form-select>
-          <b-form-invalid-feedback :state="fieldState(product.code)">
-            La categoría es requerida
-          </b-form-invalid-feedback>
-        </b-form-group>
+              <b-input
+                v-model="product.name"
+                placeholder="Ingrese el nombre del producto"
+              ></b-input>
+            </b-field>
 
-        <b-form-group
-          id="input-group-2"
-          label="Proveedor:"
-          label-for="vendor-input"
-        >
-          <b-form-select v-model="product.vendorId" class="mb-3">
-            <!-- This slot appears above the options from 'options' prop -->
-            <template v-slot:first>
-              <b-form-select-option :value="null" disabled>
-                -- Por favor seleccione una categoría --
-              </b-form-select-option>
-            </template>
-
-            <!-- These options will appear after the ones from 'options' prop -->
-            <b-form-select-option
-              v-for="vendor in vendors"
-              :key="vendor.id"
-              :value="vendor.id"
-              >{{ vendor.name }}</b-form-select-option
+            <b-field
+              label="Descripción:"
+              :type="
+                fieldState(product.description) ? 'is-success' : 'is-danger'
+              "
             >
-          </b-form-select>
-          <b-form-invalid-feedback :state="fieldState(product.code)">
-            La categoría es requerida
-          </b-form-invalid-feedback>
-        </b-form-group>
+              <b-input
+                v-model="product.description"
+                placeholder="Ingrese la descripción del producto"
+                type="textarea"
+              ></b-input>
+            </b-field>
 
-        <b-form-group id="input-group-2" label="Código:" label-for="code-input">
-          <b-form-input
-            id="code-input"
-            v-model="product.code"
-            :state="fieldState(product.code)"
-            type="text"
-            required
-            placeholder="Ingrese el código del producto"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(product.code)">
-            El código es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+            <b-field
+              label="Categoría"
+              :type="
+                fieldState(product.categoryId) ? 'is-success' : 'is-danger'
+              "
+            >
+              <b-select
+                v-model="product.categoryId"
+                placeholder="Seleccione una categoría"
+              >
+                <option
+                  v-for="category in categories"
+                  :value="category.id"
+                  :key="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </b-select>
+            </b-field>
 
-        <b-form-group id="input-group-1" label="Marca:" label-for="brand-input">
-          <b-form-input
-            id="brand-input"
-            v-model="product.brand"
-            :state="fieldState(product.brand)"
-            type="text"
-            required
-            placeholder="Ingrese la marca del producto"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(product.brand)">
-            El teléfono es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+            <b-field
+              label="Proveedor"
+              :type="fieldState(product.vendorId) ? 'is-success' : 'is-danger'"
+            >
+              <b-select
+                v-model="product.vendorId"
+                placeholder="Seleccione un Proveedor"
+              >
+                <option
+                  v-for="vendor in vendors"
+                  :key="vendor.id"
+                  :value="vendor.id"
+                >
+                  {{ vendor.name }}
+                </option>
+              </b-select>
+            </b-field>
 
-        <b-form-group
-          id="input-group-2"
-          label="Precio:"
-          label-for="price-input"
-        >
-          <b-form-input
-            id="price-input"
-            v-model="product.price.value"
-            :state="fieldState(product.price.value)"
-            type="number"
-            required
-            placeholder="Ingrese el precio del producto"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(product.price.value)">
-            El precio es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
-        <b-form-group id="input-group-1" label="" label-for="available-input">
-          <b-form-checkbox
-            id="available-input"
-            v-model="product.available"
-            switch
-          >
-            Disponible
-          </b-form-checkbox>
-        </b-form-group>
+            <b-field
+              label="Código:"
+              :type="fieldState(product.code) ? 'is-success' : 'is-danger'"
+            >
+              <b-input
+                v-model="product.code"
+                placeholder="Ingrese el código del producto"
+              ></b-input>
+            </b-field>
 
-        <b-form-group id="input-group-1" label="" label-for="active-input">
-          <b-form-checkbox id="active-input" v-model="product.active" switch>
-            Activo
-          </b-form-checkbox>
-        </b-form-group>
+            <b-field
+              label="Marca:"
+              :type="fieldState(product.brand) ? 'is-success' : 'is-danger'"
+            >
+              <b-input
+                v-model="product.brand"
+                placeholder="Ingrese la marca del producto"
+              ></b-input>
+            </b-field>
 
-        <b-button type="submit" variant="primary" :disabled="!formValid()">
-          {{ product.id ? "Editar" : "Crear" }}
-        </b-button>
-        <b-button
-          type="button"
-          variant="danger"
-          @click="$router.push('/product-list')"
-        >
-          Cancelar
-        </b-button>
-      </b-form>
-    </b-card>
+            <b-field
+              label="Precio:"
+              :type="
+                fieldState(product.price.value) ? 'is-success' : 'is-danger'
+              "
+            >
+              <b-input
+                v-model="product.price.value"
+                type="number"
+                placeholder="Ingrese el precio del producto"
+              ></b-input>
+            </b-field>
+
+            <div class="field">
+              <b-switch v-model="product.available">
+                Disponible
+              </b-switch>
+            </div>
+
+            <div class="field">
+              <b-switch v-model="product.active">
+                Activo
+              </b-switch>
+            </div>
+
+            <b-button
+              type="submit"
+              class="is-success"
+              :disabled="!formValid()"
+              @click="submit"
+            >
+              {{ product.id ? "Editar" : "Crear" }}
+            </b-button>
+            <b-button
+              type="button"
+              class="is-danger"
+              @click="$router.push('/product-list')"
+            >
+              Cancelar
+            </b-button>
+
+            <b-button type="button" class="is-danger" @click="mostrar()">
+              Mostrar
+            </b-button>
+          </section>
+        </div>
+      </div>
+    </div>
 
     <!-- <ErrorDialog
       :error="errorMsg"
@@ -174,9 +155,10 @@ import { Vue, Component } from "vue-property-decorator";
 import { NavigatorProductService } from "../../services/product-service";
 import { NavigatorCategoryService } from "../../services/category-service";
 import { NavigatorVendorService } from "../../services/vendor-service";
-import { Product } from "../../models/product";
+import { Product, ProductForCreation } from "../../models/product";
 import { Category } from "../../models/category";
 import { Vendor } from "../../models/vendor";
+import { Price, PriceForCreation } from "../../models/price";
 // import { DialogMsg } from "../../models/dialogMsg";
 // import ErrorDialog from "../../components/dialogs/error-dialog.vue";
 
@@ -196,12 +178,28 @@ export default class EditProduct extends Vue {
   public vendors: Vendor[] = [];
 
   fieldState(field: any) {
-    return field && field.length > 0 ? true : false;
+    switch (typeof field) {
+      case "number":
+        return field >= 0;
+      case "string":
+        return field && field.length > 0 ? true : false;
+      default:
+        return false;
+    }
+  }
+
+  mostrar() {
+    Object.keys(this.product as Product).forEach(key => {
+      console.log(key + " " + this.product[key as keyof Product]);
+    });
   }
 
   formValid() {
     let flag = true;
     Object.keys(this.product as Product).forEach(key => {
+      console.log(key + ": " + this.product[key as keyof Product] + " type: " + typeof this.product[key as keyof Product]);
+
+      const field = this.product[key as keyof Product];
       switch (typeof this.product[key as keyof Product]) {
         case "string":
           if ((this.product[key as keyof Product] as string).length <= 0) {
@@ -209,7 +207,9 @@ export default class EditProduct extends Vue {
           }
           break;
         case "object":
-          flag = false;
+          if (field instanceof Price && !field.value) {
+            flag = false;
+          }
           break;
         case "number":
           break;
@@ -239,8 +239,20 @@ export default class EditProduct extends Vue {
   }
 
   public newProduct() {
+    const pr: ProductForCreation = {
+      name: this.product.name,
+      description: this.product.description,
+      code: this.product.code,
+      brand: this.product.brand,
+      active: this.product.active,
+      available: this.product.available,
+      categoryId: this.product.categoryId,
+      vendorId: this.product.vendorId,
+      price: new PriceForCreation()
+    };
+    pr.price.value = this.product.price.value;
     this.productService
-      .addProduct(this.product)
+      .addProduct(pr)
       .then(() => {
         this.$router.push({ name: "ProductList" });
       })
@@ -251,7 +263,7 @@ export default class EditProduct extends Vue {
         // };
         // this.errorDialog = true;
         console.log("error: ", e);
-        this.$router.push({ name: "ProductList" });
+        // this.$router.push({ name: "ProductList" });
       });
   }
 

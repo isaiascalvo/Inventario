@@ -1,6 +1,6 @@
 import { Category } from "./category";
 import { Vendor } from "./vendor";
-import { Price } from './price';
+import { PriceForCreation } from './price';
 
 export class ProductForCreation {
   public name!: string;
@@ -13,7 +13,7 @@ export class ProductForCreation {
   public category?: Category;
   public vendorId?: string;
   public vendor?: Vendor;
-  public price?: Price;
+  public price: PriceForCreation;
 
   constructor() {
     this.name = "";
@@ -24,7 +24,7 @@ export class ProductForCreation {
     this.available = true;
     this.categoryId = "";
     this.vendorId = "";
-    this.price = new Price();
+    this.price = new PriceForCreation();
   }
 }
 

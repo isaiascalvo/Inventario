@@ -1,180 +1,348 @@
 <template>
-  <b-card title="Productos">
-    <b-button class="mb-2" to="/product/new">
-      Nuevo Producto
-    </b-button>
-    <b-table
-      striped
-      hover
-      :items="products"
-      :fields="headers"
-      id="my-table"
-      :per-page="perPage"
-      :current-page="currentPage"
-    >
-      <template v-slot:cell(action)="item">
-        <b-icon
-          class="clickeable  mr-2"
-          icon="pencil"
-          @click="$router.push('/product/modify/' + item.id)"
-        ></b-icon>
-        <b-icon
-          class="clickeable"
-          icon="trash"
-          @click="openDeleteDialog(item.id)"
-        ></b-icon>
-      </template>
-    </b-table>
+  <div>
+    <section class="hero is-light">
+      <div class="hero-head">
+        <div class="container level">
+          <div>
+            <h1 class="title">Productos</h1>
+            <h2 class="subtitle">
+              Lista de productos
+            </h2>
+          </div>
+          <div>
+            <b-button
+              type="is-info"
+              tag="router-link"
+              to="/product/new"
+              class="mx-1"
+            >
+              Nuevo Producto
+            </b-button>
+            <b-button
+              @click="openFilters = !openFilters"
+              class="is-pulled-right"
+              type="is-primary"
+              :icon-right="openFilters ? 'eye-off-outline' : 'eye-outline'"
+            >
+              {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
+            </b-button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <b-pagination
-      v-model="currentPage"
-      :total-rows="products.length"
-      :per-page="perPage"
-      aria-controls="my-table"
-      align="center"
-    ></b-pagination>
-    <!-- <ErrorDialog
-      :error="errorMsg"
-      v-if="errorDialog"
-      @close:dialog="errorDialog = $event"
-    />
+    <div class="">
+      <div class="columns filtersClass level" v-if="openFilters">
+        <div class="column is-10">
+          <b-field grouped group-multiline>
+            <b-field label-position="on-border" label="Categoría">
+              <b-select
+                v-model="productFilters.categoryId"
+                placeholder="Categoría"
+                size="is-small"
+              >
+                <option
+                  v-for="category in categories"
+                  :value="category.id"
+                  :key="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </b-select>
+            </b-field>
 
-    <ConfirmDialog
-      :msgDialog="confirmMsg"
-      v-if="confirmDialog"
-      @close:dialog="onClose"
-    /> -->
-  </b-card>
+            <b-field label-position="on-border" label="Proveedor">
+              <b-select
+                v-model="productFilters.vendorId"
+                placeholder="Proveedor"
+                size="is-small"
+              >
+                <option
+                  v-for="vendor in vendors"
+                  :value="vendor.id"
+                  :key="vendor.id"
+                >
+                  {{ vendor.name }}
+                </option>
+              </b-select>
+            </b-field>
+
+            <!-- <b-field label-position="on-border" label="Cliente">
+              <b-select
+                v-model="productFilters.clientId"
+                placeholder="Seleccione un cliente"
+                size="is-small"
+              >
+                <option
+                  v-for="client in clients"
+                  :key="client.id"
+                  :value="client.id"
+                >
+                  {{ client.name }}
+                </option>
+              </b-select>
+            </b-field> -->
+
+            <b-field label-position="on-border" label="Código">
+              <b-input
+                v-model="productFilters.code"
+                placeholder="Código"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Marca">
+              <b-input
+                v-model="productFilters.brand"
+                placeholder="Marca"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
+            <div class="field">
+              <b-checkbox v-model="productFilters.active" size="is-small">
+                Activo?
+              </b-checkbox>
+            </div>
+
+            <div class="field">
+              <b-checkbox v-model="productFilters.available" size="is-small">
+                Disponible?
+              </b-checkbox>
+            </div>
+          </b-field>
+        </div>
+
+        <div class="column level-right">
+          <b-button type="is-info" class="mx-1">
+            Apply
+          </b-button>
+          <b-button @click="clearFilters()" type="is-danger">
+            Clear
+          </b-button>
+        </div>
+      </div>
+
+      <b-table
+        :striped="true"
+        :hoverable="true"
+        :data="products"
+        id="my-table"
+        :paginated="true"
+        :per-page="perPage"
+        :current-page.sync="currentPage"
+        aria-next-label="Next page"
+        aria-previous-label="Previous page"
+        aria-page-label="Page"
+        aria-current-label="Current page"
+      >
+        <template slot-scope="props">
+          <b-table-column field="name" label="Nombre">
+            {{ props.row.name }}
+          </b-table-column>
+          <b-table-column field="description" label="Descripción">
+            {{ props.row.description }}
+          </b-table-column>
+          <b-table-column field="code" label="Código">
+            {{ props.row.code }}
+          </b-table-column>
+          <b-table-column field="category" label="Categoría">
+            {{ getCategory(props.row.categoryId) }}
+          </b-table-column>
+          <b-table-column field="vendor" label="Proveedor">
+            {{ getVendor(props.row.vendorId) }}
+          </b-table-column>
+          <b-table-column field="brand" label="Marca">
+            {{ props.row.brand }}
+          </b-table-column>
+          <b-table-column field="available" label="Disponible">
+            {{ props.row.available ? "Si" : "No" }}
+          </b-table-column>
+          <b-table-column field="active" label="Activo">
+            {{ props.row.active ? "Si" : "No" }}
+          </b-table-column>
+          <b-table-column field="price" label="Precio">
+            $ {{ props.row.price.value }}
+          </b-table-column>
+
+          <b-table-column field="action" label="Acciones">
+            <b-button tag="router-link" :to="'/product/modify/' + props.row.id">
+              <b-icon icon="pencil"></b-icon>
+            </b-button>
+            <b-button @click="deleteProduct(props.row)">
+              <b-icon icon="delete"></b-icon>
+            </b-button>
+          </b-table-column>
+        </template>
+
+        <template slot-scope="props">
+          <b-table-column field="name" label="Nombre">
+            {{ props.row.name }}
+          </b-table-column>
+          <b-table-column field="description" label="Descripción">
+            {{ props.row.description }}
+          </b-table-column>
+          <b-table-column field="code" label="Código">
+            {{ props.row.code }}
+          </b-table-column>
+          <b-table-column field="category" label="Categoría">
+            {{ getCategory(props.row.categoryId) }}
+          </b-table-column>
+          <b-table-column field="vendor" label="Proveedor">
+            {{ getVendor(props.row.vendorId) }}
+          </b-table-column>
+          <b-table-column field="brand" label="Marca">
+            {{ props.row.brand }}
+          </b-table-column>
+          <b-table-column field="available" label="Disponible">
+            {{ props.row.available ? "Si" : "No" }}
+          </b-table-column>
+          <b-table-column field="active" label="Activo">
+            {{ props.row.active ? "Si" : "No" }}
+          </b-table-column>
+          <b-table-column field="price" label="Precio">
+            $ {{ props.row.price.value }}
+          </b-table-column>
+
+          <b-table-column field="action" label="Acciones">
+            <b-button tag="router-link" :to="'/product/modify/' + props.row.id">
+              <b-icon icon="pencil"></b-icon>
+            </b-button>
+            <b-button @click="deleteProduct(props.row)">
+              <b-icon icon="delete"></b-icon>
+            </b-button>
+          </b-table-column>
+        </template>
+      </b-table>
+    </div>
+
+    <b-loading is-full-page :active.sync="isLoading"></b-loading>
+  </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import { Product } from "../../models/product";
 import { NavigatorProductService } from "../../services/product-service";
-// import ConfirmDialog from "../../components/dialogs/confirm-dialog.vue";
-// import { DialogMsg } from "../../models/dialogMsg";
-// import ErrorDialog from "../../components/dialogs/error-dialog.vue";
+import { ProductFilters } from "../../models/productFilters";
+import { NavigatorCategoryService } from "../../services/category-service";
+import { NavigatorVendorService } from "../../services/vendor-service";
+import { Category } from "../../models/category";
+import { Vendor } from "../../models/vendor";
 
-@Component({
-  components: {} //ConfirmDialog, ErrorDialog
-})
+@Component
 export default class ProductList extends Vue {
   public products: Product[] = [];
+  public categories: Category[] = [];
+  public vendors: Vendor[] = [];
   public productService: NavigatorProductService = new NavigatorProductService();
+  public categoryService: NavigatorCategoryService = new NavigatorCategoryService();
+  public vendorService: NavigatorVendorService = new NavigatorVendorService();
 
   public currentPage = 1;
-  public perPage = 1;
-  public errorDialog = false;
-  public confirmDialog = false;
-  // public errorMsg = new DialogMsg();
-  // public confirmMsg = new DialogMsg();
-  public headers = [
-    { key: "name", label: "Nombre" },
-    { key: "description", label: "Descripción" },
-    { key: "code", label: "Código" },
-    { key: "categoryId", label: "categoryId" },
-    { key: "vendorId", label: "vendorId" },
-    { key: "brand", label: "Marca" },
-    { key: "available", label: "Disponible" },
-    { key: "active", label: "Activo" },
-    { key: "price", label: "Precio" },
-    { key: "action", label: "Acciones" }
-  ];
+  public perPage = 10;
+  public openFilters = false;
+  public productFilters: ProductFilters = new ProductFilters();
+  public dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  public isLoading = true;
 
   deleteProduct(product: Product) {
-    this.productService
-      .deleteProduct(product.id)
-      .then(() => {
+    this.$buefy.dialog.confirm({
+      title: "Eliminando Producto",
+      message:
+        "Estás seguro que deseas <b>eliminar</b> el producto? Esta acción no podrá dehacerse.",
+      confirmText: "Eliminar Producto",
+      cancelText: "Cancelar",
+      type: "is-danger",
+      hasIcon: true,
+      onConfirm: () => {
         this.products.splice(this.products.indexOf(product), 1);
-      })
-      .catch(e => {
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
-        // this.errorDialog = true;
-        console.log("error: ", e);
-      });
-  }
-
-  onClose(elemId: string) {
-    this.confirmDialog = false;
-    if (elemId.trim() !== "") {
-      const product = this.products.find(x => x.id === elemId);
-      if (product) {
-        this.deleteProduct(product);
+        //  this.productService
+        // .deleteProduct(product.id)
+        // .then(() => {
+        //   this.products.splice(this.products.indexOf(product), 1);
+        // })
+        // .catch(e => {
+        //   // this.errorMsg = {
+        //   //   title: "Error",
+        //   //   msg: "An unexpected error has occurred. please try again later."
+        //   // };
+        //   // this.errorDialog = true;
+        //   console.log("error: ", e);
+        // });
+        this.$buefy.toast.open("Producto eliminado!");
       }
-    }
+    });
   }
 
-  openDeleteDialog(elemId: string) {
-    // this.confirmMsg = {
-    //   elemId: elemId,
-    //   title: "Warning",
-    //   msg: "Are you sure you want to delete the product?"
-    // };
-    // this.confirmDialog = true;
+  getCategory(id: string) {
+    const elem = this.categories.find(x => x.id === id);
+    return elem ? elem.name : "";
+  }
+
+  getVendor(id: string) {
+    const elem = this.vendors.find(x => x.id === id);
+    return elem ? elem.name : "";
+  }
+
+  public clearFilters() {
+    this.productFilters = new ProductFilters();
   }
 
   created() {
+    this.isLoading = true;
     this.productService
       .getProducts()
       .then(response => {
         this.products = response;
+        return this.categoryService.getCategories();
+      })
+      .then(response => {
+        this.categories = response;
+        return this.vendorService.getVendors();
+      })
+      .then(response => {
+        this.vendors = response;
+        this.isLoading = false;
       })
       .catch(e => {
         // this.errorMsg = {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
         // };
-        // this.errorDialog = true;
+        this.isLoading = false;
         console.log("error: ", e);
       });
-
-    // this.products = [
-    //   {
-    //     id: "jjj",
-    //     name: "trending_up",
-    //     description: "Most Popular",
-    //     code: "Most Popular",
-    //     categoryId: "Most Popular",
-    //     vendorId: "Most Popular",
-    //     brand: "Most Popular",
-    //     available: true,
-    //     active: true,
-    //     price: 16.5
-    //   },
-    //   {
-    //     id: "jje",
-    //     name: "trending_up",
-    //     description: "Most Popular",
-    //     code: "Most Popular",
-    //     categoryId: "Most Popular",
-    //     vendorId: "Most Popular",
-    //     brand: "Most Popular",
-    //     available: true,
-    //     active: true,
-    //     price: 16.5
-    //   }
-    // ];
   }
 }
 </script>
 
 <style>
-/* table,
-table.bordered td,
-table.bordered th {
-  border: 1px black solid;
-  margin: auto;
-  margin-bottom: 10px;
-}
-
-.align-center {
-  text-align: center;
-} */
-
 .clickeable {
   cursor: pointer;
+}
+
+th {
+  /* background-color: #dbdbdb; */
+  background-color: #384caf4a;
+}
+
+.filtersClass {
+  margin: 0em !important;
+  padding: 1em;
+  background-color: #e0eaff !important;
+}
+
+.ml-1 {
+  margin-left: 1em;
+}
+
+table {
+  font-size: 13px;
+  border: 0px !important;
+}
+
+.filtersClass select {
+  min-width: 120px;
 }
 </style>

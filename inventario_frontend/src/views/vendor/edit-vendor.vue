@@ -1,110 +1,108 @@
 <template>
   <div>
-    <b-card :title="vendor.id ? 'Editar Proveedor' : 'Crear Proveedor'">
-      <!-- <v-card-title>{{ id ? "Update" : "Create" }} Vendor</v-card-title> -->
-      <b-form @submit.prevent="submit">
-        <b-form-group id="input-group-1" label="Nombre:" label-for="name-input">
-          <b-form-input
-            id="name-input"
-            v-model="vendor.name"
-            :state="fieldState(vendor.name)"
-            type="text"
-            required
-            placeholder="Ingrese el nombre del proveedor"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(vendor.name)">
-            El nombre es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+    <div class="card">
+      <div class="card-content">
+        <div class="media">
+          <div class="media-content">
+            <p class="title is-4">
+              {{ vendor.id ? "Editar Proveedor" : "Crear Proveedor" }}
+            </p>
+          </div>
+        </div>
 
-        <b-form-group id="input-group-2" label="CUIL:" label-for="cuil-input">
-          <b-form-input
-            id="cuil-input"
-            v-model="vendor.cuil"
-            :state="fieldState(vendor.cuil)"
-            type="text"
-            required
-            placeholder="Ingrese el CUIL del proveedor"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(vendor.cuil)">
-            El CUIL es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+        <div class="content">
+          <section>
+            <b-field
+              label="Nombre:"
+              :type="fieldState(vendor.name) ? 'is-success' : 'is-danger'"
+              :message="
+                fieldState(vendor.name) ? '' : 'Debe ingresar un nombre'
+              "
+            >
+              <b-input
+                v-model="vendor.name"
+                placeholder="Ingrese el nombre del proveedor"
+              ></b-input>
+            </b-field>
 
-        <b-form-group
-          id="input-group-1"
-          label="Teléfono:"
-          label-for="phone-input"
-        >
-          <b-form-input
-            id="phone-input"
-            v-model="vendor.phone"
-            :state="fieldState(vendor.phone)"
-            type="text"
-            required
-            placeholder="Ingrese el teléfono del proveedor"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(vendor.phone)">
-            El teléfono es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+            <b-field
+              label="CUIL:"
+              :type="fieldState(vendor.cuil) ? 'is-success' : 'is-danger'"
+              :message="fieldState(vendor.cuil) ? '' : 'Debe ingresar un cuil'"
+            >
+              <b-input
+                v-model="vendor.cuil"
+                placeholder="Ingrese el cuil del proveedor"
+              ></b-input>
+            </b-field>
 
-        <b-form-group id="input-group-2" label="Mail:" label-for="mail-input">
-          <b-form-input
-            id="mail-input"
-            v-model="vendor.mail"
-            :state="fieldState(vendor.mail)"
-            type="text"
-            required
-            placeholder="Ingrese el mail del proveedor"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(vendor.mail)">
-            El mail es requerido
-          </b-form-invalid-feedback>
-        </b-form-group>
+            <b-field
+              label="Teléfono"
+              :type="fieldState(vendor.phone) ? 'is-success' : 'is-danger'"
+              :message="
+                fieldState(vendor.phone) ? '' : 'Debe ingresar un teléfono'
+              "
+            >
+              <b-input
+                v-model="vendor.phone"
+                placeholder="Ingrese el teléfono del proveedor"
+              ></b-input>
+            </b-field>
 
-        <b-form-group
-          id="input-group-2"
-          label="Descripción:"
-          label-for="description-input"
-        >
-          <b-form-input
-            id="description-input"
-            v-model="vendor.description"
-            :state="fieldState(vendor.description)"
-            type="text"
-            required
-            placeholder="Ingrese la descripción del proveedor"
-          ></b-form-input>
-          <b-form-invalid-feedback :state="fieldState(vendor.description)">
-            La descripción es requerida
-          </b-form-invalid-feedback>
-        </b-form-group>
+            <b-field
+              label="Mail"
+              :type="fieldState(vendor.mail) ? 'is-success' : 'is-danger'"
+              :message="fieldState(vendor.mail) ? '' : 'Debe ingresar un mail'"
+            >
+              <b-input
+                v-model="vendor.mail"
+                placeholder="Ingrese el mail del proveedor"
+              ></b-input>
+            </b-field>
 
-        <b-form-group id="input-group-1" label="" label-for="active-input">
-          <b-form-checkbox id="active-input" v-model="vendor.active" switch>
-            Activo
-          </b-form-checkbox>
-        </b-form-group>
+            <b-field
+              label="Descripción"
+              :type="
+                fieldState(vendor.description) ? 'is-success' : 'is-danger'
+              "
+              :message="
+                fieldState(vendor.description)
+                  ? ''
+                  : 'Debe ingresar una descripción'
+              "
+            >
+              <b-input
+                v-model="vendor.description"
+                placeholder="Ingrese la descripción del proveedor"
+                type="textarea"
+              ></b-input>
+            </b-field>
 
-        <b-button type="submit" variant="primary" :disabled="!formValid()">
-          {{ vendor.id ? "Editar" : "Crear" }}
-        </b-button>
-        <b-button
-          type="button"
-          variant="danger"
-          @click="$router.push('/vendor-list')"
-        >
-          Cancelar
-        </b-button>
-      </b-form>
-    </b-card>
+            <div class="field">
+              <b-switch v-model="vendor.active">
+                Activo
+              </b-switch>
+            </div>
 
-    <!-- <ErrorDialog
-      :error="errorMsg"
-      v-if="errorDialog"
-      @close:dialog="errorDialog = $event"
-    /> -->
+            <b-button
+              type="submit"
+              class="is-success mr-1"
+              :disabled="!formValid()"
+              @click="submit"
+            >
+              {{ vendor.id ? "Editar" : "Crear" }}
+            </b-button>
+            <b-button
+              type="button"
+              class="is-danger"
+              @click="$router.push('/vendor-list')"
+            >
+              Cancelar
+            </b-button>
+          </section>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -112,54 +110,25 @@
 import { Vue, Component } from "vue-property-decorator";
 import { NavigatorVendorService } from "../../services/vendor-service";
 import { Vendor } from "../../models/vendor";
-// import { DialogMsg } from "../../models/dialogMsg";
-// import ErrorDialog from "../../components/dialogs/error-dialog.vue";
+import {
+  fieldStateValidation,
+  formValidation
+} from "../../utils/common-functions";
 
-@Component({
-  components: {
-    // ErrorDialog
-  }
-})
+@Component
 export default class EditVendor extends Vue {
   public errorDialog = false;
   //   public errorMsg = new DialogMsg();
   public vendor: Vendor = new Vendor();
   public vendorService: NavigatorVendorService = new NavigatorVendorService();
 
-  fieldState(field: any) {
-    return field && field.length > 0 ? true : false;
+  fieldState(field: unknown) {
+    return fieldStateValidation(field);
   }
 
   formValid() {
-    let flag = true;
-    Object.keys(this.vendor as Vendor).forEach(key => {
-      switch (typeof this.vendor[key as keyof Vendor]) {
-        case "string":
-          if ((this.vendor[key as keyof Vendor] as string).length <= 0) {
-            flag = false;
-          }
-          break;
-        case "object":
-          // console.log(key);
-          flag = false;
-          break;
-        case "number":
-          break;
-        case "bigint":
-          break;
-        case "boolean":
-          break;
-        case "symbol":
-          break;
-        case "undefined":
-          break;
-        case "function":
-          break;
-        default:
-          break;
-      }
-    });
-    return flag;
+    const result = formValidation(this.vendor as never);
+    return result === "";
   }
 
   public submit() {
@@ -215,4 +184,8 @@ export default class EditVendor extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+.mr-1 {
+  margin-right: 1em;
+}
+</style>

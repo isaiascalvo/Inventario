@@ -13,10 +13,14 @@ namespace Application.Profiles
         public Profiles()
         {
             CreateMap<ProductViewModel, ProductDto>();
+            //.ForMember(pDto => pDto.Price, pVM => pVM.MapFrom(src => src.Price))
+            //.ForMember(pDto => pDto.Category, pVM => pVM.MapFrom(src => src.Category))
+            //.ForMember(pDto => pDto.Vendor, pVM => pVM.MapFrom(src => src.Vendor));
             CreateMap<ProductDto, ProductViewModel>();
-                //.ForMember(aVM => aVM.MotherName, aDto => aDto.MapFrom(src => src.Mother.Name))
-                //.ForMember(aVM => aVM.FatherName, aDto => aDto.MapFrom(src => src.Father.Name));
-            CreateMap <ProductForCreationViewModel, ProductForCreationDto>();
+                //.ForMember(pVM => pVM.Price, pDto => pDto.MapFrom(src => src.Price))
+                //.ForMember(pVM => pVM.Category, pDto => pDto.MapFrom(src => src.Category))
+                //.ForMember(pVM => pVM.Vendor, pDto => pDto.MapFrom(src => src.Vendor));
+            CreateMap<ProductForCreationViewModel, ProductForCreationDto>();
             //.ForMember(
             //    dest => dest.Name,
             //    opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}")

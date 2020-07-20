@@ -28,7 +28,7 @@ namespace Application.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<PriceDto> animalDiseaseDto = await _animalDiseaseUseCases.GetAll();
+            IEnumerable<PriceDto> animalDiseaseDto = _animalDiseaseUseCases.GetAll();
             IEnumerable<PriceViewModel> animalDiseaseVM = _mapper.Map<IEnumerable<PriceDto>, IEnumerable<PriceViewModel>>(animalDiseaseDto);
             return Ok(animalDiseaseVM);
         }

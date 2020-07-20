@@ -47,7 +47,7 @@ namespace Logic
                 throw new KeyNotFoundException($"Price with id: {id} not found.");
         }
 
-        public async Task<IEnumerable<PriceDto>> GetAll()
+        public IEnumerable<PriceDto> GetAll()
         {
             var prices = _priceRepository.AllIncluding(p => p.Product);
             var pricesDto = _mapper.Map<IEnumerable<Price>, IEnumerable<PriceDto>>(prices);

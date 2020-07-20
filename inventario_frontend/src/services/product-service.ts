@@ -37,6 +37,7 @@ export class NavigatorProductService implements ProductService {
   }
 
   public addProduct(product: ProductForCreation): Promise<void> {
+    console.log(product);
     return apiClient.post("/products", product);
   }
 

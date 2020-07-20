@@ -1,6 +1,6 @@
 export class CategoryForCreation {
-    public name!: string;
-    public description!: string;
+    public name: string | undefined = undefined;
+    public description: string | undefined = undefined;
 }
   
 export class Category extends CategoryForCreation {
