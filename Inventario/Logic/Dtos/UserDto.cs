@@ -5,19 +5,15 @@ using System.Text;
 
 namespace Logic.Dtos
 {
-    public class ClientDto: Entity
+    public class UserDto : Entity
     {
-        //public Guid Id { get; set; }
-        //public DateTime CreatedAt { get; set; }
-        //public DateTime? LastModificationAt { get; set; }
-        //public bool IsDeleted { get; set; }
-        //public DateTime? DeletedAt { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
         public string Dni { get; set; }
         public string Phone { get; set; }
         public string Mail { get; set; }
         public bool Active { get; set; }
-        public DateTime? Birthdate { get; set; }
     }
 }

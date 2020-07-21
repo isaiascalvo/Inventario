@@ -3,27 +3,19 @@ import { Vendor } from "./vendor";
 import { PriceForCreation } from './price';
 
 export class ProductForCreation {
-  public name!: string;
-  public description!: string;
-  public code!: string;
-  public brand!: string;
-  public active!: boolean;
-  public available!: boolean;
-  public categoryId!: string;
+  public name: string | undefined = undefined;
+  public description: string | undefined = undefined;
+  public code: string | undefined = undefined;
+  public brand: string | undefined = undefined;
+  public categoryId: string | undefined = undefined;
   public category?: Category;
   public vendorId?: string;
   public vendor?: Vendor;
   public price: PriceForCreation;
+  public stock = 0;
+  public unitOfMeasurement: string | undefined = undefined;
 
   constructor() {
-    this.name = "";
-    this.description = "";
-    this.code = "";
-    this.brand = "";
-    this.active = true;
-    this.available = true;
-    this.categoryId = "";
-    this.vendorId = "";
     this.price = new PriceForCreation();
   }
 }

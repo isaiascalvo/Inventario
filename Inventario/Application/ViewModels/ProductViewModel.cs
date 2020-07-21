@@ -25,8 +25,6 @@ namespace Application.ViewModels
         public string Brand { get; set; }
         public double Stock { get; set; }
         public string UnitOfMeasurement { get; set; }
-        public bool Active { get; set; }
-        public bool Available { get; set; }
         public PriceViewModel Price { get; set; }
     }
 }

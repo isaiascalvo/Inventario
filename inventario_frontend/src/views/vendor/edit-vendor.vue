@@ -103,6 +103,8 @@
         </div>
       </div>
     </div>
+
+    <b-loading is-full-page :active.sync="isLoading"></b-loading>
   </div>
 </template>
 
@@ -118,9 +120,9 @@ import {
 @Component
 export default class EditVendor extends Vue {
   public errorDialog = false;
-  //   public errorMsg = new DialogMsg();
   public vendor: Vendor = new Vendor();
   public vendorService: NavigatorVendorService = new NavigatorVendorService();
+  public isLoading = false;
 
   fieldState(field: unknown) {
     return fieldStateValidation(field);
@@ -140,9 +142,11 @@ export default class EditVendor extends Vue {
   }
 
   public newVendor() {
+    this.isLoading = true;
     this.vendorService
       .addVendor(this.vendor)
       .then(() => {
+        this.isLoading = false;
         this.$router.push({ name: "VendorList" });
       })
       .catch(e => {
@@ -150,35 +154,46 @@ export default class EditVendor extends Vue {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
         // };
-        // this.errorDialog = true;
+        this.isLoading = false;
         console.log("error: ", e);
         this.$router.push({ name: "VendorList" });
       });
   }
 
   public updateVendor() {
+    this.isLoading = true;
     this.vendorService
       .updateVendor(this.vendor)
       .then(() => {
+        this.isLoading = false;
         this.$router.push({ name: "VendorList" });
       })
       .catch(e => {
+        this.isLoading = false;
         // this.errorMsg = {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
         // };
         // this.errorDialog = true;
         console.log("error: ", e);
-        // this.$router.push({ name: "VendorList" });
+        this.$router.push({ name: "VendorList" });
       });
   }
 
   created() {
     this.vendor.id = this.$route.params.id;
     if (this.vendor.id) {
-      this.vendorService.getVendor(this.vendor.id).then(response => {
-        this.vendor = response as Vendor;
-      });
+      this.isLoading = true;
+      this.vendorService.getVendor(this.vendor.id).then(
+        response => {
+          this.vendor = response as Vendor;
+          this.isLoading = false;
+        },
+        error => {
+          console.log(error);
+          this.isLoading = true;
+        }
+      );
     }
   }
 }

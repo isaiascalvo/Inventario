@@ -52,7 +52,9 @@ namespace Application
             services.AddScoped<IPriceUseCases, PriceUseCases>();
             services.AddScoped<IClientUseCases, ClientUseCases>();
             services.AddScoped<IVendorUseCases, VendorUseCases>();
-            services.AddScoped<ICategoryUseCases, Logic.CategoryUseCases>();
+            services.AddScoped<ICategoryUseCases, CategoryUseCases>();
+            services.AddScoped<IUserUseCases, UserUseCases>();
+            services.AddScoped<ISendMailUseCases, SendMailUseCases>();
 
 
             services.AddScoped<IProductRepository, ProductRepository>();
@@ -60,6 +62,7 @@ namespace Application
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IVendorRepository, VendorRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

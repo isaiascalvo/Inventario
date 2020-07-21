@@ -8,7 +8,7 @@ export interface ProductService {
   getProductsFiltered(productFilters: ProductFilters): Promise<Product[]>;
   getOneProductByFilters(productFilters: ProductFilters): Promise<Product>;
   getProduct(id: string): Promise<Product>;
-  addProduct(product: Product): Promise<void>;
+  addProduct(product: Product): Promise<Product>;
   updateProduct(product: Product): Promise<void>;
   deleteProduct(productId: string): Promise<void>;
 }
@@ -36,8 +36,7 @@ export class NavigatorProductService implements ProductService {
     return (await apiClient.get("/products/" + id)).data;
   }
 
-  public addProduct(product: ProductForCreation): Promise<void> {
-    console.log(product);
+  public addProduct(product: ProductForCreation): Promise<Product> {
     return apiClient.post("/products", product);
   }
 

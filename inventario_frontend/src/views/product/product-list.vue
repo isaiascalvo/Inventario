@@ -155,60 +155,29 @@
           <b-table-column field="brand" label="Marca">
             {{ props.row.brand }}
           </b-table-column>
-          <b-table-column field="available" label="Disponible">
-            {{ props.row.available ? "Si" : "No" }}
+          <b-table-column field="stock" label="Stock">
+            {{ props.row.stock }}
           </b-table-column>
-          <b-table-column field="active" label="Activo">
-            {{ props.row.active ? "Si" : "No" }}
-          </b-table-column>
-          <b-table-column field="price" label="Precio">
-            $ {{ props.row.price.value }}
-          </b-table-column>
-
-          <b-table-column field="action" label="Acciones">
-            <b-button tag="router-link" :to="'/product/modify/' + props.row.id">
-              <b-icon icon="pencil"></b-icon>
-            </b-button>
-            <b-button @click="deleteProduct(props.row)">
-              <b-icon icon="delete"></b-icon>
-            </b-button>
-          </b-table-column>
-        </template>
-
-        <template slot-scope="props">
-          <b-table-column field="name" label="Nombre">
-            {{ props.row.name }}
-          </b-table-column>
-          <b-table-column field="description" label="Descripción">
-            {{ props.row.description }}
-          </b-table-column>
-          <b-table-column field="code" label="Código">
-            {{ props.row.code }}
-          </b-table-column>
-          <b-table-column field="category" label="Categoría">
-            {{ getCategory(props.row.categoryId) }}
-          </b-table-column>
-          <b-table-column field="vendor" label="Proveedor">
-            {{ getVendor(props.row.vendorId) }}
-          </b-table-column>
-          <b-table-column field="brand" label="Marca">
-            {{ props.row.brand }}
-          </b-table-column>
-          <b-table-column field="available" label="Disponible">
-            {{ props.row.available ? "Si" : "No" }}
-          </b-table-column>
-          <b-table-column field="active" label="Activo">
-            {{ props.row.active ? "Si" : "No" }}
+          <b-table-column field="unitOfMeasurement" label="Unidad">
+            {{ props.row.unitOfMeasurement }}
           </b-table-column>
           <b-table-column field="price" label="Precio">
             $ {{ props.row.price.value }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
-            <b-button tag="router-link" :to="'/product/modify/' + props.row.id">
+            <b-button
+              tag="router-link"
+              :to="'/product/modify/' + props.row.id"
+              type="is-small"
+            >
               <b-icon icon="pencil"></b-icon>
             </b-button>
-            <b-button @click="deleteProduct(props.row)">
+            <b-button
+              @click="deleteProduct(props.row)"
+              type="is-small"
+              class="actionButton"
+            >
               <b-icon icon="delete"></b-icon>
             </b-button>
           </b-table-column>
@@ -244,7 +213,7 @@ export default class ProductList extends Vue {
   public openFilters = false;
   public productFilters: ProductFilters = new ProductFilters();
   public dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-  public isLoading = true;
+  public isLoading = false;
 
   deleteProduct(product: Product) {
     this.$buefy.dialog.confirm({
@@ -256,20 +225,21 @@ export default class ProductList extends Vue {
       type: "is-danger",
       hasIcon: true,
       onConfirm: () => {
-        this.products.splice(this.products.indexOf(product), 1);
-        //  this.productService
-        // .deleteProduct(product.id)
-        // .then(() => {
-        //   this.products.splice(this.products.indexOf(product), 1);
-        // })
-        // .catch(e => {
-        //   // this.errorMsg = {
-        //   //   title: "Error",
-        //   //   msg: "An unexpected error has occurred. please try again later."
-        //   // };
-        //   // this.errorDialog = true;
-        //   console.log("error: ", e);
-        // });
+        this.isLoading = true;
+        this.productService
+          .deleteProduct(product.id)
+          .then(() => {
+            this.isLoading = false;
+            this.products.splice(this.products.indexOf(product), 1);
+          })
+          .catch(e => {
+            // this.errorMsg = {
+            //   title: "Error",
+            //   msg: "An unexpected error has occurred. please try again later."
+            // };
+            this.isLoading = false;
+            console.log("error: ", e);
+          });
         this.$buefy.toast.open("Producto eliminado!");
       }
     });
@@ -333,8 +303,8 @@ th {
   background-color: #e0eaff !important;
 }
 
-.ml-1 {
-  margin-left: 1em;
+.actionButton {
+  margin-left: 5px;
 }
 
 table {

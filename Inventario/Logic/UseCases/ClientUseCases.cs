@@ -26,7 +26,7 @@ namespace Logic
             var client = new Client()
             {
                 Name = clientForCreationDto.Name,
-                LastName = clientForCreationDto.LastName,
+                Lastname = clientForCreationDto.Lastname,
                 Dni = clientForCreationDto.Dni,
                 Phone = clientForCreationDto.Phone,
                 Mail = clientForCreationDto.Mail,
@@ -67,7 +67,7 @@ namespace Logic
                 throw new KeyNotFoundException($"Client with id: {id} not found.");
 
             client.Name = clientForCreationDto.Name;
-            client.LastName = clientForCreationDto.LastName;
+            client.Lastname = clientForCreationDto.Lastname;
             client.Dni = clientForCreationDto.Dni;
             client.Phone = clientForCreationDto.Phone;
             client.Mail = clientForCreationDto.Mail;

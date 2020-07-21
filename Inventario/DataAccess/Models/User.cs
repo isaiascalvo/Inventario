@@ -5,8 +5,12 @@ using System.Text;
 
 namespace Data
 {
-    public class Client: Entity
+    public class User : Entity
     {
+        [Required]
+        public string Username { get; set; }
+        [Required]
+        public string Password { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
@@ -17,6 +21,5 @@ namespace Data
         public string Mail { get; set; }
         [Required]
         public bool Active { get; set; }
-        public DateTime? Birthdate { get; set; }
     }
 }

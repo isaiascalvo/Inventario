@@ -23,7 +23,7 @@ namespace Application.Profiles
             CreateMap<ProductForCreationViewModel, ProductForCreationDto>();
             //.ForMember(
             //    dest => dest.Name,
-            //    opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}")
+            //    opt => opt.MapFrom(src => $"{src.FirstName} {src.Lastname}")
             //);
 
             CreateMap<PriceViewModel, PriceDto>();
@@ -41,6 +41,10 @@ namespace Application.Profiles
             CreateMap<ClientViewModel, ClientDto>();
             CreateMap<ClientDto, ClientViewModel>();
             CreateMap<ClientForCreationViewModel, ClientForCreationDto>();
+
+            CreateMap<UserViewModel, UserDto>();
+            CreateMap<UserDto, UserViewModel>();
+            CreateMap<UserForCreationViewModel, UserForCreationDto>();
 
             CreateMap<PriceViewModel, PriceDto>();
             CreateMap<PriceDto, PriceViewModel>();

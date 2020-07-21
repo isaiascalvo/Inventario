@@ -37,24 +37,26 @@ namespace Logic
                 VendorId = productForCreationDto.VendorId,
                 Brand = productForCreationDto.Brand,
                 Stock = productForCreationDto.Stock,
-                UnitOfMeasurement = productForCreationDto.UnitOfMeasurement,
-                Active = productForCreationDto.Active,
-                Available = productForCreationDto.Available
+                UnitOfMeasurement = productForCreationDto.UnitOfMeasurement
             };
 
-            var productDto = await _productRepository.Add(product);
+            product = await _productRepository.Add(product);
 
             //Price
             var price = new Price()
             {
                 Value = productForCreationDto.Price.Value,
                 DateTime = DateTime.Now,
-                ProductId = productDto.Id
+                ProductId = product.Id
             };
 
             await _priceRepository.Add(price);
+            
+            var productDto = _mapper.Map<Product, ProductDto>(product);
 
-            return _mapper.Map<Product, ProductDto>(productDto);
+            productDto.Price = _mapper.Map<Price, PriceDto>(price);
+
+            return productDto;
         }
 
         public async Task Delete(Guid id)
@@ -116,8 +118,6 @@ namespace Logic
             product.Brand = productDto.Brand;
             product.Stock = productDto.Stock;
             product.UnitOfMeasurement = productDto.UnitOfMeasurement;
-            product.Active = productDto.Active;
-            product.Available = productDto.Available;
             await _productRepository.Update(product);
 
             //Price

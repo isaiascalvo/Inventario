@@ -80,20 +80,6 @@ import { Vue, Component } from "vue-property-decorator";
 @Component
 export default class Menu extends Vue {
   public openSidebar = false;
-  public items3 = [
-    { icon: "trending_up", text: "Most Popular" },
-    { icon: "subscriptions", text: "Subscriptions" },
-    { icon: "history", text: "History" },
-    { icon: "featured_play_list", text: "Playlists" },
-    { icon: "watch_later", text: "Watch Later" }
-  ];
-  public items2 = [
-    { picture: 28, text: "Joseph" },
-    { picture: 38, text: "Apple" },
-    { picture: 48, text: "Xbox Ahoy" },
-    { picture: 58, text: "Nokia" },
-    { picture: 78, text: "MKBHD" }
-  ];
   public items = [
     {
       icon: "text-box-outline",
@@ -107,7 +93,8 @@ export default class Menu extends Vue {
     },
     { icon: "shape", text: "Categorías", url: "/category-list" },
     { icon: "database", text: "Proveedores", url: "/vendor-list" },
-    { icon: "human", text: "Clientes", url: "/client-list" }
+    { icon: "human", text: "Clientes", url: "/client-list" },
+    { icon: "human", text: "Usuarios", url: "/user-list" }
   ];
 }
 </script>

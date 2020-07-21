@@ -106,21 +106,34 @@
               ></b-input>
             </b-field>
 
-            <div class="field">
-              <b-switch v-model="product.available">
-                Disponible
-              </b-switch>
-            </div>
+            <b-field
+              label="Stock Inicial:"
+              :type="fieldState(product.stock) ? 'is-success' : 'is-danger'"
+            >
+              <b-input
+                v-model="product.stock"
+                type="number"
+                placeholder="Ingrese el stock inicial del producto"
+              ></b-input>
+            </b-field>
 
-            <div class="field">
-              <b-switch v-model="product.active">
-                Activo
-              </b-switch>
-            </div>
+            <b-field
+              label="Unidad de medida:"
+              :type="
+                fieldState(product.unitOfMeasurement)
+                  ? 'is-success'
+                  : 'is-danger'
+              "
+            >
+              <b-input
+                v-model="product.unitOfMeasurement"
+                placeholder="Ej: unidad, kg, m, cm, etc."
+              ></b-input>
+            </b-field>
 
             <b-button
               type="submit"
-              class="is-success"
+              class="is-success mr-1"
               :disabled="!formValid()"
               @click="submit"
             >
@@ -133,20 +146,10 @@
             >
               Cancelar
             </b-button>
-
-            <b-button type="button" class="is-danger" @click="mostrar()">
-              Mostrar
-            </b-button>
           </section>
         </div>
       </div>
     </div>
-
-    <!-- <ErrorDialog
-      :error="errorMsg"
-      v-if="errorDialog"
-      @close:dialog="errorDialog = $event"
-    /> -->
   </div>
 </template>
 
@@ -158,76 +161,29 @@ import { NavigatorVendorService } from "../../services/vendor-service";
 import { Product, ProductForCreation } from "../../models/product";
 import { Category } from "../../models/category";
 import { Vendor } from "../../models/vendor";
-import { Price, PriceForCreation } from "../../models/price";
-// import { DialogMsg } from "../../models/dialogMsg";
-// import ErrorDialog from "../../components/dialogs/error-dialog.vue";
+import { PriceForCreation } from "../../models/price";
+import {
+  fieldStateValidation,
+  formValidation
+} from "../../utils/common-functions";
 
-@Component({
-  components: {
-    // ErrorDialog
-  }
-})
+@Component
 export default class EditProduct extends Vue {
-  public errorDialog = false;
-  //   public errorMsg = new DialogMsg();
   public product: Product = new Product();
   public productService: NavigatorProductService = new NavigatorProductService();
   public categoryService: NavigatorCategoryService = new NavigatorCategoryService();
   public vendorService: NavigatorVendorService = new NavigatorVendorService();
   public categories: Category[] = [];
   public vendors: Vendor[] = [];
+  public isLoading = false;
 
-  fieldState(field: any) {
-    switch (typeof field) {
-      case "number":
-        return field >= 0;
-      case "string":
-        return field && field.length > 0 ? true : false;
-      default:
-        return false;
-    }
-  }
-
-  mostrar() {
-    Object.keys(this.product as Product).forEach(key => {
-      console.log(key + " " + this.product[key as keyof Product]);
-    });
+  fieldState(field: unknown) {
+    return fieldStateValidation(field);
   }
 
   formValid() {
-    let flag = true;
-    Object.keys(this.product as Product).forEach(key => {
-      console.log(key + ": " + this.product[key as keyof Product] + " type: " + typeof this.product[key as keyof Product]);
-
-      const field = this.product[key as keyof Product];
-      switch (typeof this.product[key as keyof Product]) {
-        case "string":
-          if ((this.product[key as keyof Product] as string).length <= 0) {
-            flag = false;
-          }
-          break;
-        case "object":
-          if (field instanceof Price && !field.value) {
-            flag = false;
-          }
-          break;
-        case "number":
-          break;
-        case "bigint":
-          break;
-        case "boolean":
-          break;
-        case "symbol":
-          break;
-        case "undefined":
-          break;
-        case "function":
-          break;
-        default:
-          break;
-      }
-    });
-    return flag;
+    const result = formValidation(this.product as never);
+    return result === "price;" && this.product.price.value;
   }
 
   public submit() {
@@ -244,16 +200,18 @@ export default class EditProduct extends Vue {
       description: this.product.description,
       code: this.product.code,
       brand: this.product.brand,
-      active: this.product.active,
-      available: this.product.available,
       categoryId: this.product.categoryId,
       vendorId: this.product.vendorId,
-      price: new PriceForCreation()
+      price: new PriceForCreation(),
+      stock: +this.product.stock,
+      unitOfMeasurement: this.product.unitOfMeasurement
     };
-    pr.price.value = this.product.price.value;
+    pr.price.value = +this.product.price.value;
+    this.isLoading = true;
     this.productService
       .addProduct(pr)
       .then(() => {
+        this.isLoading = false;
         this.$router.push({ name: "ProductList" });
       })
       .catch(e => {
@@ -261,16 +219,18 @@ export default class EditProduct extends Vue {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
         // };
-        // this.errorDialog = true;
+        this.isLoading = false;
         console.log("error: ", e);
-        // this.$router.push({ name: "ProductList" });
+        this.$router.push({ name: "ProductList" });
       });
   }
 
   public updateProduct() {
+    this.isLoading = true;
     this.productService
       .updateProduct(this.product)
       .then(() => {
+        this.isLoading = false;
         this.$router.push({ name: "ProductList" });
       })
       .catch(e => {
@@ -278,27 +238,45 @@ export default class EditProduct extends Vue {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
         // };
-        // this.errorDialog = true;
+        this.isLoading = false;
         console.log("error: ", e);
-        // this.$router.push({ name: "ProductList" });
+        this.$router.push({ name: "ProductList" });
       });
   }
 
   created() {
     this.product.id = this.$route.params.id;
+    this.isLoading = true;
     const p1 = this.categoryService.getCategories();
     const p2 = this.vendorService.getVendors();
     Promise.all([p1, p2]).then(collections => {
       this.categories = collections[0] as Category[];
       this.vendors = collections[1] as Vendor[];
       if (this.product.id) {
-        this.productService.getProduct(this.product.id).then(response => {
-          this.product = response as Product;
-        });
+        this.productService
+          .getProduct(this.product.id)
+          .then(response => {
+            this.product = response as Product;
+            this.isLoading = false;
+          })
+          .catch(e => {
+            // this.errorMsg = {
+            //   title: "Error",
+            //   msg: "An unexpected error has occurred. please try again later."
+            // };
+            this.isLoading = false;
+            console.log("error: ", e);
+          });
+      } else {
+        this.isLoading = false;
       }
     });
   }
 }
 </script>
 
-<style></style>
+<style>
+.mr-1 {
+  margin-right: 1em;
+}
+</style>

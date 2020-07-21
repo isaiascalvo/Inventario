@@ -16,7 +16,7 @@ namespace Logic.Profiles
             CreateMap<Product, ProductDto>();
             //.ForMember(
             //    dest => dest.Name,
-            //    opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}")
+            //    opt => opt.MapFrom(src => $"{src.FirstName} {src.Lastname}")
             //);
 
             CreateMap<CategoryDto, Category>();
@@ -24,6 +24,9 @@ namespace Logic.Profiles
 
             CreateMap<ClientDto, Client>();
             CreateMap<Client, ClientDto>();
+
+            CreateMap<UserDto, User>();
+            CreateMap<User, UserDto>();
 
             CreateMap<VendorDto, Vendor>();
             CreateMap<Vendor, VendorDto>();

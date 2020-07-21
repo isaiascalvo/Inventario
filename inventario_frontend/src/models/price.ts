@@ -1,7 +1,7 @@
 export class PriceForCreation {
-    public value!: number;
-    public datetime!: Date;
-    public productId!: string;
+    public value = 0;
+    public datetime: Date | undefined = undefined;
+    public productId: string | undefined = undefined;
 }
   
 export class Price extends PriceForCreation {

@@ -44,10 +44,15 @@
             <b-button
               tag="router-link"
               :to="'/category/modify/' + props.row.id"
+              type="is-small"
             >
               <b-icon icon="pencil"></b-icon>
             </b-button>
-            <b-button @click="deleteCategory(props.row)">
+            <b-button
+              @click="deleteCategory(props.row)"
+              type="is-small"
+              class="actionButton"
+            >
               <b-icon icon="delete"></b-icon>
             </b-button>
           </b-table-column>
@@ -83,7 +88,7 @@ export default class CategoryList extends Vue {
 
   public currentPage = 1;
   public perPage = 10;
-  public isLoading = true;
+  public isLoading = false;
 
   deleteCategory(category: Category) {
     this.$buefy.dialog.confirm({
@@ -95,9 +100,11 @@ export default class CategoryList extends Vue {
       type: "is-danger",
       hasIcon: true,
       onConfirm: () => {
+        this.isLoading = true;
         this.categoryService
           .deleteCategory(category.id)
           .then(() => {
+            this.isLoading = false;
             this.categories.splice(this.categories.indexOf(category), 1);
           })
           .catch(e => {
@@ -105,22 +112,13 @@ export default class CategoryList extends Vue {
             //   title: "Error",
             //   msg: "An unexpected error has occurred. please try again later."
             // };
-            // this.errorDialog = true;
+            this.isLoading = false;
             console.log("error: ", e);
           });
 
         this.$buefy.toast.open("Categoría eliminada!");
       }
     });
-  }
-
-  onClose(elemId: string) {
-    if (elemId.trim() !== "") {
-      const category = this.categories.find(x => x.id === elemId);
-      if (category) {
-        this.deleteCategory(category);
-      }
-    }
   }
 
   created() {
@@ -137,7 +135,6 @@ export default class CategoryList extends Vue {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
         // };
-        // this.errorDialog = true;
         console.log("error: ", e);
       });
   }
@@ -162,6 +159,10 @@ th {
 
 .ml-1 {
   margin-left: 1em;
+}
+
+.actionButton {
+  margin-left: 5px;
 }
 
 table {

@@ -70,6 +70,25 @@ const routes: Array<RouteConfig> = [
       import(/* webpackChunkName: "vendor" */ "../views/vendor/edit-vendor.vue"),
     props: true
   },
+  {
+    path: "/user-list",
+    name: "UserList",
+    component: () =>
+      import(/* webpackChunkName: "user" */ "../views/user/user-list.vue"),
+  },
+  {
+    path: "/user/new",
+    name: "NewUser",
+    component: () =>
+      import(/* webpackChunkName: "user" */ "../views/user/edit-user.vue"),
+  },
+  {
+    path: "/user/modify/:id",
+    name: "ModifyUser",
+    component: () =>
+      import(/* webpackChunkName: "user" */ "../views/user/edit-user.vue"),
+    props: true
+  },
 ];
 
 const router = new VueRouter({

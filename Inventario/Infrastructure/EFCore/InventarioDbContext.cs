@@ -20,6 +20,7 @@ namespace Infrastructure.EFCore
         public DbSet<Client> Clients { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
         public DbSet<StockMovement> StockMovements { get; set; }
+        public DbSet<User> Users { get; set; }
 
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -72,6 +73,16 @@ namespace Infrastructure.EFCore
                 .HasOne(sm => sm.Product)
                 .WithMany()
                 .HasForeignKey(sm => sm.ProductId);
+
+            //User
+            modelBuilder.Entity<User>()
+                .HasIndex(c => c.Username).IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(c => c.Dni).IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(c => c.Mail).IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(c => c.Phone).IsUnique();
 
         }
         #endregion

@@ -61,11 +61,8 @@
         </div>
       </div>
     </div>
-    <!-- <ErrorDialog
-      :error="errorMsg"
-      v-if="errorDialog"
-      @close:dialog="errorDialog = $event"
-    /> -->
+
+    <b-loading is-full-page :active.sync="isLoading"></b-loading>
   </div>
 </template>
 
@@ -85,11 +82,8 @@ import {
 })
 export default class EditCategory extends Vue {
   public errorDialog = false;
-  //   public errorMsg = new DialogMsg();
-  // public id!: string;
-  // public name = "";
-  // public description = "";
   public category: Category = new Category();
+  public isLoading = false;
 
   public categoryService: NavigatorCategoryService = new NavigatorCategoryService();
 
@@ -115,12 +109,15 @@ export default class EditCategory extends Vue {
       name: this.category.name,
       description: this.category.description
     };
+    this.isLoading = true;
     this.categoryService
       .addCategory(category)
       .then(() => {
+        this.isLoading = false;
         this.$router.push({ name: "CategoryList" });
       })
       .catch(e => {
+        this.isLoading = false;
         // this.errorMsg = {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
@@ -137,6 +134,7 @@ export default class EditCategory extends Vue {
       name: this.category.name,
       description: this.category.description
     };
+    this.isLoading = true;
     this.categoryService
       .updateCategory(category)
       .then(() => {
@@ -147,19 +145,27 @@ export default class EditCategory extends Vue {
         //   title: "Error",
         //   msg: "An unexpected error has occurred. please try again later."
         // };
-        // this.errorDialog = true;
+        this.isLoading = false;
         console.log("error: ", e);
-        // this.$router.push({ name: "CategoryList" });
+        this.$router.push({ name: "CategoryList" });
       });
   }
 
   created() {
     this.category.id = this.$route.params.id;
     if (this.category.id) {
-      this.categoryService.getCategory(this.category.id).then(response => {
-        this.category.name = response.name;
-        this.category.description = response.description;
-      });
+      this.isLoading = true;
+      this.categoryService.getCategory(this.category.id).then(
+        response => {
+          this.category.name = response.name;
+          this.category.description = response.description;
+          this.isLoading = false;
+        },
+        error => {
+          console.log(error);
+          this.isLoading = false;
+        }
+      );
     }
   }
 }

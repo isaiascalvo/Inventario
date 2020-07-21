@@ -4,19 +4,19 @@
       <div class="hero-head">
         <div class="container level">
           <div>
-            <h1 class="title">Proveedores</h1>
+            <h1 class="title">Usuarios</h1>
             <h2 class="subtitle">
-              Lista de proveedores
+              Lista de usuarios
             </h2>
           </div>
           <div>
             <b-button
               type="is-info"
               tag="router-link"
-              to="/vendor/new"
+              to="/user/new"
               class="mx-1"
             >
-              Nuevo Proveedor
+              Nuevo Usuario
             </b-button>
           </div>
         </div>
@@ -26,7 +26,7 @@
     <b-table
       striped
       hoverable
-      :data="vendors"
+      :data="users"
       id="my-table"
       :paginated="true"
       :per-page="perPage"
@@ -37,20 +37,23 @@
       aria-current-label="Current page"
     >
       <template slot-scope="props">
+        <b-table-column field="username" label="Nombre de Usuario">
+          {{ props.row.username }}
+        </b-table-column>
         <b-table-column field="name" label="Nombre">
           {{ props.row.name }}
         </b-table-column>
-        <b-table-column field="cuil" label="CUIL">
-          {{ props.row.cuil }}
+        <b-table-column field="lastname" label="Apellido">
+          {{ props.row.lastname }}
+        </b-table-column>
+        <b-table-column field="dni" label="DNI">
+          {{ props.row.dni }}
         </b-table-column>
         <b-table-column field="phone" label="Teléfono">
           {{ props.row.phone }}
         </b-table-column>
         <b-table-column field="mail" label="Mail">
           {{ props.row.mail }}
-        </b-table-column>
-        <b-table-column field="description" label="Descripción">
-          {{ props.row.description }}
         </b-table-column>
         <b-table-column field="active" label="Activo">
           {{ props.row.active ? "Si" : "No" }}
@@ -59,13 +62,13 @@
         <b-table-column field="action" label="Acciones">
           <b-button
             tag="router-link"
-            :to="'/vendor/modify/' + props.row.id"
+            :to="'/user/modify/' + props.row.id"
             type="is-small"
           >
             <b-icon icon="pencil"></b-icon>
           </b-button>
           <b-button
-            @click="deleteVendor(props.row)"
+            @click="deleteUser(props.row)"
             type="is-small"
             class="actionButton"
           >
@@ -81,13 +84,13 @@
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
-import { Vendor } from "../../models/vendor";
-import { NavigatorVendorService } from "../../services/vendor-service";
+import { User } from "../../models/user";
+import { NavigatorUserService } from "../../services/user-service";
 
 @Component
-export default class VendorList extends Vue {
-  public vendors: Vendor[] = [];
-  public vendorService: NavigatorVendorService = new NavigatorVendorService();
+export default class UserList extends Vue {
+  public users: User[] = [];
+  public userService: NavigatorUserService = new NavigatorUserService();
 
   public currentPage = 1;
   public perPage = 10;
@@ -95,22 +98,22 @@ export default class VendorList extends Vue {
   public confirmDialog = false;
   public isLoading = false;
 
-  deleteVendor(vendor: Vendor) {
+  deleteUser(user: User) {
     this.$buefy.dialog.confirm({
-      title: "Eliminando Proveedor",
+      title: "Eliminando Usuario",
       message:
-        "Estás seguro que deseas <b>eliminar</b> el proveedor? Esta acción no podrá dehacerse.",
-      confirmText: "Eliminar Proveedor",
+        "Estás seguro que deseas <b>eliminar</b> el usuario? Esta acción no podrá dehacerse.",
+      confirmText: "Eliminar Usuario",
       cancelText: "Cancelar",
       type: "is-danger",
       hasIcon: true,
       onConfirm: () => {
         this.isLoading = true;
-        this.vendorService
-          .deleteVendor(vendor.id)
+        this.userService
+          .deleteUser(user.id)
           .then(() => {
             this.isLoading = false;
-            this.vendors.splice(this.vendors.indexOf(vendor), 1);
+            this.users.splice(this.users.indexOf(user), 1);
           })
           .catch(e => {
             this.isLoading = false;
@@ -120,17 +123,17 @@ export default class VendorList extends Vue {
             // };
             console.log("error: ", e);
           });
-        this.$buefy.toast.open("Proveedor eliminado!");
+        this.$buefy.toast.open("Usuario eliminado!");
       }
     });
   }
 
   created() {
     this.isLoading = true;
-    this.vendorService
-      .getVendors()
+    this.userService
+      .getUsers()
       .then(response => {
-        this.vendors = response as Vendor[];
+        this.users = response as User[];
         this.isLoading = false;
       })
       .catch(e => {
