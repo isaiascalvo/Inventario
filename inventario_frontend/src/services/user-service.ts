@@ -1,5 +1,6 @@
 import { apiClient } from "./apiClient";
 import { User, UserForCreation } from "@/models/user";
+import { JwtResult } from "@/models/JwtResult";
 
 export interface UserService {
   getUsers(): Promise<User[]>;
@@ -28,5 +29,19 @@ export class NavigatorUserService implements UserService {
 
   public deleteUser(userId: string): Promise<void> {
     return apiClient.delete("/users/" + userId);
+  }
+
+  public login(username: string, password: string) : Promise<
+    {config: object, data: JwtResult, headers: object, request: object, status: number, statusText: string}
+  > {
+    return  apiClient.post("login", {
+      username: username,
+      password: password
+    });
+  }
+
+  public logout() {
+    // remove user from local storage to log user out
+    localStorage.removeItem("currentUser");
   }
 }

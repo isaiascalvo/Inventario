@@ -2,31 +2,38 @@
 using AutoMapper;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("api/users")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : Controller
     {
         private readonly IUserUseCases _userUseCases;
         private readonly ISendMailUseCases _sendMailUseCases;
+        private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
-        public UserController(IUserUseCases userUseCases, ISendMailUseCases sendMailUseCases, IMapper mapper)
+        public UserController(IUserUseCases userUseCases, ISendMailUseCases sendMailUseCases, IConfiguration configuration, IMapper mapper)
         {
             _userUseCases = userUseCases;
             _sendMailUseCases = sendMailUseCases;
+            _configuration = configuration;
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -91,6 +98,66 @@ namespace Application.Controllers
             {
                 return NotFound();
             }
+        }
+
+        [HttpPost("Login")]
+        public async Task<object> Login(LoginViewModel loginVM)
+        {
+            UserDto userDto = await _userUseCases.Login(loginVM.Username, loginVM.Password);
+            //IEnumerable<RolDto> roles = _userUseCases.GetRolesUsuarioPorAplicacion(usuario.Id, eAplicaciones.AppWeb);
+            //IEnumerable<MenuDto> menues = await _rolesService.GetMenuesFromRoles(roles.Select(r => r.Id));
+            //IEnumerable<string> codigosMenues = menues.Select(m => m.Codigo);
+
+            string appUser = loginVM.Username;
+            var token = GenerateJwtToken(userDto);
+            //return GenerateJwtResult(userDto, roles, codigosMenues, token);
+            return GenerateJwtResult(userDto, token);
+        }
+
+        private string GenerateJwtToken(UserDto user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                //new Claim(JwtRegisteredClaimNames.Sub, usuario.NombreApellido),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            //var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
+            //var expires = DateTime.Now.AddSeconds(Convert.ToDouble(_configuration["JwtExpireSeconds"]));
+            var expires = DateTime.Now.AddHours(Convert.ToDouble(_configuration["JwtExpireHours"]));
+
+            var token = new JwtSecurityToken(
+                _configuration["JwtIssuer"],
+                _configuration["JwtIssuer"],
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private JwtResultViewModel GenerateJwtResult(
+            UserDto userResult,
+            //IEnumerable<RolDto> roles,
+            //IEnumerable<string> codigosMenues,
+            string token)
+        {
+            return new JwtResultViewModel
+            {
+                Id = userResult.Id,
+                Mail = userResult.Mail,
+                Name = userResult.Name,
+                Lastname = userResult.Lastname,
+                Token = token,
+                //Roles = roles.Select(r => r.Codigo),
+                //CodigosMenues = codigosMenues,
+                Username = userResult.Username
+            };
         }
     }
 }

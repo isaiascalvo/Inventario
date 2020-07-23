@@ -128,5 +128,14 @@ namespace Logic
             );
         }
 
+        public async Task<UserDto> Login(string userName, string password)
+        {
+            var passHased = CommonFunctions.MD5(password);
+            var user = (await _userRepository.Find(x => x.Username == userName && x.Password == passHased && x.Active)).FirstOrDefault();
+            if (user == null)
+                throw new AuthenticationException($"Error.");
+
+            return _mapper.Map<User, UserDto>(user);
+        }
     }
 }

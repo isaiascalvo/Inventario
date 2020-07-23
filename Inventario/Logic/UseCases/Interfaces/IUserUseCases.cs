@@ -13,5 +13,6 @@ namespace Logic.Interfaces
         Task Delete(Guid id);
         Task<UserDto> Create(UserForCreationDto userDTO);
         Task Update(Guid id, UserDto USERdTO);
+        Task<UserDto> Login(string userName, string password);
     }
 }

@@ -2,6 +2,7 @@
 using AutoMapper;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("api/categories")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CategoryController : Controller
     {
         private readonly ICategoryUseCases _categoryUseCases;
@@ -25,7 +26,6 @@ namespace Application.Controllers
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card">
+    <div class="card column is-6 is-offset-3">
       <div class="card-content">
         <div class="media">
           <div class="media-content">
@@ -11,114 +11,107 @@
         </div>
 
         <div class="content">
-          <section>
-            <b-field
-              label="Nombre de Usuario:"
-              :type="fieldState(user.username) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(user.username)
-                  ? ''
-                  : 'Debe ingresar un nombre de usuario'
-              "
-            >
-              <b-input
-                v-model="user.username"
-                placeholder="Ingrese el nombre de usuario"
-              ></b-input>
-            </b-field>
+          <form @submit.prevent="submit()">
+            <div class="columns">
+              <div class="column">
+                <b-field label="Nombre de Usuario:">
+                  <b-input
+                    v-model="user.username"
+                    placeholder="Ingrese el nombre de usuario"
+                    required
+                    validation-message="Debe ingresar un nombre de usuario"
+                  ></b-input>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field label="Mail">
+                  <b-input
+                    v-model="user.mail"
+                    placeholder="Ingrese el mail del usuario"
+                    type="email"
+                    required
+                    validation-message="Debe ingresar un mail válido"
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
 
-            <b-field
-              v-if="!user.id"
-              label="Contraseña:"
-              :type="
-                fieldState(user.password) && validPassword()
-                  ? 'is-success'
-                  : 'is-danger'
-              "
-              :message="
-                fieldState(user.password) && validPassword()
-                  ? ''
-                  : 'La contraeña debe conterner al menos 8 caracteres'
-              "
-            >
-              <b-input
-                v-model="user.password"
-                placeholder="Ingrese una contraseña"
-              ></b-input>
-            </b-field>
+            <div class="columns">
+              <div class="column">
+                <b-field v-if="!user.id" label="Contraseña:">
+                  <b-input
+                    v-model="user.password"
+                    required
+                    placeholder="Ingrese una contraseña"
+                    minlength="8"
+                    type="password"
+                    password-reveal
+                  ></b-input>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field
+                  v-if="!user.id"
+                  label="Confirmar contraseña:"
+                  :type="!confirmPasswordState() ? '' : 'is-danger'"
+                  :message="
+                    !confirmPasswordState()
+                      ? ''
+                      : 'Las contraseñas no coinciden'
+                  "
+                >
+                  <b-input
+                    v-model="confirmPassword"
+                    placeholder="Confirme la contraseña"
+                    required
+                    type="password"
+                    password-reveal
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
 
-            <b-field
-              v-if="!user.id"
-              label="Confirmar contraseña:"
-              :type="!confirmPasswordState() ? 'is-success' : 'is-danger'"
-              :message="
-                !confirmPasswordState() ? '' : 'Debe confirmar la contraseña'
-              "
-            >
-              <b-input
-                v-model="confirmPassword"
-                placeholder="Confirme la contraseña"
-              ></b-input>
-            </b-field>
+            <div class="columns">
+              <div class="column">
+                <b-field label="Nombre:">
+                  <b-input
+                    v-model="user.name"
+                    placeholder="Ingrese el nombre del usuario"
+                    required
+                  ></b-input>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field label="Apellido:">
+                  <b-input
+                    v-model="user.lastname"
+                    placeholder="Ingrese el apellido del usuario"
+                    required
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
 
-            <b-field
-              label="Nombre:"
-              :type="fieldState(user.name) ? 'is-success' : 'is-danger'"
-              :message="fieldState(user.name) ? '' : 'Debe ingresar un nombre'"
-            >
-              <b-input
-                v-model="user.name"
-                placeholder="Ingrese el nombre del usuario"
-              ></b-input>
-            </b-field>
-
-            <b-field
-              label="Apellido:"
-              :type="fieldState(user.lastname) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(user.lastname) ? '' : 'Debe ingresar un apellido'
-              "
-            >
-              <b-input
-                v-model="user.lastname"
-                placeholder="Ingrese el apellido del usuario"
-              ></b-input>
-            </b-field>
-
-            <b-field
-              label="DNI"
-              :type="fieldState(user.dni) ? 'is-success' : 'is-danger'"
-              :message="fieldState(user.dni) ? '' : 'Debe ingresar un DNI'"
-            >
-              <b-input
-                v-model="user.dni"
-                placeholder="Ingrese el DNI del usuario"
-              ></b-input>
-            </b-field>
-
-            <b-field
-              label="Teléfono"
-              :type="fieldState(user.phone) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(user.phone) ? '' : 'Debe ingresar un teléfono'
-              "
-            >
-              <b-input
-                v-model="user.phone"
-                placeholder="Ingrese el teléfono del usuario"
-              ></b-input>
-            </b-field>
-
-            <b-field
-              label="Mail"
-              :type="fieldState(user.mail) ? 'is-success' : 'is-danger'"
-              :message="fieldState(user.mail) ? '' : 'Debe ingresar un mail'"
-            >
-              <b-input
-                v-model="user.mail"
-                placeholder="Ingrese el mail del usuario"
-              ></b-input>
-            </b-field>
+            <div class="columns">
+              <div class="column">
+                <b-field label="DNI">
+                  <b-input
+                    v-model="user.dni"
+                    placeholder="Ingrese el DNI del usuario"
+                    required
+                  ></b-input>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field label="Teléfono">
+                  <b-input
+                    v-model="user.phone"
+                    placeholder="Ingrese el teléfono del usuario"
+                    required
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
 
             <div class="field">
               <b-switch v-model="user.active">
@@ -127,10 +120,9 @@
             </div>
 
             <b-button
-              type="submit"
+              native-type="submit"
               class="is-success mr-1"
               :disabled="!formValid()"
-              @click="submit"
             >
               {{ user.id ? "Editar" : "Crear" }}
             </b-button>
@@ -141,7 +133,7 @@
             >
               Cancelar
             </b-button>
-          </section>
+          </form>
         </div>
       </div>
     </div>
@@ -174,7 +166,9 @@ export default class EditUser extends Vue {
   formValid() {
     const result = formValidation(this.user as never);
     return (
-      (result === "" && !this.confirmPasswordState()) ||
+      (result === "" &&
+        !this.confirmPasswordState() &&
+        this.confirmPassword !== "") ||
       (result === "password;" && this.user.id)
     );
   }
@@ -182,8 +176,11 @@ export default class EditUser extends Vue {
   validPassword() {
     return this.user.password && this.user.password.length >= 8;
   }
+
   confirmPasswordState() {
-    return this.confirmPassword !== this.user.password;
+    return (
+      this.confirmPassword !== "" && this.confirmPassword !== this.user.password
+    );
   }
 
   public submit() {

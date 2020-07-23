@@ -56,26 +56,27 @@
     </template>
 
     <template slot="end">
-      <b-navbar-dropdown label="Lang">
-        <b-navbar-item href="#">EN</b-navbar-item>
+      <b-navbar-dropdown :label="getName()" v-if="loggedIn()">
+        <!-- <b-navbar-item @click="getName()">EN</b-navbar-item>
         <b-navbar-item href="#">ES</b-navbar-item>
-        <b-navbar-item href="#">RU</b-navbar-item>
-        <b-navbar-item href="#">FA</b-navbar-item>
+        <b-navbar-item href="#">RU</b-navbar-item> -->
+        <b-navbar-item @click="logOut()">Cerrar Sesión</b-navbar-item>
       </b-navbar-dropdown>
 
-      <b-navbar-dropdown label="">
+      <!-- <b-navbar-dropdown label="">
         <template v-slot:button-content>
           <em>User</em>
         </template>
         <b-navbar-item href="#">Profile</b-navbar-item>
         <b-navbar-item href="#">Sign Out</b-navbar-item>
-      </b-navbar-dropdown>
+      </b-navbar-dropdown> -->
     </template>
   </b-navbar>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
+import { JwtResult } from "../models/JwtResult";
 
 @Component
 export default class Menu extends Vue {
@@ -94,8 +95,27 @@ export default class Menu extends Vue {
     { icon: "shape", text: "Categorías", url: "/category-list" },
     { icon: "database", text: "Proveedores", url: "/vendor-list" },
     { icon: "human", text: "Clientes", url: "/client-list" },
-    { icon: "human", text: "Usuarios", url: "/user-list" }
+    { icon: "human", text: "Usuarios", url: "/user-list" },
+    { icon: "human", text: "Iniciar Sesión", url: "/login" }
   ];
+
+  public loggedIn() {
+    return sessionStorage.getItem("currentUser") !== null;
+  }
+
+  public getName() {
+    const currentUser: JwtResult = JSON.parse(
+      sessionStorage.getItem("currentUser") ?? ""
+    );
+    return currentUser.name + " " + currentUser.lastname;
+  }
+
+  public logOut() {
+    // this.$store.commit("setCurrentUser", null);
+    sessionStorage.removeItem("currentUser");
+    this.$forceUpdate();
+    this.$router.push("/login");
+  }
 }
 </script>
 

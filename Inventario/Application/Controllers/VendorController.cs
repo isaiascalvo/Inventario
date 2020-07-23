@@ -2,6 +2,7 @@
 using AutoMapper;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("api/vendors")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class VendorController : Controller
     {
         private readonly IVendorUseCases _vendorUseCases;
@@ -25,7 +26,6 @@ namespace Application.Controllers
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

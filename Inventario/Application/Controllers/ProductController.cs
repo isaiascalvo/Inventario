@@ -2,6 +2,7 @@
 using AutoMapper;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Application
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("api/products")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProductController: Controller
     {
         private readonly IProductUseCases _productUseCases;
@@ -25,7 +26,6 @@ namespace Application
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

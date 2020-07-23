@@ -2,6 +2,7 @@
 using AutoMapper;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("api/prices")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PriceController : Controller
     {
         private readonly IPriceUseCases _animalDiseaseUseCases;
