@@ -26,7 +26,7 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<ProductDto> Create(ProductForCreationDto productForCreationDto)
+        public async Task<ProductDto> Create(Guid userId, ProductForCreationDto productForCreationDto)
         {
             var product = new Product()
             {
@@ -37,7 +37,8 @@ namespace Logic
                 VendorId = productForCreationDto.VendorId,
                 Brand = productForCreationDto.Brand,
                 Stock = productForCreationDto.Stock,
-                UnitOfMeasurement = productForCreationDto.UnitOfMeasurement
+                UnitOfMeasurement = productForCreationDto.UnitOfMeasurement,
+                CreatedBy = userId
             };
 
             product = await _productRepository.Add(product);
@@ -59,9 +60,9 @@ namespace Logic
             return productDto;
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid userId, Guid id)
         {
-            var product = await _productRepository.Delete(id);
+            var product = await _productRepository.Delete(userId, id);
             if (product == null)
                 throw new KeyNotFoundException($"Product with id: {id} not found.");
         }
@@ -118,6 +119,8 @@ namespace Logic
             product.Brand = productDto.Brand;
             product.Stock = productDto.Stock;
             product.UnitOfMeasurement = productDto.UnitOfMeasurement;
+            product.LastModificationBy = productDto.LastModificationBy;
+
             await _productRepository.Update(product);
 
             //Price
@@ -129,7 +132,8 @@ namespace Logic
                 {
                     Value = productDto.Price.Value,
                     DateTime = DateTime.Now,
-                    ProductId = productDto.Id
+                    ProductId = productDto.Id,
+                    CreatedBy = productDto.LastModificationBy.Value
                 };
 
                 await _priceRepository.Add(price);

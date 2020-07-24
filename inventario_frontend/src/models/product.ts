@@ -1,6 +1,6 @@
 import { Category } from "./category";
 import { Vendor } from "./vendor";
-import { PriceForCreation } from './price';
+import { PriceForCreation, Price } from './price';
 
 export class ProductForCreation {
   public name: string | undefined = undefined;
@@ -22,5 +22,11 @@ export class ProductForCreation {
 
 export class Product extends ProductForCreation {
   public id!: string;
+  public price: Price;
+
+  constructor() {
+    super();
+    this.price = new Price();
+  }
 }
 

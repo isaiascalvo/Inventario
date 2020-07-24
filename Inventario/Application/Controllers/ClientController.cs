@@ -4,10 +4,12 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Application.Controllers
@@ -18,11 +20,13 @@ namespace Application.Controllers
     public class ClientController : Controller
     {
         private readonly IClientUseCases _clientUseCases;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public ClientController(IClientUseCases clientUseCases, IMapper mapper)
+        public ClientController(IClientUseCases clientUseCases, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _clientUseCases = clientUseCases;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
         }
 
@@ -52,8 +56,10 @@ namespace Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(ClientForCreationViewModel clientForCreationVM)
         {
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
             var clientForCreationDto = _mapper.Map<ClientForCreationViewModel, ClientForCreationDto>(clientForCreationVM);
-            var clientDto = await _clientUseCases.Create(clientForCreationDto);
+            var clientDto = await _clientUseCases.Create(userId, clientForCreationDto);
             var clientVM = _mapper.Map<ClientDto, ClientViewModel>(clientDto);
 
             return CreatedAtRoute(
@@ -68,7 +74,9 @@ namespace Application.Controllers
         {
             try
             {
-                await _clientUseCases.Delete(clientId);
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
+                await _clientUseCases.Delete(userId, clientId);
                 return Ok("The client was deleted.");
             }
             catch (KeyNotFoundException)
@@ -82,7 +90,10 @@ namespace Application.Controllers
         {
             try
             {
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
                 var clientDto = _mapper.Map<ClientViewModel, ClientDto>(clientVM);
+                clientDto.LastModificationBy = userId;
                 await _clientUseCases.Update(clientId, clientDto);
                 return Ok("Client successfully updated.");
             }

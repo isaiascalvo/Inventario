@@ -21,7 +21,7 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<VendorDto> Create(VendorForCreationDto vendorForCreationDto)
+        public async Task<VendorDto> Create(Guid userId, VendorForCreationDto vendorForCreationDto)
         {
             var vendor = new Vendor()
             {
@@ -30,15 +30,16 @@ namespace Logic
                 Phone = vendorForCreationDto.Phone,
                 Mail = vendorForCreationDto.Mail,
                 Active = vendorForCreationDto.Active,
-                Description = vendorForCreationDto.Description
+                Description = vendorForCreationDto.Description,
+                CreatedBy = userId
             };
 
             return _mapper.Map<Vendor, VendorDto>(await _vendorRepository.Add(vendor));
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid userId, Guid id)
         {
-            var vendor = await _vendorRepository.Delete(id);
+            var vendor = await _vendorRepository.Delete(userId, id);
             if (vendor == null)
                 throw new KeyNotFoundException($"Vendor with id: {id} not found.");
         }
@@ -75,6 +76,7 @@ namespace Logic
             vendor.Mail = vendorDto.Mail;
             vendor.Active = vendorDto.Active;
             vendor.Description = vendorDto.Description;
+            vendor.LastModificationBy = vendorDto.LastModificationBy;
 
             await _vendorRepository.Update(vendor);
         }

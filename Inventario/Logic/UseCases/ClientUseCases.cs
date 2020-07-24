@@ -21,7 +21,7 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<ClientDto> Create(ClientForCreationDto clientForCreationDto)
+        public async Task<ClientDto> Create(Guid userId, ClientForCreationDto clientForCreationDto)
         {
             var client = new Client()
             {
@@ -31,15 +31,16 @@ namespace Logic
                 Phone = clientForCreationDto.Phone,
                 Mail = clientForCreationDto.Mail,
                 Active = clientForCreationDto.Active,
-                Birthdate = clientForCreationDto.Birthdate
+                Birthdate = clientForCreationDto.Birthdate,
+                CreatedBy = userId
             };
 
             return _mapper.Map<Client, ClientDto>(await _clientRepository.Add(client));
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid userId, Guid id)
         {
-            var client = await _clientRepository.Delete(id);
+            var client = await _clientRepository.Delete(userId, id);
             if (client == null)
                 throw new KeyNotFoundException($"Client with id: {id} not found.");
         }
@@ -60,19 +61,21 @@ namespace Logic
             return _mapper.Map<Client, ClientDto>(client);
         }
 
-        public async Task Update(Guid id, ClientDto clientForCreationDto)
+        public async Task Update(Guid id, ClientDto clientDto)
         {
             var client = await _clientRepository.GetById(id);
             if (client == null)
                 throw new KeyNotFoundException($"Client with id: {id} not found.");
 
-            client.Name = clientForCreationDto.Name;
-            client.Lastname = clientForCreationDto.Lastname;
-            client.Dni = clientForCreationDto.Dni;
-            client.Phone = clientForCreationDto.Phone;
-            client.Mail = clientForCreationDto.Mail;
-            client.Active = clientForCreationDto.Active;
-            client.Birthdate = clientForCreationDto.Birthdate;
+            client.Name = clientDto.Name;
+            client.Lastname = clientDto.Lastname;
+            client.Dni = clientDto.Dni;
+            client.Phone = clientDto.Phone;
+            client.Mail = clientDto.Mail;
+            client.Active = clientDto.Active;
+            client.Birthdate = clientDto.Birthdate;
+            client.LastModificationBy = clientDto.LastModificationBy;
+
             await _clientRepository.Update(client);
         }
     }

@@ -15,6 +15,7 @@ using Logic.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Util.Auth;
 
 namespace Application
 {
@@ -98,13 +100,16 @@ namespace Application
             services.AddScoped<IUserUseCases, UserUseCases>();
             services.AddScoped<ISendMailUseCases, SendMailUseCases>();
 
-
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IPriceRepository, PriceRepository>();
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IVendorRepository, VendorRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            
+            services.AddSingleton<IAuthService, AuthService>();
+            
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

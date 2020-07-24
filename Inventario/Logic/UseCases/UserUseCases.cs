@@ -26,7 +26,7 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<UserDto> Create(UserForCreationDto userForCreationDto)
+        public async Task<UserDto> Create(Guid userId, UserForCreationDto userForCreationDto)
         {
             var hasedPassword = CommonFunctions.MD5(userForCreationDto.Password);
             var user = new User()
@@ -39,14 +39,15 @@ namespace Logic
                 Phone = userForCreationDto.Phone,
                 Mail = userForCreationDto.Mail,
                 Active = userForCreationDto.Active,
+                CreatedBy = userId
             };
 
             return _mapper.Map<User, UserDto>(await _userRepository.Add(user));
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid userId, Guid id)
         {
-            var user = await _userRepository.Delete(id);
+            var user = await _userRepository.Delete(userId, id);
             if (user == null)
                 throw new KeyNotFoundException($"User with id: {id} not found.");
         }
@@ -83,7 +84,7 @@ namespace Logic
             return _mapper.Map<User, UserDto>(user);
         }
 
-        public async Task Update(Guid id, UserDto userForCreationDto)
+        public async Task Update(Guid id, UserDto userDto)
         {
             var user = await _userRepository.GetById(id);
             if (user == null)
@@ -91,12 +92,14 @@ namespace Logic
 
             //user.Username = userForCreationDto.Username;
             //user.Password = userForCreationDto.Password;
-            user.Name = userForCreationDto.Name;
-            user.Lastname = userForCreationDto.Lastname;
-            user.Dni = userForCreationDto.Dni;
-            user.Phone = userForCreationDto.Phone;
-            user.Mail = userForCreationDto.Mail;
-            user.Active = userForCreationDto.Active;
+            user.Name = userDto.Name;
+            user.Lastname = userDto.Lastname;
+            user.Dni = userDto.Dni;
+            user.Phone = userDto.Phone;
+            user.Mail = userDto.Mail;
+            user.Active = userDto.Active;
+            user.LastModificationBy = userDto.LastModificationBy;
+
             await _userRepository.Update(user);
         }
 

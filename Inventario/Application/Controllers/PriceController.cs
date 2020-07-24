@@ -4,10 +4,12 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Application.Controllers
@@ -17,31 +19,33 @@ namespace Application.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PriceController : Controller
     {
-        private readonly IPriceUseCases _animalDiseaseUseCases;
+        private readonly IPriceUseCases _priceUseCases;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public PriceController(IPriceUseCases animalDiseaseUseCases, IMapper mapper)
+        public PriceController(IPriceUseCases priceUseCases, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
-            _animalDiseaseUseCases = animalDiseaseUseCases;
+            _priceUseCases = priceUseCases;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<PriceDto> animalDiseaseDto = _animalDiseaseUseCases.GetAll();
-            IEnumerable<PriceViewModel> animalDiseaseVM = _mapper.Map<IEnumerable<PriceDto>, IEnumerable<PriceViewModel>>(animalDiseaseDto);
-            return Ok(animalDiseaseVM);
+            IEnumerable<PriceDto> priceDto = _priceUseCases.GetAll();
+            IEnumerable<PriceViewModel> priceVM = _mapper.Map<IEnumerable<PriceDto>, IEnumerable<PriceViewModel>>(priceDto);
+            return Ok(priceVM);
         }
 
-        [HttpGet("{animalDiseaseId}", Name = "GetAnimalDisease")]
-        public async Task<IActionResult> GetOne(Guid animalDiseaseId)
+        [HttpGet("{priceId}", Name = "GetPrice")]
+        public async Task<IActionResult> GetOne(Guid priceId)
         {
             try
             {
-                var animalDiseaseDto = await _animalDiseaseUseCases.GetOne(animalDiseaseId);
-                var animalDiseaseVM = _mapper.Map<PriceDto, PriceViewModel>(animalDiseaseDto);
-                return Ok(animalDiseaseVM);
+                var priceDto = await _priceUseCases.GetOne(priceId);
+                var priceVM = _mapper.Map<PriceDto, PriceViewModel>(priceDto);
+                return Ok(priceVM);
             }
             catch (KeyNotFoundException)
             {
@@ -50,25 +54,29 @@ namespace Application.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(PriceForCreationViewModel animalDiseaseForCreationVM)
+        public async Task<IActionResult> Add(PriceForCreationViewModel priceForCreationVM)
         {
-            var animalDiseaseForCreationDto = _mapper.Map<PriceForCreationViewModel, PriceForCreationDto>(animalDiseaseForCreationVM);
-            var animalDiseaseDto = await _animalDiseaseUseCases.Create(animalDiseaseForCreationDto);
-            var animalDiseaseVM = _mapper.Map<PriceDto, PriceViewModel>(animalDiseaseDto);
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
+            var priceForCreationDto = _mapper.Map<PriceForCreationViewModel, PriceForCreationDto>(priceForCreationVM);
+            var priceDto = await _priceUseCases.Create(userId, priceForCreationDto);
+            var priceVM = _mapper.Map<PriceDto, PriceViewModel>(priceDto);
 
             return CreatedAtRoute(
-                "GetAnimalDisease",
-                new { animalDiseaseId = animalDiseaseVM.Id },
-                animalDiseaseVM
+                "GetPrice",
+                new { priceId = priceVM.Id },
+                priceVM
             );
         }
 
-        [HttpDelete("{animalDiseaseId}")]
-        public async Task<IActionResult> Delete(Guid animalDiseaseId)
+        [HttpDelete("{priceId}")]
+        public async Task<IActionResult> Delete(Guid priceId)
         {
             try
             {
-                await _animalDiseaseUseCases.Delete(animalDiseaseId);
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
+                await _priceUseCases.Delete(userId, priceId);
                 return Ok("The animal-disease was deleted.");
             }
             catch (KeyNotFoundException)
@@ -77,14 +85,17 @@ namespace Application.Controllers
             }
         }
 
-        [HttpPut("{animalDiseaseId}")]
-        public async Task<IActionResult> Update(Guid animalDiseaseId, [FromBody] PriceViewModel animalDiseaseVM)
+        [HttpPut("{priceId}")]
+        public async Task<IActionResult> Update(Guid priceId, [FromBody] PriceViewModel priceVM)
         {
             try
             {
-                var animalDiseaseDto = _mapper.Map<PriceViewModel, PriceDto>(animalDiseaseVM);
-                await _animalDiseaseUseCases.Update(animalDiseaseId, animalDiseaseDto);
-                return Ok("AnimalDisease successfully updated.");
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
+                var priceDto = _mapper.Map<PriceViewModel, PriceDto>(priceVM);
+                priceDto.LastModificationBy = userId;
+                await _priceUseCases.Update(priceId, priceDto);
+                return Ok("Price successfully updated.");
             }
             catch (KeyNotFoundException)
             {

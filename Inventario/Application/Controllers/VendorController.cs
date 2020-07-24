@@ -4,10 +4,12 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Application.Controllers
@@ -18,11 +20,13 @@ namespace Application.Controllers
     public class VendorController : Controller
     {
         private readonly IVendorUseCases _vendorUseCases;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public VendorController(IVendorUseCases vendorUseCases, IMapper mapper)
+        public VendorController(IVendorUseCases vendorUseCases, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _vendorUseCases = vendorUseCases;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
         }
 
@@ -52,8 +56,10 @@ namespace Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(VendorForCreationViewModel vendorForCrationVM)
         {
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
             var vendorForCrationDto = _mapper.Map<VendorForCreationViewModel, VendorForCreationDto>(vendorForCrationVM);
-            var vendorDto = await _vendorUseCases.Create(vendorForCrationDto);
+            var vendorDto = await _vendorUseCases.Create(userId, vendorForCrationDto);
             var vendorVM = _mapper.Map<VendorDto, VendorViewModel>(vendorDto);
 
             return CreatedAtRoute(
@@ -68,7 +74,8 @@ namespace Application.Controllers
         {
             try
             {
-                await _vendorUseCases.Delete(vendorId);
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+                await _vendorUseCases.Delete(userId, vendorId);
                 return Ok("The Vendor was deleted.");
             }
             catch (KeyNotFoundException)
@@ -82,7 +89,10 @@ namespace Application.Controllers
         {
             try
             {
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
                 var vendorDto = _mapper.Map<VendorViewModel, VendorDto>(vendorVM);
+                vendorDto.LastModificationBy = userId;
                 await _vendorUseCases.Update(vendorId, vendorDto);
                 return Ok("Vendor successfully updated.");
             }

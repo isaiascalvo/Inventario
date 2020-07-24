@@ -21,20 +21,21 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<CategoryDto> Create(CategoryForCreationDto categoryForCreationDto)
+        public async Task<CategoryDto> Create(Guid userId, CategoryForCreationDto categoryForCreationDto)
         {
-            var race = new Data.Category()
+            var category = new Data.Category()
             {
                 Name = categoryForCreationDto.Name,
-                Description = categoryForCreationDto.Description
+                Description = categoryForCreationDto.Description,
+                CreatedBy = userId
             };
 
-            return _mapper.Map<Data.Category, CategoryDto>(await __categoryRepositoryRepository.Add(race));
+            return _mapper.Map<Data.Category, CategoryDto>(await __categoryRepositoryRepository.Add(category));
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid userId, Guid id)
         {
-            var category = await __categoryRepositoryRepository.Delete(id);
+            var category = await __categoryRepositoryRepository.Delete(userId, id);
             if (category == null)
                 throw new KeyNotFoundException($"Category with id: {id} not found.");
         }
@@ -60,6 +61,7 @@ namespace Logic
             var category = await __categoryRepositoryRepository.GetById(id);
             category.Name = categoryDto.Name;
             category.Description = categoryDto.Description;
+            category.LastModificationBy = categoryDto.LastModificationBy;
             await __categoryRepositoryRepository.Update(category);
         }
     }

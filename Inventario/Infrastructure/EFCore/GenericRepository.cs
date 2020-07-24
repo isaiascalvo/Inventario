@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Util.Auth;
 
 namespace Infrastructure.EFCore
 {
@@ -13,18 +14,24 @@ namespace Infrastructure.EFCore
         where TEntity : class, IEntity
     {
         private readonly InventarioDbContext context;
+        private readonly IAuthService _auth;
+
         public GenericRepository(InventarioDbContext context)
         {
             this.context = context;
+            _auth = new AuthService();
         }
         public async Task<TEntity> Add(TEntity entity)
         {
+            //entity.CreatedBy = Guid.Parse(_auth.GetCurrentUserId());
+            entity.CreatedAt = DateTime.Now;
+            entity.IsDeleted = false;
             await context.Set<TEntity>().AddAsync(entity);
             await context.SaveChangesAsync();
             return entity;
         }
 
-        public async Task<TEntity> Delete(Guid id)
+        public async Task<TEntity> Delete(Guid userId, Guid id)
         {
             var entity = await this.GetById(id);
             if (entity == null)
@@ -32,6 +39,7 @@ namespace Infrastructure.EFCore
                 return entity;
             }
             entity.IsDeleted = true;
+            entity.DeletedBy = userId;
             entity.DeletedAt = DateTime.Now;
             context.Set<TEntity>().Update(entity);
             await context.SaveChangesAsync();
@@ -62,6 +70,7 @@ namespace Infrastructure.EFCore
 
         public async Task<TEntity> Update(TEntity entity)
         {
+            //entity.LastModificationBy = Guid.Parse(_auth.GetCurrentUserId());
             entity.LastModificationAt = DateTime.Now;
             context.Set<TEntity>().Update(entity);
             await context.SaveChangesAsync();
@@ -86,6 +95,6 @@ namespace Infrastructure.EFCore
         public async Task<List<TEntity>> FindDeleted(Expression<Func<TEntity, bool>> predicate)
         {
             return await context.Set<TEntity>().Where(predicate).Where(e => e.IsDeleted).ToListAsync();
-        }
+        }        
     }
 }

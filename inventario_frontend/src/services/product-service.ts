@@ -2,7 +2,6 @@ import { Product, ProductForCreation } from "@/models/product";
 import { ProductFilters } from "@/models/productFilters";
 import { apiClient } from "./apiClient";
 
-
 export interface ProductService {
   getProducts(): Promise<Product[]>;
   getProductsFiltered(productFilters: ProductFilters): Promise<Product[]>;

@@ -4,6 +4,7 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -23,13 +24,15 @@ namespace Application.Controllers
     {
         private readonly IUserUseCases _userUseCases;
         private readonly ISendMailUseCases _sendMailUseCases;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
-        public UserController(IUserUseCases userUseCases, ISendMailUseCases sendMailUseCases, IConfiguration configuration, IMapper mapper)
+        public UserController(IUserUseCases userUseCases, ISendMailUseCases sendMailUseCases, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IMapper mapper)
         {
             _userUseCases = userUseCases;
             _sendMailUseCases = sendMailUseCases;
+            _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _mapper = mapper;
         }
@@ -60,8 +63,10 @@ namespace Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(UserForCreationViewModel userForCreationVM)
         {
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
             var userForCreationDto = _mapper.Map<UserForCreationViewModel, UserForCreationDto>(userForCreationVM);
-            var userDto = await _userUseCases.Create(userForCreationDto);
+            var userDto = await _userUseCases.Create(userId, userForCreationDto);
             var userVM = _mapper.Map<UserDto, UserViewModel>(userDto);
 
             return CreatedAtRoute(
@@ -76,7 +81,9 @@ namespace Application.Controllers
         {
             try
             {
-                await _userUseCases.Delete(userId);
+                var deletor = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
+                await _userUseCases.Delete(deletor, userId);
                 return Ok("The user was deleted.");
             }
             catch (KeyNotFoundException)
@@ -90,7 +97,10 @@ namespace Application.Controllers
         {
             try
             {
+                var modifier = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
                 var userDto = _mapper.Map<UserViewModel, UserDto>(userVM);
+                userDto.LastModificationBy = modifier;
                 await _userUseCases.Update(userId, userDto);
                 return Ok("User successfully updated.");
             }

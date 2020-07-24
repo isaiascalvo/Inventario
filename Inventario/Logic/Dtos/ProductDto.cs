@@ -17,9 +17,9 @@ namespace Logic.Dtos
         public string Description { get; set; }
         public string Code { get; set; }
         public Guid CategoryId { get; set; }
-        public Category Category { get; set; }
+        public CategoryDto Category { get; set; }
         public Guid? VendorId { get; set; }
-        public Vendor Vendor { get; set; }
+        public VendorDto Vendor { get; set; }
         public string Brand { get; set; }
         public double Stock { get; set; }
         public string UnitOfMeasurement { get; set; }

@@ -23,7 +23,7 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<PriceDto> Create(PriceForCreationDto priceForCreationDto)
+        public async Task<PriceDto> Create(Guid userId, PriceForCreationDto priceForCreationDto)
         {
             var product = await _productRepository.GetById(priceForCreationDto.ProductId);
             if (product == null)
@@ -34,15 +34,16 @@ namespace Logic
                 Value = priceForCreationDto.Value,
                 DateTime = priceForCreationDto.DateTime,
                 ProductId = priceForCreationDto.ProductId,
-                Product = product
+                Product = product,
+                CreatedBy = userId
             };
 
             return _mapper.Map<Price, PriceDto>(await _priceRepository.Add(price));
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid userId, Guid id)
         {
-            var price = await _priceRepository.Delete(id);
+            var price = await _priceRepository.Delete(userId, id);
             if (price == null)
                 throw new KeyNotFoundException($"Price with id: {id} not found.");
         }
@@ -77,6 +78,8 @@ namespace Logic
             price.ProductId = priceDto.ProductId;
             price.Product = product;
             price.DateTime = priceDto.DateTime;
+            price.LastModificationBy = priceDto.LastModificationBy;
+
             await _priceRepository.Update(price);
         }
     }

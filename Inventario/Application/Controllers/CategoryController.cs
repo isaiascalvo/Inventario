@@ -4,10 +4,12 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Application.Controllers
@@ -18,11 +20,13 @@ namespace Application.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryUseCases _categoryUseCases;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryUseCases categoryUseCases, IMapper mapper)
+        public CategoryController(ICategoryUseCases categoryUseCases, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _categoryUseCases = categoryUseCases;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
         }
 
@@ -52,8 +56,10 @@ namespace Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(CategoryForCreationViewModel categoryForCreationVM)
         {
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
             var categoryForCreationDto = _mapper.Map<CategoryForCreationViewModel, CategoryForCreationDto>(categoryForCreationVM);
-            var categoryDto = await _categoryUseCases.Create(categoryForCreationDto);
+            var categoryDto = await _categoryUseCases.Create(userId, categoryForCreationDto);
             var categoryVM = _mapper.Map<CategoryDto, CategoryViewModel>(categoryDto);
 
             return CreatedAtRoute(
@@ -68,7 +74,9 @@ namespace Application.Controllers
         {
             try
             {
-                await _categoryUseCases.Delete(categoryId);
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
+                await _categoryUseCases.Delete(userId, categoryId);
                 return Ok("The category was deleted.");
             }
             catch (KeyNotFoundException)
@@ -82,7 +90,10 @@ namespace Application.Controllers
         {
             try
             {
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+
                 var categoryDto = _mapper.Map<CategoryViewModel, CategoryDto>(category);
+                categoryDto.LastModificationBy = userId;
                 await _categoryUseCases.Update(categoryId, categoryDto);
                 return Ok("Category successfully updated.");
             }

@@ -10,8 +10,8 @@ namespace Logic.Interfaces
     {
         Task<VendorDto> GetOne(Guid id);
         Task<IEnumerable<VendorDto>> GetAll();
-        Task Delete(Guid id);
-        Task<VendorDto> Create(VendorForCreationDto pregnancyDto);
+        Task Delete(Guid userId, Guid id);
+        Task<VendorDto> Create(Guid userId, VendorForCreationDto pregnancyDto);
         Task Update(Guid id, VendorDto pregnancyDto);
     }
 }

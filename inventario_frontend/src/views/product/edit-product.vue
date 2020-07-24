@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card">
+    <div class="card column is-8 is-offset-2">
       <div class="card-content">
         <div class="media">
           <div class="media-content">
@@ -11,131 +11,135 @@
         </div>
 
         <div class="content">
-          <section>
-            <b-field
-              label="Nombre:"
-              :type="fieldState(product.name) ? 'is-success' : 'is-danger'"
-            >
-              <b-input
-                v-model="product.name"
-                placeholder="Ingrese el nombre del producto"
-              ></b-input>
-            </b-field>
+          <form @submit.prevent="submit()">
+            <div class="columns">
+              <div class="column">
+                <b-field label="Nombre:">
+                  <b-input
+                    v-model="product.name"
+                    placeholder="Ingrese el nombre del producto"
+                    required
+                    validation-message="Ingrese el nombre del producto"
+                  ></b-input>
+                </b-field>
 
-            <b-field
-              label="Descripción:"
-              :type="
-                fieldState(product.description) ? 'is-success' : 'is-danger'
-              "
-            >
-              <b-input
-                v-model="product.description"
-                placeholder="Ingrese la descripción del producto"
-                type="textarea"
-              ></b-input>
-            </b-field>
+                <b-field label="Marca:">
+                  <b-input
+                    v-model="product.brand"
+                    placeholder="Ingrese la marca del producto"
+                    required
+                    validation-message="Ingrese la marca del producto"
+                  ></b-input>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field label="Descripción:">
+                  <b-input
+                    v-model="product.description"
+                    placeholder="Ingrese la descripción del producto"
+                    type="textarea"
+                    required
+                    validation-message="Ingrese la descripción del producto"
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
 
-            <b-field
-              label="Categoría"
-              :type="
-                fieldState(product.categoryId) ? 'is-success' : 'is-danger'
-              "
-            >
-              <b-select
-                v-model="product.categoryId"
-                placeholder="Seleccione una categoría"
-              >
-                <option
-                  v-for="category in categories"
-                  :value="category.id"
-                  :key="category.id"
-                >
-                  {{ category.name }}
-                </option>
-              </b-select>
-            </b-field>
+            <div class="columns">
+              <div class="column">
+                <b-field label="Categoría">
+                  <b-select
+                    v-model="product.categoryId"
+                    placeholder="Seleccione una categoría"
+                    expanded
+                    required
+                    validation-message="Ingrese la categoría del producto"
+                  >
+                    <option
+                      v-for="category in categories"
+                      :value="category.id"
+                      :key="category.id"
+                    >
+                      {{ category.name }}
+                    </option>
+                  </b-select>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field label="Proveedor">
+                  <b-select
+                    v-model="product.vendorId"
+                    placeholder="Seleccione un Proveedor"
+                    expanded
+                    required
+                    validation-message="Seleccione un Proveedor"
+                  >
+                    <option
+                      v-for="vendor in vendors"
+                      :key="vendor.id"
+                      :value="vendor.id"
+                    >
+                      {{ vendor.name }}
+                    </option>
+                  </b-select>
+                </b-field>
+              </div>
+            </div>
 
-            <b-field
-              label="Proveedor"
-              :type="fieldState(product.vendorId) ? 'is-success' : 'is-danger'"
-            >
-              <b-select
-                v-model="product.vendorId"
-                placeholder="Seleccione un Proveedor"
-              >
-                <option
-                  v-for="vendor in vendors"
-                  :key="vendor.id"
-                  :value="vendor.id"
-                >
-                  {{ vendor.name }}
-                </option>
-              </b-select>
-            </b-field>
+            <div class="columns">
+              <div class="column">
+                <b-field :label="product.id ? 'Stock:' : 'Stock Inicial:'">
+                  <b-input
+                    v-model="product.stock"
+                    type="number"
+                    placeholder="Ingrese el stock del producto"
+                    :disabled="product.id"
+                    required
+                    validation-message="Ingrese el stock del producto"
+                  ></b-input>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field label="Unidad de medida:">
+                  <b-input
+                    v-model="product.unitOfMeasurement"
+                    placeholder="Ej: unidad, kg, m, cm, etc."
+                    required
+                    validation-message="Ingrese la unidad de medida"
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
 
-            <b-field
-              label="Código:"
-              :type="fieldState(product.code) ? 'is-success' : 'is-danger'"
-            >
-              <b-input
-                v-model="product.code"
-                placeholder="Ingrese el código del producto"
-              ></b-input>
-            </b-field>
+            <div class="columns">
+              <div class="column">
+                <b-field label="Código:">
+                  <b-input
+                    v-model="product.code"
+                    placeholder="Ingrese el código del producto"
+                    required
+                    validation-message="Ingrese el código del producto"
+                  ></b-input>
+                </b-field>
+              </div>
 
-            <b-field
-              label="Marca:"
-              :type="fieldState(product.brand) ? 'is-success' : 'is-danger'"
-            >
-              <b-input
-                v-model="product.brand"
-                placeholder="Ingrese la marca del producto"
-              ></b-input>
-            </b-field>
-
-            <b-field
-              label="Precio:"
-              :type="
-                fieldState(product.price.value) ? 'is-success' : 'is-danger'
-              "
-            >
-              <b-input
-                v-model="product.price.value"
-                type="number"
-                placeholder="Ingrese el precio del producto"
-              ></b-input>
-            </b-field>
-
-            <b-field
-              label="Stock Inicial:"
-              :type="fieldState(product.stock) ? 'is-success' : 'is-danger'"
-            >
-              <b-input
-                v-model="product.stock"
-                type="number"
-                placeholder="Ingrese el stock inicial del producto"
-              ></b-input>
-            </b-field>
-
-            <b-field
-              label="Unidad de medida:"
-              :type="
-                fieldState(product.unitOfMeasurement)
-                  ? 'is-success'
-                  : 'is-danger'
-              "
-            >
-              <b-input
-                v-model="product.unitOfMeasurement"
-                placeholder="Ej: unidad, kg, m, cm, etc."
-              ></b-input>
-            </b-field>
+              <div class="column">
+                <b-field label="Precio:">
+                  <b-input
+                    v-model="product.price.value"
+                    type="number"
+                    placeholder="Ingrese el precio del producto"
+                    required
+                    validation-message="Ingrese el precio del producto"
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
 
             <b-button
-              type="submit"
+              native-type="submit"
               class="is-success mr-1"
               :disabled="!formValid()"
-              @click="submit"
             >
               {{ product.id ? "Editar" : "Crear" }}
             </b-button>
@@ -146,7 +150,7 @@
             >
               Cancelar
             </b-button>
-          </section>
+          </form>
         </div>
       </div>
     </div>
@@ -183,7 +187,11 @@ export default class EditProduct extends Vue {
 
   formValid() {
     const result = formValidation(this.product as never);
-    return result === "price;" && this.product.price.value;
+    console.log(result);
+    return (
+      (result === "price;" || result === "category;vendor;price;") &&
+      this.product.price.value
+    );
   }
 
   public submit() {
@@ -227,6 +235,7 @@ export default class EditProduct extends Vue {
 
   public updateProduct() {
     this.isLoading = true;
+    this.product.price.value = +this.product.price.value;
     this.productService
       .updateProduct(this.product)
       .then(() => {
