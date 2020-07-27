@@ -18,5 +18,6 @@ namespace Infrastructure.EFCore
         Task<T> Delete(Guid userId, Guid id);
         IQueryable<T> AllIncluding(params Expression<Func<T, object>>[] includeProperties);
         Task<List<T>> FindDeleted(Expression<Func<T, bool>> predicate);
+        Task CommitAsync();
     }
 }

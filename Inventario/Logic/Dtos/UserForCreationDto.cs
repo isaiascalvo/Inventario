@@ -13,6 +13,7 @@ namespace Logic.Dtos
         public string Dni { get; set; }
         public string Phone { get; set; }
         public string Mail { get; set; }
+        public bool IsAdmin { get; set; }
         public bool Active { get; set; }
     }
 }

@@ -12,31 +12,23 @@
 
         <div class="content">
           <form @submit.prevent="submit()">
-            <b-field
-              label="Nombre de usuario:"
-              :type="fieldState(username) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(username) ? '' : 'Debe ingresar el nombre de usuario'
-              "
-            >
+            <b-field label="Nombre de usuario:">
               <b-input
                 v-model="username"
                 placeholder="Ingrese el nombre de usuario"
+                required
+                validation-message="Debe ingresar el nombre de usuario"
               ></b-input>
             </b-field>
 
-            <b-field
-              label="Contraseña:"
-              :type="fieldState(password) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(password) ? '' : 'Debe ingresar la contraseña'
-              "
-            >
+            <b-field label="Contraseña:">
               <b-input
                 v-model="password"
                 placeholder="Ingrese la contraseña"
                 type="password"
                 password-reveal
+                required
+                validation-message="Debe ingresar la contraseña"
               ></b-input>
             </b-field>
 

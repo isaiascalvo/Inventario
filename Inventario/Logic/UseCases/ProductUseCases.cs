@@ -15,19 +15,29 @@ namespace Logic
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IVendorRepository _vendorRepository;
         private readonly IPriceRepository _priceRepository;
         private readonly IMapper _mapper;
 
-        public ProductUseCases(IProductRepository productRepository, ICategoryRepository categoryRepository, IPriceRepository priceRepository, IMapper mapper)
+        public ProductUseCases(IProductRepository productRepository, ICategoryRepository categoryRepository, IVendorRepository vendorRepository, IPriceRepository priceRepository, IMapper mapper)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _vendorRepository = vendorRepository;
             _priceRepository = priceRepository;
             _mapper = mapper;
         }
 
         public async Task<ProductDto> Create(Guid userId, ProductForCreationDto productForCreationDto)
         {
+            var vendor = await _vendorRepository.GetById(productForCreationDto.VendorId);
+            if (vendor == null)
+                throw new KeyNotFoundException($"Vendor with id: {productForCreationDto.VendorId} not found.");
+
+            var category = await _categoryRepository.GetById(productForCreationDto.CategoryId);
+            if (category == null)
+                throw new KeyNotFoundException($"Category with id: {productForCreationDto.CategoryId} not found.");
+
             var product = new Product()
             {
                 Name = productForCreationDto.Name,
@@ -52,7 +62,10 @@ namespace Logic
             };
 
             await _priceRepository.Add(price);
-            
+
+            await _productRepository.CommitAsync();
+            await _priceRepository.CommitAsync();
+
             var productDto = _mapper.Map<Product, ProductDto>(product);
 
             productDto.Price = _mapper.Map<Price, PriceDto>(price);
@@ -65,6 +78,8 @@ namespace Logic
             var product = await _productRepository.Delete(userId, id);
             if (product == null)
                 throw new KeyNotFoundException($"Product with id: {id} not found.");
+
+            await _productRepository.CommitAsync();
         }
 
         public async Task<IEnumerable<ProductDto>> GetAll()
@@ -110,6 +125,14 @@ namespace Logic
 
         public async Task Update(Guid id, ProductDto productDto)
         {
+            var vendor = await _vendorRepository.GetById(productDto.VendorId);
+            if (vendor == null)
+                throw new KeyNotFoundException($"Vendor with id: {productDto.VendorId} not found.");
+
+            var category = await _categoryRepository.GetById(productDto.CategoryId);
+            if (category == null)
+                throw new KeyNotFoundException($"Category with id: {productDto.CategoryId} not found.");
+
             var product = await _productRepository.GetById(id);
             product.Name = productDto.Name;
             product.Description = productDto.Description;
@@ -138,6 +161,9 @@ namespace Logic
 
                 await _priceRepository.Add(price);
             }
+
+            await _productRepository.CommitAsync();
+            await _priceRepository.CommitAsync();
         }
     }
 }

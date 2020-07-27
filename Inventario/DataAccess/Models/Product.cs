@@ -18,7 +18,7 @@ namespace Data
         [Required]
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
-        public Guid? VendorId { get; set; }
+        public Guid VendorId { get; set; }
         public Vendor Vendor { get; set; }
         public string Brand { get; set; }
         public double Stock { get; set; }

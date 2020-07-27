@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card">
+    <div class="card column is-4 is-offset-4">
       <div class="card-content">
         <div class="media">
           <div class="media-content">
@@ -11,34 +11,22 @@
         </div>
         <div class="content">
           <section>
-            <b-field
-              label="Nombre:"
-              :type="fieldState(category.name) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(category.name) ? '' : 'Debe ingresar un nombre'
-              "
-            >
+            <b-field label="Nombre:">
               <b-input
                 v-model="category.name"
                 placeholder="Ingrese el nombre de la categoría"
+                required
+                validation-message="Debe ingresar un nombre"
               ></b-input>
             </b-field>
 
-            <b-field
-              label="Descripción:"
-              :type="
-                fieldState(category.description) ? 'is-success' : 'is-danger'
-              "
-              :message="
-                fieldState(category.description)
-                  ? ''
-                  : 'Debe ingresar una descripción'
-              "
-            >
+            <b-field label="Descripción:">
               <b-input
                 v-model="category.description"
                 placeholder="Ingrese la descripción de la categoría"
                 type="textarea"
+                required
+                validation-message="Debe ingresar una descripción"
               ></b-input>
             </b-field>
 
@@ -118,13 +106,19 @@ export default class EditCategory extends Vue {
       })
       .catch(e => {
         this.isLoading = false;
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
-        // this.errorDialog = true;
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         console.log("error: ", e);
-        // this.$router.push({ name: "CategoryList" });
+        this.$router.push({ name: "CategoryList" });
       });
   }
 
@@ -141,10 +135,17 @@ export default class EditCategory extends Vue {
         this.$router.push({ name: "CategoryList" });
       })
       .catch(e => {
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         this.isLoading = false;
         console.log("error: ", e);
         this.$router.push({ name: "CategoryList" });
@@ -162,6 +163,17 @@ export default class EditCategory extends Vue {
           this.isLoading = false;
         },
         error => {
+          this.$buefy.dialog.alert({
+            title: "Error",
+            message:
+              "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+            type: "is-danger",
+            hasIcon: true,
+            icon: "times-circle",
+            iconPack: "fa",
+            ariaRole: "alertdialog",
+            ariaModal: true
+          });
           console.log(error);
           this.isLoading = false;
         }

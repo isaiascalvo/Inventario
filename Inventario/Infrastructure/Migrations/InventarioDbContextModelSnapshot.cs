@@ -124,52 +124,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("Data.Models.StockMovement", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Amount")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Entry")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModificationAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("LastModificationBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("StockMovements");
-                });
-
             modelBuilder.Entity("Data.Price", b =>
                 {
                     b.Property<Guid>("Id")
@@ -263,7 +217,7 @@ namespace Infrastructure.Migrations
                     b.Property<string>("UnitOfMeasurement")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("VendorId")
+                    b.Property<Guid>("VendorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -277,6 +231,84 @@ namespace Infrastructure.Migrations
                     b.HasIndex("VendorId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Data.ProductEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductEntries");
+                });
+
+            modelBuilder.Entity("Data.ProductEntryLine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductEntryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductEntryLines");
                 });
 
             modelBuilder.Entity("Data.User", b =>
@@ -303,6 +335,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Dni")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -413,15 +448,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Vendors");
                 });
 
-            modelBuilder.Entity("Data.Models.StockMovement", b =>
-                {
-                    b.HasOne("Data.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Data.Price", b =>
                 {
                     b.HasOne("Data.Product", "Product")
@@ -441,7 +467,24 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Data.Vendor", "Vendor")
                         .WithMany()
-                        .HasForeignKey("VendorId");
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Data.ProductEntryLine", b =>
+                {
+                    b.HasOne("Data.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.ProductEntry", "ProductEntry")
+                        .WithMany("ProductEntryLines")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

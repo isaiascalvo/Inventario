@@ -20,6 +20,8 @@ namespace Data
         public string Phone { get; set; }
         public string Mail { get; set; }
         [Required]
+        public bool IsAdmin { get; set; }
+        [Required]
         public bool Active { get; set; }
     }
 }

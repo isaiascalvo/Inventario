@@ -223,10 +223,17 @@ export default class EditProduct extends Vue {
         this.$router.push({ name: "ProductList" });
       })
       .catch(e => {
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         this.isLoading = false;
         console.log("error: ", e);
         this.$router.push({ name: "ProductList" });
@@ -243,10 +250,17 @@ export default class EditProduct extends Vue {
         this.$router.push({ name: "ProductList" });
       })
       .catch(e => {
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         this.isLoading = false;
         console.log("error: ", e);
         this.$router.push({ name: "ProductList" });
@@ -269,10 +283,17 @@ export default class EditProduct extends Vue {
             this.isLoading = false;
           })
           .catch(e => {
-            // this.errorMsg = {
-            //   title: "Error",
-            //   msg: "An unexpected error has occurred. please try again later."
-            // };
+            this.$buefy.dialog.alert({
+              title: "Error",
+              message:
+                "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+              type: "is-danger",
+              hasIcon: true,
+              icon: "times-circle",
+              iconPack: "fa",
+              ariaRole: "alertdialog",
+              ariaModal: true
+            });
             this.isLoading = false;
             console.log("error: ", e);
           });

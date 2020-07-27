@@ -102,6 +102,7 @@ namespace Application.Controllers
                 new Claim("Name", user.Name),
                 new Claim("Lastname", user.Lastname),
                 new Claim(JwtRegisteredClaimNames.Email, user.Mail),
+                new Claim("IsAdmin", user.IsAdmin.ToString()),
                 new Claim(ClaimTypes.Role, "Rol 1")
             };
 
@@ -138,6 +139,7 @@ namespace Application.Controllers
                 Mail = userResult.Mail,
                 Name = userResult.Name,
                 Lastname = userResult.Lastname,
+                IsAdmin = userResult.IsAdmin,
                 Token = token,
                 //Roles = roles.Select(r => r.Codigo),
                 //CodigosMenues = codigosMenues,

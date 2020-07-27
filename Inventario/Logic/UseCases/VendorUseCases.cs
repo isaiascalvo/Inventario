@@ -33,8 +33,9 @@ namespace Logic
                 Description = vendorForCreationDto.Description,
                 CreatedBy = userId
             };
-
-            return _mapper.Map<Vendor, VendorDto>(await _vendorRepository.Add(vendor));
+            vendor = await _vendorRepository.Add(vendor);
+            await _vendorRepository.CommitAsync();
+            return _mapper.Map<Vendor, VendorDto>(vendor);
         }
 
         public async Task Delete(Guid userId, Guid id)
@@ -42,6 +43,8 @@ namespace Logic
             var vendor = await _vendorRepository.Delete(userId, id);
             if (vendor == null)
                 throw new KeyNotFoundException($"Vendor with id: {id} not found.");
+
+            await _vendorRepository.CommitAsync();
         }
 
         public async Task<IEnumerable<VendorDto>> GetAll()
@@ -79,6 +82,7 @@ namespace Logic
             vendor.LastModificationBy = vendorDto.LastModificationBy;
 
             await _vendorRepository.Update(vendor);
+            await _vendorRepository.CommitAsync();
         }
     }
 }

@@ -106,6 +106,8 @@ namespace Application
             services.AddScoped<IVendorRepository, VendorRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IProductEntryRepository, ProductEntryRepository>();
+            services.AddScoped<IProductEntryLineRepository, ProductEntryLineRepository>();
             
             services.AddSingleton<IAuthService, AuthService>();
             

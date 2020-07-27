@@ -1,5 +1,4 @@
 ﻿using Data;
-using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,8 @@ namespace Infrastructure.EFCore
         public DbSet<Price> Prices { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
-        public DbSet<StockMovement> StockMovements { get; set; }
+        public DbSet<ProductEntryLine> ProductEntryLines { get; set; }
+        public DbSet<ProductEntry> ProductEntries { get; set; }
         public DbSet<User> Users { get; set; }
 
         #region Required
@@ -68,11 +68,21 @@ namespace Infrastructure.EFCore
             //.withmany()
             //.hasforeignkey(p => p.cityid);
 
-            //StockMovement
-            modelBuilder.Entity<StockMovement>()
-                .HasOne(sm => sm.Product)
+            //ProductEntryLine
+            modelBuilder.Entity<ProductEntryLine>()
+                .HasOne(pel => pel.Product)
                 .WithMany()
-                .HasForeignKey(sm => sm.ProductId);
+                .HasForeignKey(pel => pel.ProductId);
+            modelBuilder.Entity<ProductEntryLine>()
+                .HasOne(pel => pel.ProductEntry)
+                .WithMany(pe => pe.ProductEntryLines)
+                .HasForeignKey(pel => pel.ProductEntryId);
+
+            //ProductEntry
+            modelBuilder.Entity<ProductEntry>()
+                .HasMany(pe => pe.ProductEntryLines)
+                .WithOne(pel => pel.ProductEntry)
+                .HasForeignKey(pel => pel.ProductId);
 
             //User
             modelBuilder.Entity<User>()

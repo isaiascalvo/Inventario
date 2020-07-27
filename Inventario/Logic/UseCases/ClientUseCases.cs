@@ -35,7 +35,9 @@ namespace Logic
                 CreatedBy = userId
             };
 
-            return _mapper.Map<Client, ClientDto>(await _clientRepository.Add(client));
+            client = await _clientRepository.Add(client);
+            await _clientRepository.CommitAsync();
+            return _mapper.Map<Client, ClientDto>(client);
         }
 
         public async Task Delete(Guid userId, Guid id)
@@ -43,6 +45,8 @@ namespace Logic
             var client = await _clientRepository.Delete(userId, id);
             if (client == null)
                 throw new KeyNotFoundException($"Client with id: {id} not found.");
+
+            await _clientRepository.CommitAsync();
         }
 
         public async Task<IEnumerable<ClientDto>> GetAll()
@@ -77,6 +81,7 @@ namespace Logic
             client.LastModificationBy = clientDto.LastModificationBy;
 
             await _clientRepository.Update(client);
+            await _clientRepository.CommitAsync();
         }
     }
 }

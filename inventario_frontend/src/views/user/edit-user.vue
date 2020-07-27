@@ -113,10 +113,24 @@
               </div>
             </div>
 
-            <div class="field">
-              <b-switch v-model="user.active">
-                Activo
-              </b-switch>
+            <div class="columns">
+              <div class="column">
+                <div class="field">
+                  <b-switch
+                    v-model="user.isAdmin"
+                    :disabled="user.id !== undefined"
+                  >
+                    Administrador
+                  </b-switch>
+                </div>
+              </div>
+              <div class="column">
+                <div class="field">
+                  <b-switch v-model="user.active">
+                    Activo
+                  </b-switch>
+                </div>
+              </div>
             </div>
 
             <b-button
@@ -200,10 +214,17 @@ export default class EditUser extends Vue {
         this.$router.push({ name: "UserList" });
       })
       .catch(e => {
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         this.isLoading = false;
         console.log("error: ", e);
         this.$router.push({ name: "UserList" });
@@ -220,11 +241,17 @@ export default class EditUser extends Vue {
       })
       .catch(e => {
         this.isLoading = false;
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
-        // this.errorDialog = true;
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         console.log("error: ", e);
         this.$router.push({ name: "UserList" });
       });
@@ -240,6 +267,17 @@ export default class EditUser extends Vue {
           this.isLoading = false;
         },
         error => {
+          this.$buefy.dialog.alert({
+            title: "Error",
+            message:
+              "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+            type: "is-danger",
+            hasIcon: true,
+            icon: "times-circle",
+            iconPack: "fa",
+            ariaRole: "alertdialog",
+            ariaModal: true
+          });
           console.log(error);
           this.isLoading = true;
         }

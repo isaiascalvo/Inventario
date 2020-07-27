@@ -38,11 +38,14 @@ namespace Logic
                 Dni = userForCreationDto.Dni,
                 Phone = userForCreationDto.Phone,
                 Mail = userForCreationDto.Mail,
+                IsAdmin = userForCreationDto.IsAdmin,
                 Active = userForCreationDto.Active,
                 CreatedBy = userId
             };
 
-            return _mapper.Map<User, UserDto>(await _userRepository.Add(user));
+            user = await _userRepository.Add(user);
+            await _userRepository.CommitAsync();
+            return _mapper.Map<User, UserDto>(user);
         }
 
         public async Task Delete(Guid userId, Guid id)
@@ -50,6 +53,8 @@ namespace Logic
             var user = await _userRepository.Delete(userId, id);
             if (user == null)
                 throw new KeyNotFoundException($"User with id: {id} not found.");
+
+            await _userRepository.CommitAsync();
         }
 
         public async Task<IEnumerable<UserDto>> GetAll()
@@ -63,6 +68,7 @@ namespace Logic
                 Dni = x.Dni,
                 Phone = x.Phone,
                 Mail = x.Mail,
+                IsAdmin = x.IsAdmin,
                 Active = x.Active,
                 CreatedAt = x.CreatedAt,
                 LastModificationAt = x.LastModificationAt,
@@ -97,10 +103,12 @@ namespace Logic
             user.Dni = userDto.Dni;
             user.Phone = userDto.Phone;
             user.Mail = userDto.Mail;
+            user.IsAdmin = userDto.IsAdmin;
             user.Active = userDto.Active;
             user.LastModificationBy = userDto.LastModificationBy;
 
             await _userRepository.Update(user);
+            await _userRepository.CommitAsync();
         }
 
         public async Task ChangePassword(Guid id, string actualPassword, string newPassword)
@@ -113,6 +121,7 @@ namespace Logic
 
             user.Password = CommonFunctions.MD5(newPassword);
             await _userRepository.Update(user);
+            await _userRepository.CommitAsync();
         }
         public async Task ResetPassword(string mail)
         {
@@ -123,6 +132,7 @@ namespace Logic
             var newPassword = Guid.NewGuid().ToString().Substring(10);
             user.Password = CommonFunctions.MD5(newPassword);
             await _userRepository.Update(user);
+            await _userRepository.CommitAsync();
 
             _sendMailUseCases.SendMail(
                 user.Mail,

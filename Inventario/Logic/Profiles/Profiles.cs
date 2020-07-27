@@ -33,6 +33,12 @@ namespace Logic.Profiles
 
             CreateMap<PriceDto, Price>();
             CreateMap<Price, PriceDto>();
+
+            CreateMap<ProductEntryDto, ProductEntry>();
+            CreateMap<ProductEntry, ProductEntryDto>();
+
+            CreateMap<ProductEntryLineDto, ProductEntryLine>();
+            CreateMap<ProductEntryLine, ProductEntryLineDto>();
         }
     }
 }

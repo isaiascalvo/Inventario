@@ -12,12 +12,12 @@ namespace Logic
 {
     public class CategoryUseCases : ICategoryUseCases
     {
-        private readonly ICategoryRepository __categoryRepositoryRepository;
+        private readonly ICategoryRepository _categoryRepositoryRepository;
         private readonly IMapper _mapper;
 
         public CategoryUseCases(ICategoryRepository categoryRepository, IMapper mapper)
         {
-            __categoryRepositoryRepository = categoryRepository;
+            _categoryRepositoryRepository = categoryRepository;
             _mapper = mapper;
         }
 
@@ -30,26 +30,30 @@ namespace Logic
                 CreatedBy = userId
             };
 
-            return _mapper.Map<Data.Category, CategoryDto>(await __categoryRepositoryRepository.Add(category));
+            category = await _categoryRepositoryRepository.Add(category);
+            await _categoryRepositoryRepository.CommitAsync();
+            return _mapper.Map<Data.Category, CategoryDto>(category);
         }
 
         public async Task Delete(Guid userId, Guid id)
         {
-            var category = await __categoryRepositoryRepository.Delete(userId, id);
+            var category = await _categoryRepositoryRepository.Delete(userId, id);
             if (category == null)
                 throw new KeyNotFoundException($"Category with id: {id} not found.");
+
+            await _categoryRepositoryRepository.CommitAsync();
         }
 
         public async Task<IEnumerable<CategoryDto>> GetAll()
         {
-            var categories = await __categoryRepositoryRepository.GetAll();
+            var categories = await _categoryRepositoryRepository.GetAll();
             var categoriesDto = _mapper.Map<IEnumerable<Data.Category>, IEnumerable<CategoryDto>>(categories);
             return categoriesDto;
         }
 
         public async Task<CategoryDto> GetOne(Guid id)
         {
-            var category = await __categoryRepositoryRepository.GetById(id);
+            var category = await _categoryRepositoryRepository.GetById(id);
             if (category == null)
                 throw new KeyNotFoundException($"Category with id: {id} not found.");
 
@@ -58,11 +62,12 @@ namespace Logic
 
         public async Task Update(Guid id, CategoryDto categoryDto)
         {
-            var category = await __categoryRepositoryRepository.GetById(id);
+            var category = await _categoryRepositoryRepository.GetById(id);
             category.Name = categoryDto.Name;
             category.Description = categoryDto.Description;
             category.LastModificationBy = categoryDto.LastModificationBy;
-            await __categoryRepositoryRepository.Update(category);
+            await _categoryRepositoryRepository.Update(category);
+            await _categoryRepositoryRepository.CommitAsync();
         }
     }
 }

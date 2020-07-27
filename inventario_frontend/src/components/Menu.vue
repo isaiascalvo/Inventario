@@ -57,11 +57,15 @@
 
     <template slot="end">
       <b-navbar-dropdown :label="getName()" v-if="loggedIn()">
-        <!-- <b-navbar-item @click="getName()">EN</b-navbar-item>
-        <b-navbar-item href="#">ES</b-navbar-item>
-        <b-navbar-item href="#">RU</b-navbar-item> -->
+        <b-navbar-item tag="router-link" :to="'/user/modify/' + getUserId()">
+          Mi Perfil
+        </b-navbar-item>
         <b-navbar-item @click="logOut()">Cerrar Sesión</b-navbar-item>
       </b-navbar-dropdown>
+
+      <b-navbar-item v-if="!loggedIn()" tag="router-link" to="/login">
+        Iniciar Sesión
+      </b-navbar-item>
 
       <!-- <b-navbar-dropdown label="">
         <template v-slot:button-content>
@@ -95,8 +99,7 @@ export default class Menu extends Vue {
     { icon: "shape", text: "Categorías", url: "/category-list" },
     { icon: "database", text: "Proveedores", url: "/vendor-list" },
     { icon: "human", text: "Clientes", url: "/client-list" },
-    { icon: "human", text: "Usuarios", url: "/user-list" },
-    { icon: "human", text: "Iniciar Sesión", url: "/login" }
+    { icon: "human", text: "Usuarios", url: "/user-list" }
   ];
 
   public loggedIn() {
@@ -108,6 +111,13 @@ export default class Menu extends Vue {
       sessionStorage.getItem("currentUser") ?? ""
     );
     return currentUser.name + " " + currentUser.lastname;
+  }
+
+  public getUserId() {
+    const currentUser: JwtResult = JSON.parse(
+      sessionStorage.getItem("currentUser") ?? ""
+    );
+    return currentUser.id;
   }
 
   public logOut() {

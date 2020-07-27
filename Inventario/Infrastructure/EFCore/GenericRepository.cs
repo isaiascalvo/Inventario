@@ -13,21 +13,18 @@ namespace Infrastructure.EFCore
     public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity>
         where TEntity : class, IEntity
     {
-        private readonly InventarioDbContext context;
-        private readonly IAuthService _auth;
+        private readonly InventarioDbContext _context;
 
         public GenericRepository(InventarioDbContext context)
         {
-            this.context = context;
-            _auth = new AuthService();
+            this._context = context;
         }
         public async Task<TEntity> Add(TEntity entity)
         {
             //entity.CreatedBy = Guid.Parse(_auth.GetCurrentUserId());
             entity.CreatedAt = DateTime.Now;
             entity.IsDeleted = false;
-            await context.Set<TEntity>().AddAsync(entity);
-            await context.SaveChangesAsync();
+            await _context.Set<TEntity>().AddAsync(entity);
             return entity;
         }
 
@@ -41,14 +38,13 @@ namespace Infrastructure.EFCore
             entity.IsDeleted = true;
             entity.DeletedBy = userId;
             entity.DeletedAt = DateTime.Now;
-            context.Set<TEntity>().Update(entity);
-            await context.SaveChangesAsync();
+            _context.Set<TEntity>().Update(entity);
             return entity;
         }
 
         public async Task<TEntity> GetById(Guid id, params Expression<Func<TEntity, object>>[] includeProperties)
         {
-            IQueryable<TEntity> query = context.Set<TEntity>();
+            IQueryable<TEntity> query = _context.Set<TEntity>();
             foreach (var includeProperty in includeProperties)
             {
                 query = query.Include(includeProperty);
@@ -60,7 +56,7 @@ namespace Infrastructure.EFCore
         {
             try
             {
-                return await context.Set<TEntity>().Where(e => !e.IsDeleted).ToListAsync();
+                return await _context.Set<TEntity>().Where(e => !e.IsDeleted).ToListAsync();
             }
             catch(Exception e)
             {
@@ -72,19 +68,18 @@ namespace Infrastructure.EFCore
         {
             //entity.LastModificationBy = Guid.Parse(_auth.GetCurrentUserId());
             entity.LastModificationAt = DateTime.Now;
-            context.Set<TEntity>().Update(entity);
-            await context.SaveChangesAsync();
+            _context.Set<TEntity>().Update(entity);
             return entity;
         }
 
         public async Task<List<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return await context.Set<TEntity>().Where(predicate).Where(e => !e.IsDeleted).ToListAsync();
+            return await _context.Set<TEntity>().Where(predicate).Where(e => !e.IsDeleted).ToListAsync();
         }
 
         public IQueryable<TEntity> AllIncluding(params Expression<Func<TEntity, object>>[] includeProperties)
         {
-            IQueryable<TEntity> query = context.Set<TEntity>();
+            IQueryable<TEntity> query = _context.Set<TEntity>();
             foreach (var includeProperty in includeProperties)
             {
                 query = query.Include(includeProperty);
@@ -94,7 +89,12 @@ namespace Infrastructure.EFCore
 
         public async Task<List<TEntity>> FindDeleted(Expression<Func<TEntity, bool>> predicate)
         {
-            return await context.Set<TEntity>().Where(predicate).Where(e => e.IsDeleted).ToListAsync();
-        }        
+            return await _context.Set<TEntity>().Where(predicate).Where(e => e.IsDeleted).ToListAsync();
+        }
+
+        public async Task CommitAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

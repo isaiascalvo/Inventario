@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card">
+    <div class="card  column is-4 is-offset-4">
       <div class="card-content">
         <div class="media">
           <div class="media-content">
@@ -12,68 +12,49 @@
 
         <div class="content">
           <section>
-            <b-field
-              label="Nombre:"
-              :type="fieldState(vendor.name) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(vendor.name) ? '' : 'Debe ingresar un nombre'
-              "
-            >
+            <b-field label="Nombre:">
               <b-input
                 v-model="vendor.name"
                 placeholder="Ingrese el nombre del proveedor"
+                required
+                validation-message="Debe ingresar un nombre"
               ></b-input>
             </b-field>
 
-            <b-field
-              label="CUIL:"
-              :type="fieldState(vendor.cuil) ? 'is-success' : 'is-danger'"
-              :message="fieldState(vendor.cuil) ? '' : 'Debe ingresar un cuil'"
-            >
+            <b-field label="CUIL:">
               <b-input
                 v-model="vendor.cuil"
                 placeholder="Ingrese el cuil del proveedor"
+                required
+                validation-message="Debe ingresar un cuil"
               ></b-input>
             </b-field>
 
-            <b-field
-              label="Teléfono"
-              :type="fieldState(vendor.phone) ? 'is-success' : 'is-danger'"
-              :message="
-                fieldState(vendor.phone) ? '' : 'Debe ingresar un teléfono'
-              "
-            >
+            <b-field label="Teléfono">
               <b-input
                 v-model="vendor.phone"
                 placeholder="Ingrese el teléfono del proveedor"
+                required
+                validation-message="Debe ingresar un teléfono"
               ></b-input>
             </b-field>
 
-            <b-field
-              label="Mail"
-              :type="fieldState(vendor.mail) ? 'is-success' : 'is-danger'"
-              :message="fieldState(vendor.mail) ? '' : 'Debe ingresar un mail'"
-            >
+            <b-field label="Mail">
               <b-input
                 v-model="vendor.mail"
                 placeholder="Ingrese el mail del proveedor"
+                required
+                type="email"
+                validation-message="Debe ingresar un mail válido"
               ></b-input>
             </b-field>
 
-            <b-field
-              label="Descripción"
-              :type="
-                fieldState(vendor.description) ? 'is-success' : 'is-danger'
-              "
-              :message="
-                fieldState(vendor.description)
-                  ? ''
-                  : 'Debe ingresar una descripción'
-              "
-            >
+            <b-field label="Descripción">
               <b-input
                 v-model="vendor.description"
                 placeholder="Ingrese la descripción del proveedor"
+                required
+                validation-message="Debe ingresar una descripción"
                 type="textarea"
               ></b-input>
             </b-field>
@@ -150,10 +131,17 @@ export default class EditVendor extends Vue {
         this.$router.push({ name: "VendorList" });
       })
       .catch(e => {
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         this.isLoading = false;
         console.log("error: ", e);
         this.$router.push({ name: "VendorList" });
@@ -170,11 +158,17 @@ export default class EditVendor extends Vue {
       })
       .catch(e => {
         this.isLoading = false;
-        // this.errorMsg = {
-        //   title: "Error",
-        //   msg: "An unexpected error has occurred. please try again later."
-        // };
-        // this.errorDialog = true;
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
         console.log("error: ", e);
         this.$router.push({ name: "VendorList" });
       });
@@ -190,6 +184,17 @@ export default class EditVendor extends Vue {
           this.isLoading = false;
         },
         error => {
+          this.$buefy.dialog.alert({
+            title: "Error",
+            message:
+              "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+            type: "is-danger",
+            hasIcon: true,
+            icon: "times-circle",
+            iconPack: "fa",
+            ariaRole: "alertdialog",
+            ariaModal: true
+          });
           console.log(error);
           this.isLoading = true;
         }

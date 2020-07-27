@@ -38,7 +38,9 @@ namespace Logic
                 CreatedBy = userId
             };
 
-            return _mapper.Map<Price, PriceDto>(await _priceRepository.Add(price));
+            price = await _priceRepository.Add(price);
+            await _priceRepository.CommitAsync();
+            return _mapper.Map<Price, PriceDto>(price);
         }
 
         public async Task Delete(Guid userId, Guid id)
@@ -46,6 +48,8 @@ namespace Logic
             var price = await _priceRepository.Delete(userId, id);
             if (price == null)
                 throw new KeyNotFoundException($"Price with id: {id} not found.");
+
+            await _priceRepository.CommitAsync();
         }
 
         public IEnumerable<PriceDto> GetAll()
@@ -81,6 +85,7 @@ namespace Logic
             price.LastModificationBy = priceDto.LastModificationBy;
 
             await _priceRepository.Update(price);
+            await _priceRepository.CommitAsync();
         }
     }
 }

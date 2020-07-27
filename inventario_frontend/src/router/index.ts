@@ -105,6 +105,25 @@ const routes: Array<RouteConfig> = [
     props: true
   },
   {
+    path: "/client-list",
+    name: "ClientList",
+    component: () =>
+      import(/* webpackChunkName: "client" */ "../views/client/client-list.vue")
+  },
+  {
+    path: "/client/new",
+    name: "NewClient",
+    component: () =>
+      import(/* webpackChunkName: "client" */ "../views/client/edit-client.vue")
+  },
+  {
+    path: "/client/modify/:id",
+    name: "ModifyClient",
+    component: () =>
+      import(/* webpackChunkName: "client" */ "../views/client/edit-client.vue"),
+    props: true
+  },
+  {
     path: "/login",
     name: "Login",
     component: () =>
