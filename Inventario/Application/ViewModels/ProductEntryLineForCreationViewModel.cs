@@ -7,7 +7,8 @@ namespace Application.ViewModels
 {
     public class ProductEntryLineForCreationViewModel
     {
-        public int Quantity { get; set; }
+        public double Quantity { get; set; }
         public Guid ProductId { get; set; }
+        public Guid? ProductEntryId { get; set; }
     }
 }

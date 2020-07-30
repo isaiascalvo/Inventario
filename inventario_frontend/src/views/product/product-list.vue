@@ -219,7 +219,7 @@ export default class ProductList extends Vue {
     this.$buefy.dialog.confirm({
       title: "Eliminando Producto",
       message:
-        "Estás seguro que deseas <b>eliminar</b> el producto? Esta acción no podrá dehacerse.",
+        "Estás seguro que deseas <b>eliminar</b> el producto? Esta acción no podrá deshacerse.",
       confirmText: "Eliminar Producto",
       cancelText: "Cancelar",
       type: "is-danger",

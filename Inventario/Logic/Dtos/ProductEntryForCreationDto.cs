@@ -7,6 +7,7 @@ namespace Logic.Dtos
     public class ProductEntryForCreationDto
     {
         public DateTime Date { get; set; }
+        public bool IsEntry { get; set; }
         public List<ProductEntryLineForCreationDto> ProductEntryLines { get; set; }
     }
 }

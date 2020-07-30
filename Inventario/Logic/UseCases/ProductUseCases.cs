@@ -46,7 +46,7 @@ namespace Logic
                 CategoryId = productForCreationDto.CategoryId,
                 VendorId = productForCreationDto.VendorId,
                 Brand = productForCreationDto.Brand,
-                Stock = productForCreationDto.Stock,
+                Stock = 0,
                 UnitOfMeasurement = productForCreationDto.UnitOfMeasurement,
                 CreatedBy = userId
             };
@@ -140,7 +140,6 @@ namespace Logic
             product.CategoryId = productDto.CategoryId;
             product.VendorId = productDto.VendorId;
             product.Brand = productDto.Brand;
-            product.Stock = productDto.Stock;
             product.UnitOfMeasurement = productDto.UnitOfMeasurement;
             product.LastModificationBy = productDto.LastModificationBy;
 

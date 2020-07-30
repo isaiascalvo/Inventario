@@ -7,7 +7,7 @@ export interface ProductService {
   getProductsFiltered(productFilters: ProductFilters): Promise<Product[]>;
   getOneProductByFilters(productFilters: ProductFilters): Promise<Product>;
   getProduct(id: string): Promise<Product>;
-  addProduct(product: Product): Promise<Product>;
+  addProduct(product: ProductForCreation): Promise<Product>;
   updateProduct(product: Product): Promise<void>;
   deleteProduct(productId: string): Promise<void>;
 }
@@ -17,13 +17,19 @@ export class NavigatorProductService implements ProductService {
     return (await apiClient.get("/products")).data;
   }
 
-  public async getProductsFiltered(productFilters: ProductFilters): Promise<Product[]> {
+  public async getProductsFiltered(
+    productFilters: ProductFilters
+  ): Promise<Product[]> {
     return (
-      await apiClient.get("/products/Filtered?" + this.getQueryString(productFilters))
+      await apiClient.get(
+        "/products/Filtered?" + this.getQueryString(productFilters)
+      )
     ).data;
   }
 
-  public async getOneProductByFilters(productFilters: ProductFilters): Promise<Product> {
+  public async getOneProductByFilters(
+    productFilters: ProductFilters
+  ): Promise<Product> {
     return (
       await apiClient.get(
         "/products/GetOneByFilters?" + this.getQueryString(productFilters)

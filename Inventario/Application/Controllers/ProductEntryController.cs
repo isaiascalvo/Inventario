@@ -2,6 +2,7 @@
 using AutoMapper;
 using Logic;
 using Logic.Dtos;
+using Logic.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -85,7 +86,7 @@ namespace Application.Controllers
                 var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
 
                 await _productEntryUseCases.Delete(userId, productEntryId);
-                return Ok("The Product was deleted.");
+                return Ok("The Product Entry was deleted.");
             }
             catch (KeyNotFoundException)
             {

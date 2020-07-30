@@ -106,7 +106,7 @@ export default class ClientList extends Vue {
     this.$buefy.dialog.confirm({
       title: "Eliminando Cliente",
       message:
-        "Estás seguro que deseas <b>eliminar</b> el cliente? Esta acción no podrá dehacerse.",
+        "Estás seguro que deseas <b>eliminar</b> el cliente? Esta acción no podrá deshacerse.",
       confirmText: "Eliminar Cliente",
       cancelText: "Cancelar",
       type: "is-danger",

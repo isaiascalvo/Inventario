@@ -4,7 +4,7 @@ import { Client, ClientForCreation } from "@/models/client";
 export interface ClientService {
   getClients(): Promise<Client[]>;
   getClient(id: string): Promise<Client>;
-  addClient(client: Client): Promise<Client>;
+  addClient(client: ClientForCreation): Promise<Client>;
   updateClient(client: Client): Promise<void>;
   deleteClient(clientId: string): Promise<void>;
 }

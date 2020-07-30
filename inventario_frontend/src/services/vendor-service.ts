@@ -4,7 +4,7 @@ import { Vendor, VendorForCreation } from "@/models/vendor";
 export interface VendorService {
   getVendors(): Promise<Vendor[]>;
   getVendor(id: string): Promise<Vendor>;
-  addVendor(vendor: Vendor): Promise<Vendor>;
+  addVendor(vendor: VendorForCreation): Promise<Vendor>;
   updateVendor(vendor: Vendor): Promise<void>;
   deleteVendor(vendorId: string): Promise<void>;
 }

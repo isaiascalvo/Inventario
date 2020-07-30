@@ -4,7 +4,7 @@ import { Category, CategoryForCreation } from "@/models/category";
 export interface CategoryService {
   getCategories(): Promise<Category[]>;
   getCategory(id: string): Promise<Category>;
-  addCategory(category: Category): Promise<Category>;
+  addCategory(category: CategoryForCreation): Promise<Category>;
   updateCategory(category: Category): Promise<void>;
   deleteCategory(categoryId: string): Promise<void>;
 }

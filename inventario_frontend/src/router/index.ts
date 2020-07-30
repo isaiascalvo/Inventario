@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
-import store from '@/store';
 
 Vue.use(VueRouter);
 
@@ -120,7 +119,37 @@ const routes: Array<RouteConfig> = [
     path: "/client/modify/:id",
     name: "ModifyClient",
     component: () =>
-      import(/* webpackChunkName: "client" */ "../views/client/edit-client.vue"),
+      import(
+        /* webpackChunkName: "client" */ "../views/client/edit-client.vue"
+      ),
+    props: true
+  },
+  {
+    path: "/product-entry-list",
+    name: "ProductEntryList",
+    component: () =>
+      import(
+        /* webpackChunkName: "productEntry" */
+        "../views/product-entry/product-entry-list.vue"
+      )
+  },
+  {
+    path: "/product-entry/new",
+    name: "NewProductEntry",
+    component: () =>
+      import(
+        /* webpackChunkName: "productEntry" */
+        "../views/product-entry/edit-product-entry.vue"
+      )
+  },
+  {
+    path: "/product-entry/modify/:id",
+    name: "ModifyProductEntry",
+    component: () =>
+      import(
+        /* webpackChunkName: "productEntry" */
+        "../views/product-entry/edit-product-entry.vue"
+      ),
     props: true
   },
   {
@@ -128,6 +157,13 @@ const routes: Array<RouteConfig> = [
     name: "Login",
     component: () =>
       import(/* webpackChunkName: "login" */ "../views/login.vue"),
+    // beforeEnter: (to, from, next) => {
+    //   if (sessionStorage.getItem("currentUser") !== null) {
+    //     next({ name: "Home" });
+    //   } else {
+    //     next();
+    //   }
+    // },
     meta: { noRequiredAuth: true }
   }
 ];
@@ -139,6 +175,12 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  // if (to.path != '/login' && sessionStorage.getItem("currentUser") !== null) {
+  //   next();
+  // } else {
+  //     next('/login');
+  // }
+
   if (!to.meta.noRequiredAuth) {
     if (sessionStorage.getItem("currentUser") === null) {
       next({ name: "Login" });

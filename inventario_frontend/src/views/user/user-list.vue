@@ -105,7 +105,7 @@ export default class UserList extends Vue {
     this.$buefy.dialog.confirm({
       title: "Eliminando Usuario",
       message:
-        "Estás seguro que deseas <b>eliminar</b> el usuario? Esta acción no podrá dehacerse.",
+        "Estás seguro que deseas <b>eliminar</b> el usuario? Esta acción no podrá deshacerse.",
       confirmText: "Eliminar Usuario",
       cancelText: "Cancelar",
       type: "is-danger",

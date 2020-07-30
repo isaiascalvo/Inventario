@@ -24,7 +24,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Util.Auth;
 
 namespace Application
 {
@@ -80,7 +79,8 @@ namespace Application
                     };
                 });
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -99,6 +99,8 @@ namespace Application
             services.AddScoped<ICategoryUseCases, CategoryUseCases>();
             services.AddScoped<IUserUseCases, UserUseCases>();
             services.AddScoped<ISendMailUseCases, SendMailUseCases>();
+            services.AddScoped<IProductEntryUseCases, ProductEntryUseCases>();
+            services.AddScoped<IProductEntryLineUseCases, ProductEntryLineUseCases>();
 
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IPriceRepository, PriceRepository>();
@@ -108,9 +110,7 @@ namespace Application
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductEntryRepository, ProductEntryRepository>();
             services.AddScoped<IProductEntryLineRepository, ProductEntryLineRepository>();
-            
-            services.AddSingleton<IAuthService, AuthService>();
-            
+                        
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 

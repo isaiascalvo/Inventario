@@ -4,14 +4,14 @@
       <div class="hero-head">
         <div class="container level">
           <div>
-            <h1 class="title">Categorías</h1>
+            <h1 class="title">Etradas y Salidas de Productos</h1>
             <h2 class="subtitle">
-              Lista de categorías
+              Lista de etradas y salidas de productos
             </h2>
           </div>
           <div>
-            <b-button type="is-info" tag="router-link" to="/category/new">
-              Nueva Categoría
+            <b-button type="is-info" tag="router-link" to="/product-entry/new">
+              Nueva Entrada/Salida de Productos
             </b-button>
           </div>
         </div>
@@ -22,7 +22,7 @@
       <b-table
         :striped="true"
         :hoverable="true"
-        :data="categories"
+        :data="productEntries"
         id="my-table"
         :paginated="true"
         :per-page="perPage"
@@ -33,23 +33,23 @@
         aria-current-label="Current page"
       >
         <template slot-scope="props">
-          <b-table-column field="name" label="Nombre">
-            {{ props.row.name }}
+          <b-table-column field="date" label="Fecha">
+            {{ dateToISO(props.row.date) }}
           </b-table-column>
-          <b-table-column field="description" label="Descripción">
-            {{ props.row.description }}
+          <b-table-column field="isEntry" label="Tipo">
+            {{ props.row.isEntry ? "Entrada" : "Salida" }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
             <b-button
               tag="router-link"
-              :to="'/category/modify/' + props.row.id"
+              :to="'/product-entry/modify/' + props.row.id"
               type="is-small"
             >
               <b-icon icon="pencil"></b-icon>
             </b-button>
             <b-button
-              @click="deleteCategory(props.row)"
+              @click="deleteProductEntry(props.row)"
               type="is-small"
               class="actionButton"
             >
@@ -78,34 +78,41 @@
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
-import { Category } from "../../models/category";
-import { NavigatorCategoryService } from "../../services/category-service";
+import { ProductEntry } from "../../models/productEntry";
+import { NavigatorProductEntryService } from "../../services/product-entry-service";
 
 @Component
-export default class CategoryList extends Vue {
-  public categories: Category[] = [];
-  public categoryService: NavigatorCategoryService = new NavigatorCategoryService();
+export default class ProductEntryList extends Vue {
+  public productEntries: ProductEntry[] = [];
+  public productEntryService: NavigatorProductEntryService = new NavigatorProductEntryService();
 
   public currentPage = 1;
   public perPage = 10;
   public isLoading = false;
 
-  deleteCategory(category: Category) {
+  dateToISO(date: Date) {
+    return new Date(date).toISOString().substr(0, 10);
+  }
+
+  deleteProductEntry(productEntry: ProductEntry) {
     this.$buefy.dialog.confirm({
-      title: "Eliminando Categoría",
+      title: "Eliminando Entrada de Productos",
       message:
-        "Estás seguro que deseas <b>eliminar</b> la categoría? Esta acción no podrá deshacerse.",
-      confirmText: "Eliminar Categoría",
+        "Estás seguro que deseas <b>eliminar</b> la etrada de productos? Esta acción no podrá deshacerse.",
+      confirmText: "Eliminar Entrada de Productos",
       cancelText: "Cancelar",
       type: "is-danger",
       hasIcon: true,
       onConfirm: () => {
         this.isLoading = true;
-        this.categoryService
-          .deleteCategory(category.id)
+        this.productEntryService
+          .deleteProductEntry(productEntry.id)
           .then(() => {
             this.isLoading = false;
-            this.categories.splice(this.categories.indexOf(category), 1);
+            this.productEntries.splice(
+              this.productEntries.indexOf(productEntry),
+              1
+            );
           })
           .catch(e => {
             this.$buefy.dialog.alert({
@@ -123,17 +130,17 @@ export default class CategoryList extends Vue {
             console.log("error: ", e);
           });
 
-        this.$buefy.toast.open("Categoría eliminada!");
+        this.$buefy.toast.open("Entrada de Productos eliminada!");
       }
     });
   }
 
   created() {
     this.isLoading = true;
-    this.categoryService
-      .getCategories()
+    this.productEntryService
+      .getProductEntries()
       .then(response => {
-        this.categories = response;
+        this.productEntries = response;
         this.isLoading = false;
       })
       .catch(e => {

@@ -5,7 +5,7 @@ import { JwtResult } from "@/models/JwtResult";
 export interface UserService {
   getUsers(): Promise<User[]>;
   getUser(id: string): Promise<User>;
-  addUser(user: User): Promise<User>;
+  addUser(user: UserForCreation): Promise<User>;
   updateUser(user: User): Promise<void>;
   deleteUser(userId: string): Promise<void>;
 }
@@ -31,10 +31,18 @@ export class NavigatorUserService implements UserService {
     return apiClient.delete("/users/" + userId);
   }
 
-  public login(username: string, password: string) : Promise<
-    {config: object, data: JwtResult, headers: object, request: object, status: number, statusText: string}
-  > {
-    return  apiClient.post("login", {
+  public login(
+    username: string,
+    password: string
+  ): Promise<{
+    config: object;
+    data: JwtResult;
+    headers: object;
+    request: object;
+    status: number;
+    statusText: string;
+  }> {
+    return apiClient.post("login", {
       username: username,
       password: password
     });

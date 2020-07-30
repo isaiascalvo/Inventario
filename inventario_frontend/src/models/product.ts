@@ -1,6 +1,6 @@
 import { Category } from "./category";
 import { Vendor } from "./vendor";
-import { PriceForCreation, Price } from './price';
+import { PriceForCreation, Price } from "./price";
 
 export class ProductForCreation {
   public name: string | undefined = undefined;
@@ -17,6 +17,7 @@ export class ProductForCreation {
 
   constructor() {
     this.price = new PriceForCreation();
+    this.stock = 0;
   }
 }
 
@@ -29,4 +30,3 @@ export class Product extends ProductForCreation {
     this.price = new Price();
   }
 }
-

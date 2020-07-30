@@ -99,7 +99,7 @@ export default class VendorList extends Vue {
     this.$buefy.dialog.confirm({
       title: "Eliminando Proveedor",
       message:
-        "Estás seguro que deseas <b>eliminar</b> el proveedor? Esta acción no podrá dehacerse.",
+        "Estás seguro que deseas <b>eliminar</b> el proveedor? Esta acción no podrá deshacerse.",
       confirmText: "Eliminar Proveedor",
       cancelText: "Cancelar",
       type: "is-danger",

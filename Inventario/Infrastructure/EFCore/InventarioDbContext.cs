@@ -82,7 +82,7 @@ namespace Infrastructure.EFCore
             modelBuilder.Entity<ProductEntry>()
                 .HasMany(pe => pe.ProductEntryLines)
                 .WithOne(pel => pel.ProductEntry)
-                .HasForeignKey(pel => pel.ProductId);
+                .HasForeignKey(pel => pel.ProductEntryId);
 
             //User
             modelBuilder.Entity<User>()

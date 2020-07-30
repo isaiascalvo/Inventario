@@ -88,17 +88,16 @@
 
             <div class="columns">
               <div class="column">
-                <b-field :label="product.id ? 'Stock:' : 'Stock Inicial:'">
+                <b-field label="Stock:">
                   <b-input
                     v-model="product.stock"
                     type="number"
                     placeholder="Ingrese el stock del producto"
-                    :disabled="product.id"
-                    required
-                    validation-message="Ingrese el stock del producto"
+                    disabled
                   ></b-input>
                 </b-field>
               </div>
+
               <div class="column">
                 <b-field label="Unidad de medida:">
                   <b-input
