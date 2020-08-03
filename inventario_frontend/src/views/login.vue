@@ -93,7 +93,7 @@ export default class Login extends Vue {
         }
         this.isLoading = false;
         this.$parent.$children[0].$forceUpdate();
-        this.$router.push({ name: "UserList" });
+        this.$router.push({ name: "ProductList" });
       })
       .catch(e => {
         this.$buefy.dialog.alert({

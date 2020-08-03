@@ -100,7 +100,8 @@ export default class Menu extends Vue {
     { icon: "database", text: "Proveedores", url: "/vendor-list" },
     { icon: "human", text: "Clientes", url: "/client-list" },
     { icon: "human", text: "Usuarios", url: "/user-list" },
-    { icon: "human", text: "Entrada de Productos", url: "/product-entry-list" }
+    { icon: "human", text: "Entrada de Productos", url: "/product-entry-list" },
+    { icon: "human", text: "Compras", url: "/purchase-list" }
   ];
 
   public loggedIn() {

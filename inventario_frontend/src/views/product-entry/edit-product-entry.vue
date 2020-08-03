@@ -55,36 +55,51 @@
               <b-table striped hoverable :data="productEntry.productEntryLines">
                 <template slot-scope="props">
                   <b-table-column field="productId" label="Producto">
-                    <b-field v-if="!props.row.id">
-                      <b-select
-                        v-model="props.row.productId"
-                        placeholder="Seleccione un Producto"
-                        expanded
+                    <b-field
+                      v-if="!props.row.id"
+                      :type="
+                        prodCodNameDesc[getIndex(props.row)].focus &&
+                        !fieldState(props.row.productId)
+                          ? 'is-danger'
+                          : ''
+                      "
+                      :message="
+                        prodCodNameDesc[getIndex(props.row)].focus &&
+                        !fieldState(props.row.productId)
+                          ? 'Debe seleccionar un Producto'
+                          : ''
+                      "
+                    >
+                      <b-autocomplete
+                        v-model="prodCodNameDesc[getIndex(props.row)].text"
+                        :data="filteredNamesProducts(props.row)"
+                        placeholder="ej.: Producto X"
+                        icon="magnify"
+                        icon-right="close-circle"
+                        icon-right-clickable
+                        @icon-right-click="
+                          props.row.productId = prodCodNameDesc[
+                            getIndex(props.row)
+                          ].text = ''
+                        "
                         size="is-small"
-                        required
-                        validation-message="Seleccione un Producto"
+                        @select="
+                          option => (props.row.productId = getProductId(option))
+                        "
+                        @blur="
+                          prodCodNameDesc[getIndex(props.row)].focus = true
+                        "
                       >
-                        <option
-                          v-for="product in filteredProducts(
-                            props.row.productId
-                          )"
-                          :key="product.id"
-                          :value="product.id"
+                        <template slot="empty"
+                          >No se encontraron resultados</template
                         >
-                          {{
-                            product.code +
-                              " - " +
-                              product.name +
-                              " - " +
-                              product.description
-                          }}
-                        </option>
-                      </b-select>
+                      </b-autocomplete>
                     </b-field>
                     <span v-if="props.row.id">
                       {{ getProduct(props.row.productId) }}
                     </span>
                   </b-table-column>
+
                   <b-table-column field="quantity" label="Cantidad">
                     <b-field v-if="!props.row.id">
                       <b-input
@@ -103,13 +118,6 @@
                   </b-table-column>
 
                   <b-table-column field="action" label="Acciones">
-                    <!-- <b-button
-                      tag="router-link"
-                      :to="'/product-entry/modify/' + props.row.id"
-                      type="is-small"
-                    >
-                      <b-icon icon="pencil"></b-icon>
-                    </b-button> -->
                     <b-button
                       @click="deleteProductEntryLine(props.row)"
                       type="is-small"
@@ -197,6 +205,7 @@ export default class EditProductEntry extends Vue {
     "Diceimbre"
   ];
   public dayNames = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+  public prodCodNameDesc: { text: string; focus: boolean }[] = [];
 
   public productEntryService: NavigatorProductEntryService = new NavigatorProductEntryService();
   public productService: NavigatorProductService = new NavigatorProductService();
@@ -207,10 +216,15 @@ export default class EditProductEntry extends Vue {
 
   formValid() {
     const result = formValidation(this.productEntry as never);
-    const productsInvalid = this.productEntry.productEntryLines.some(
+    const productsInvalid = this.productEntry.productEntryLines.filter(
       x => x.quantity === undefined || x.productId === undefined
     );
-    if (productsInvalid) {
+
+    if (productsInvalid.length > 0) {
+      this.prodCodNameDesc.forEach((elem, index) => {
+        this.productEntry.productEntryLines[index].productId =
+          this.getProductId(elem.text) ?? "";
+      });
       return false;
     }
     return result === "productEntryLines;";
@@ -223,6 +237,47 @@ export default class EditProductEntry extends Vue {
     );
   }
 
+  filteredNamesProducts(row: ProductEntryLine) {
+    const filtered = this.products.filter(option => {
+      return (
+        (option.name
+          ? option.name
+              .toString()
+              .toLowerCase()
+              .indexOf(
+                (
+                  this.prodCodNameDesc[this.getIndex(row)].text ?? ""
+                ).toLowerCase()
+              ) >= 0
+          : false) &&
+        !this.productEntry.productEntryLines.some(
+          pl => pl.productId === option.id && pl.productId !== row.id
+        )
+      );
+    });
+
+    const codNameDescArray: string[] = [];
+
+    filtered.forEach(x => {
+      if (x.name) {
+        codNameDescArray.push(x.code + " - " + x.name + " - " + x.description);
+      }
+    });
+    return codNameDescArray;
+  }
+
+  getProductId(option: string) {
+    const prod = this.products.find(
+      x => x.code + " - " + x.name + " - " + x.description === option
+    );
+    return prod ? prod.id : undefined;
+  }
+
+  getIndex(row: ProductEntryLine) {
+    const index = this.productEntry.productEntryLines.indexOf(row);
+    return index;
+  }
+
   getProduct(productId: string) {
     const product = this.products.find(x => x.id === productId);
     return product
@@ -232,20 +287,19 @@ export default class EditProductEntry extends Vue {
 
   pushProduct() {
     this.productEntry.productEntryLines.push(new ProductEntryLine());
+    this.prodCodNameDesc.push({ text: "", focus: false });
   }
 
   deleteProductEntryLine(productEntryLine: ProductEntryLine) {
-    const index = this.productEntry.productEntryLines.indexOf(productEntryLine);
+    const index = this.getIndex(productEntryLine);
     this.productEntry.productEntryLines.splice(index, 1);
-  }
+    this.prodCodNameDesc.splice(index, 1);
 
-  filteredProducts(currentProductId: string): Product[] {
-    return this.products.filter(
-      x =>
-        !this.productEntry.productEntryLines.some(
-          pl => pl.productId === x.id && pl.productId !== currentProductId
-        )
-    );
+    this.prodCodNameDesc.forEach((elem, index) => {
+      this.productEntry.productEntryLines[index].productId =
+        this.getProductId(elem.text) ?? "";
+    });
+    this.formValid();
   }
 
   public submit() {
@@ -337,7 +391,19 @@ export default class EditProductEntry extends Vue {
                 this.productEntry.productEntryLines.push(
                   new ProductEntryLine()
                 );
+                this.prodCodNameDesc.push({ text: "", focus: false });
               }
+
+              this.productEntry.productEntryLines.forEach(pel => {
+                const prod =
+                  this.products.find(x => x.id === pel.productId) ??
+                  new Product();
+                this.prodCodNameDesc.push({
+                  text:
+                    prod.code + " - " + prod.name + " - " + prod.description,
+                  focus: true
+                });
+              });
             },
             error => {
               this.isLoading = false;
@@ -359,6 +425,7 @@ export default class EditProductEntry extends Vue {
         } else {
           this.isLoading = false;
           this.productEntry.productEntryLines.push(new ProductEntryLine());
+          this.prodCodNameDesc.push({ text: "", focus: false });
         }
       },
       error => {

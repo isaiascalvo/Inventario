@@ -10,6 +10,7 @@ export interface ProductService {
   addProduct(product: ProductForCreation): Promise<Product>;
   updateProduct(product: Product): Promise<void>;
   deleteProduct(productId: string): Promise<void>;
+  getPriceByDate(productId: string, date: string): Promise<number>;
 }
 
 export class NavigatorProductService implements ProductService {
@@ -51,6 +52,17 @@ export class NavigatorProductService implements ProductService {
 
   public deleteProduct(productId: string): Promise<void> {
     return apiClient.delete("/products/" + productId);
+  }
+
+  public async getPriceByDate(
+    productId: string,
+    date: string
+  ): Promise<number> {
+    return (
+      await apiClient.get(
+        "/products/GetPrice?productId=" + productId + "&date=" + date
+      )
+    ).data;
   }
 
   public getQueryString(productFilters: ProductFilters): string {

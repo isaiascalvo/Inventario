@@ -5,5 +5,5 @@ export class ProductEntryLineForCreation {
 }
 
 export class ProductEntryLine extends ProductEntryLineForCreation {
-  public id!: string;
+  public id: string | undefined = undefined;
 }

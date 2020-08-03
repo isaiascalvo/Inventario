@@ -35,6 +35,30 @@
       <div class="columns filtersClass level" v-if="openFilters">
         <div class="column is-10">
           <b-field grouped group-multiline>
+            <b-field label-position="on-border" label="Código">
+              <b-input
+                v-model="productFilters.code"
+                placeholder="Código"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Nombre">
+              <b-input
+                v-model="productFilters.name"
+                placeholder="Nombre"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Descripción">
+              <b-input
+                v-model="productFilters.description"
+                placeholder="Descripción"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
             <b-field label-position="on-border" label="Categoría">
               <b-select
                 v-model="productFilters.categoryId"
@@ -67,30 +91,6 @@
               </b-select>
             </b-field>
 
-            <!-- <b-field label-position="on-border" label="Cliente">
-              <b-select
-                v-model="productFilters.clientId"
-                placeholder="Seleccione un cliente"
-                size="is-small"
-              >
-                <option
-                  v-for="client in clients"
-                  :key="client.id"
-                  :value="client.id"
-                >
-                  {{ client.name }}
-                </option>
-              </b-select>
-            </b-field> -->
-
-            <b-field label-position="on-border" label="Código">
-              <b-input
-                v-model="productFilters.code"
-                placeholder="Código"
-                size="is-small"
-              ></b-input>
-            </b-field>
-
             <b-field label-position="on-border" label="Marca">
               <b-input
                 v-model="productFilters.brand"
@@ -98,27 +98,15 @@
                 size="is-small"
               ></b-input>
             </b-field>
-
-            <div class="field">
-              <b-checkbox v-model="productFilters.active" size="is-small">
-                Activo?
-              </b-checkbox>
-            </div>
-
-            <div class="field">
-              <b-checkbox v-model="productFilters.available" size="is-small">
-                Disponible?
-              </b-checkbox>
-            </div>
           </b-field>
         </div>
 
         <div class="column level-right">
-          <b-button type="is-info" class="mx-1">
-            Apply
+          <b-button type="is-info" class="mx-1" @click="applyFilters()">
+            Aplicar
           </b-button>
           <b-button @click="clearFilters()" type="is-danger">
-            Clear
+            Limpiar
           </b-button>
         </div>
       </div>
@@ -263,7 +251,54 @@ export default class ProductList extends Vue {
   }
 
   public clearFilters() {
+    this.isLoading = true;
     this.productFilters = new ProductFilters();
+    this.productService
+      .getProducts()
+      .then(response => {
+        this.products = response;
+        this.isLoading = false;
+      })
+      .catch(e => {
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
+        this.isLoading = false;
+        console.log("error: ", e);
+      });
+  }
+
+  public applyFilters() {
+    this.isLoading = true;
+    this.productService
+      .getProductsFiltered(this.productFilters)
+      .then(response => {
+        this.products = response;
+        this.isLoading = false;
+      })
+      .catch(e => {
+        this.$buefy.dialog.alert({
+          title: "Error",
+          message:
+            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          iconPack: "fa",
+          ariaRole: "alertdialog",
+          ariaModal: true
+        });
+        this.isLoading = false;
+        console.log("error: ", e);
+      });
   }
 
   created() {
@@ -313,7 +348,7 @@ th {
 
 .filtersClass {
   margin: 0em !important;
-  padding: 1em;
+  /* padding: 0em; */
   background-color: #e0eaff !important;
 }
 

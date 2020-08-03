@@ -1,6 +1,8 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
+import { JwtResult } from "@/models/JwtResult";
+import { getCurrentUser } from "@/utils/common-functions";
 
 Vue.use(VueRouter);
 
@@ -27,7 +29,8 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(
         /* webpackChunkName: "product" */ "../views/product/edit-product.vue"
-      )
+      ),
+    meta: { requiredAuth: true }
   },
   {
     path: "/product/modify/:id",
@@ -36,7 +39,8 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "product" */ "../views/product/edit-product.vue"
       ),
-    props: true
+    props: true,
+    meta: { requiredAuth: true }
   },
   {
     path: "/category-list",
@@ -52,7 +56,8 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(
         /* webpackChunkName: "category" */ "../views/category/edit-category.vue"
-      )
+      ),
+    meta: { requiredAuth: true }
   },
   {
     path: "/category/modify/:id",
@@ -61,7 +66,8 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "category" */ "../views/category/edit-category.vue"
       ),
-    props: true
+    props: true,
+    meta: { requiredAuth: true }
   },
   {
     path: "/vendor-list",
@@ -73,7 +79,11 @@ const routes: Array<RouteConfig> = [
     path: "/vendor/new",
     name: "NewVendor",
     component: () =>
-      import(/* webpackChunkName: "vendor" */ "../views/vendor/edit-vendor.vue")
+      import(
+        /* webpackChunkName: "vendor" */
+        "../views/vendor/edit-vendor.vue"
+      ),
+    meta: { requiredAuth: true }
   },
   {
     path: "/vendor/modify/:id",
@@ -82,19 +92,22 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "vendor" */ "../views/vendor/edit-vendor.vue"
       ),
-    props: true
+    props: true,
+    meta: { requiredAuth: true }
   },
   {
     path: "/user-list",
     name: "UserList",
     component: () =>
-      import(/* webpackChunkName: "user" */ "../views/user/user-list.vue")
+      import(/* webpackChunkName: "user" */ "../views/user/user-list.vue"),
+    meta: { requiredAuth: true }
   },
   {
     path: "/user/new",
     name: "NewUser",
     component: () =>
-      import(/* webpackChunkName: "user" */ "../views/user/edit-user.vue")
+      import(/* webpackChunkName: "user" */ "../views/user/edit-user.vue"),
+    meta: { requiredAuth: true }
   },
   {
     path: "/user/modify/:id",
@@ -113,7 +126,11 @@ const routes: Array<RouteConfig> = [
     path: "/client/new",
     name: "NewClient",
     component: () =>
-      import(/* webpackChunkName: "client" */ "../views/client/edit-client.vue")
+      import(
+        /* webpackChunkName: "client" */
+        "../views/client/edit-client.vue"
+      ),
+    meta: { requiredAuth: true }
   },
   {
     path: "/client/modify/:id",
@@ -122,7 +139,8 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "client" */ "../views/client/edit-client.vue"
       ),
-    props: true
+    props: true,
+    meta: { requiredAuth: true }
   },
   {
     path: "/product-entry-list",
@@ -153,10 +171,38 @@ const routes: Array<RouteConfig> = [
     props: true
   },
   {
+    path: "/purchase-list",
+    name: "PurchaseList",
+    component: () =>
+      import(
+        /* webpackChunkName: "purchase" */
+        "../views/purchase/purchase-list.vue"
+      )
+  },
+  {
+    path: "/purchase/new",
+    name: "NewPurchase",
+    component: () =>
+      import(
+        /* webpackChunkName: "purchase" */
+        "../views/purchase/edit-purchase.vue"
+      )
+  },
+  {
+    path: "/purchase/modify/:id",
+    name: "ModifyPurchase",
+    component: () =>
+      import(
+        /* webpackChunkName: "purchase" */
+        "../views/purchase/edit-purchase.vue"
+      ),
+    props: true
+  },
+  {
     path: "/login",
     name: "Login",
     component: () =>
-      import(/* webpackChunkName: "login" */ "../views/login.vue"),
+      import(/* webpackChunkName: "login" */ "../views/login.vue")
     // beforeEnter: (to, from, next) => {
     //   if (sessionStorage.getItem("currentUser") !== null) {
     //     next({ name: "Home" });
@@ -164,7 +210,6 @@ const routes: Array<RouteConfig> = [
     //     next();
     //   }
     // },
-    meta: { noRequiredAuth: true }
   }
 ];
 
@@ -175,15 +220,30 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // if (to.path != '/login' && sessionStorage.getItem("currentUser") !== null) {
-  //   next();
-  // } else {
-  //     next('/login');
-  // }
+  if (to.path !== "/login" && sessionStorage.getItem("currentUser") === null) {
+    next({ name: "Login" });
+    alert("Debe iniciar sesión para continuar.");
+  } else {
+    next();
+  }
 
-  if (!to.meta.noRequiredAuth) {
-    if (sessionStorage.getItem("currentUser") === null) {
-      next({ name: "Login" });
+  // if (!to.meta.noRequiredAuth) {
+  //   if (sessionStorage.getItem("currentUser") === null) {
+  //     next({ name: "Login" });
+  //   } else {
+  //     next();
+  //   }
+  // } else {
+  //   next();
+  // }
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiredAuth) {
+    const currentUser: JwtResult | null = getCurrentUser();
+    if (!currentUser || !currentUser.isAdmin) {
+      alert("Acceso denegado.\nDebe ser administrador para poder acceder.");
+      next(false);
     } else {
       next();
     }
