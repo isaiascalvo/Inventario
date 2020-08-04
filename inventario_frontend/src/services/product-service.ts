@@ -4,8 +4,13 @@ import { apiClient } from "./apiClient";
 
 export interface ProductService {
   getProducts(): Promise<Product[]>;
+  getTotalQtyOfProducts(): Promise<number>;
+  getProductsByPageAndQty(page: number, qty: number): Promise<Product[]>;
+  //
   getProductsFiltered(productFilters: ProductFilters): Promise<Product[]>;
-  getOneProductByFilters(productFilters: ProductFilters): Promise<Product>;
+  getTotalQtyOfProductsByFilters(productFilters: ProductFilters): Promise<number>;
+  getProductsByFiltersPageAndQty(productFilters: ProductFilters, skip: number, qty: number): Promise<Product[]>;
+  // getOneProductByFilters(productFilters: ProductFilters): Promise<Product>;
   getProduct(id: string): Promise<Product>;
   addProduct(product: ProductForCreation): Promise<Product>;
   updateProduct(product: Product): Promise<void>;
@@ -18,6 +23,14 @@ export class NavigatorProductService implements ProductService {
     return (await apiClient.get("/products")).data;
   }
 
+  public async getTotalQtyOfProducts(): Promise<number> {
+    return (await apiClient.get("/products/GetTotalQty")).data;
+  }
+
+  public async getProductsByPageAndQty(skip: number, qty: number): Promise<Product[]>{
+    return (await apiClient.get("/products/GetByPageAndQty?skip=" + skip + "&qty=" + qty)).data;
+  }
+
   public async getProductsFiltered(
     productFilters: ProductFilters
   ): Promise<Product[]> {
@@ -28,15 +41,37 @@ export class NavigatorProductService implements ProductService {
     ).data;
   }
 
-  public async getOneProductByFilters(
+  public async getTotalQtyOfProductsByFilters(
     productFilters: ProductFilters
-  ): Promise<Product> {
+  ): Promise<number> {
     return (
       await apiClient.get(
-        "/products/GetOneByFilters?" + this.getQueryString(productFilters)
+        "/products/GetTotalQtyByFilters?" + this.getQueryString(productFilters)
       )
     ).data;
   }
+
+  public async getProductsByFiltersPageAndQty(
+    productFilters: ProductFilters,
+    skip: number,
+    qty: number
+  ): Promise<Product[]> {
+    return (
+      await apiClient.get(
+        "/products/GetByFiltersPageAndQty?" + this.getQueryString(productFilters) + "&skip=" + + skip + "&qty=" + qty
+      )
+    ).data;
+  }
+
+  // public async getOneProductByFilters(
+  //   productFilters: ProductFilters
+  // ): Promise<Product> {
+  //   return (
+  //     await apiClient.get(
+  //       "/products/GetOneByFilters?" + this.getQueryString(productFilters)
+  //     )
+  //   ).data;
+  // }
 
   public async getProduct(id: string): Promise<Product> {
     return (await apiClient.get("/products/" + id)).data;

@@ -116,9 +116,12 @@
         :hoverable="true"
         :data="products"
         id="my-table"
-        :paginated="true"
+        paginated
+        backend-pagination
+        :total="totalPages"
         :per-page="perPage"
         :current-page.sync="currentPage"
+        @page-change="onPageChange"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
         aria-page-label="Page"
@@ -170,6 +173,20 @@
             </b-button>
           </b-table-column>
         </template>
+
+        <template slot="bottom-left">
+          <span class="ml-1">
+            <b-field label="Productos por página:" label-position="on-border">
+              <b-select v-model="perPage" @select="getProducts()">
+                <option value="1">1 por página</option>
+                <option value="5">5 por página</option>
+                <option value="10">10 por página</option>
+                <option value="15">15 por página</option>
+                <option value="20">20 por página</option>
+              </b-select>
+            </b-field>
+          </span>
+        </template>
       </b-table>
     </div>
 
@@ -197,11 +214,13 @@ export default class ProductList extends Vue {
   public vendorService: NavigatorVendorService = new NavigatorVendorService();
 
   public currentPage = 1;
-  public perPage = 10;
+  public perPage = 1;
   public openFilters = false;
   public productFilters: ProductFilters = new ProductFilters();
   public dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
   public isLoading = false;
+  public totalPages = 0;
+  public filtersApplied = false;
 
   deleteProduct(product: Product) {
     this.$buefy.dialog.confirm({
@@ -240,6 +259,11 @@ export default class ProductList extends Vue {
     });
   }
 
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getProducts();
+  }
+
   getCategory(id: string) {
     const elem = this.categories.find(x => x.id === id);
     return elem ? elem.name : "";
@@ -251,62 +275,57 @@ export default class ProductList extends Vue {
   }
 
   public clearFilters() {
-    this.isLoading = true;
+    this.filtersApplied = false;
     this.productFilters = new ProductFilters();
-    this.productService
-      .getProducts()
-      .then(response => {
-        this.products = response;
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
-        });
-        this.isLoading = false;
-        console.log("error: ", e);
-      });
+    this.getProducts();
   }
 
   public applyFilters() {
     this.isLoading = true;
-    this.productService
-      .getProductsFiltered(this.productFilters)
-      .then(response => {
-        this.products = response;
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
+    this.filtersApplied = true;
+    this.getProducts();
+  }
+
+  getProducts(): Promise<void> {
+    this.isLoading = true;
+    let rta: Promise<void>;
+    if (this.filtersApplied) {
+      rta = this.productService
+        .getTotalQtyOfProductsByFilters(this.productFilters)
+        .then(qty => {
+          this.totalPages = qty;
+          return this.productService.getProductsByFiltersPageAndQty(
+            this.productFilters,
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.products = response;
         });
-        this.isLoading = false;
-        console.log("error: ", e);
-      });
+    } else {
+      rta = this.productService
+        .getTotalQtyOfProducts()
+        .then(qty => {
+          this.totalPages = qty;
+          return this.productService.getProductsByPageAndQty(
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.products = response;
+        });
+    }
+
+    this.isLoading = false;
+    return rta;
   }
 
   created() {
-    this.isLoading = true;
-    this.productService
-      .getProducts()
-      .then(response => {
-        this.products = response;
+    this.getProducts()
+      .then(() => {
+        this.isLoading = true;
         return this.categoryService.getCategories();
       })
       .then(response => {
@@ -315,7 +334,6 @@ export default class ProductList extends Vue {
       })
       .then(response => {
         this.vendors = response;
-        this.isLoading = false;
       })
       .catch(e => {
         this.$buefy.dialog.alert({
@@ -331,6 +349,9 @@ export default class ProductList extends Vue {
         });
         this.isLoading = false;
         console.log("error: ", e);
+      })
+      .finally(() => {
+        this.isLoading = false;
       });
   }
 }
