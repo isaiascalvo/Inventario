@@ -39,6 +39,9 @@ namespace Logic.Profiles
 
             CreateMap<ProductEntryLineDto, ProductEntryLine>();
             CreateMap<ProductEntryLine, ProductEntryLineDto>();
+            
+            CreateMap<PurchaseDto, Purchase>();
+            CreateMap<Purchase, PurchaseDto>();
         }
     }
 }

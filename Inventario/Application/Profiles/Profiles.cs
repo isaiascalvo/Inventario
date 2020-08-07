@@ -57,6 +57,13 @@ namespace Application.Profiles
             CreateMap<ProductEntryLineViewModel, ProductEntryLineDto>();
             CreateMap<ProductEntryLineDto, ProductEntryLineViewModel>();
             CreateMap<ProductEntryLineForCreationViewModel, ProductEntryLineForCreationDto>();
+
+            CreateMap<PurchaseViewModel, PurchaseDto>();
+            CreateMap<PurchaseDto, PurchaseViewModel>();
+            CreateMap<PurchaseForCreationViewModel, PurchaseForCreationDto>();
+
+            CreateMap<ProductFiltersViewModel, ProductFiltersDto>();
+            CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
         }
     }
 }

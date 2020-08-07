@@ -51,11 +51,16 @@ namespace Infrastructure.EFCore
             return await query.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
         }
 
-        public async Task<List<TEntity>> GetAll()
+        public async Task<List<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] includeProperties)
         {
             try
             {
-                return await _context.Set<TEntity>().Where(e => !e.IsDeleted).ToListAsync();
+                IQueryable<TEntity> query = _context.Set<TEntity>();
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+                return await query.Where(e => !e.IsDeleted).ToListAsync();
             }
             catch(Exception e)
             {

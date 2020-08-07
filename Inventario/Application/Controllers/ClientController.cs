@@ -38,6 +38,15 @@ namespace Application.Controllers
             return Ok(clientsVM);
         }
 
+        [HttpGet("Filtered")]
+        public async Task<IActionResult> GetByFilters([FromQuery] ClientFiltersViewModel filtersVM)
+        {
+            var filtersDto = _mapper.Map<ClientFiltersViewModel, ClientFiltersDto>(filtersVM);
+            IEnumerable<ClientDto> clientsDto = await _clientUseCases.GetByFilters(filtersDto);
+            IEnumerable<ClientViewModel> clientsVM = _mapper.Map<IEnumerable<ClientDto>, IEnumerable<ClientViewModel>>(clientsDto);
+            return Ok(clientsVM);
+        }
+
         [HttpGet("{clientId}", Name = "GetClient")]
         public async Task<IActionResult> GetOne(Guid clientId)
         {

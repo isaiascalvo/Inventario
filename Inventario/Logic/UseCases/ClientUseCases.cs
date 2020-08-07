@@ -5,6 +5,7 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,6 +56,13 @@ namespace Logic
             var clientDto = _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(client);
             return clientDto;
         }
+        public async Task<IEnumerable<ClientDto>> GetByFilters(ClientFiltersDto filters)
+        {
+            var tt = filters.GetExpresion();
+            var clients = (await _clientRepository.GetAll()).AsQueryable().Where(tt).ToList().OrderBy(x => x.Name);
+            return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+        }
+
 
         public async Task<ClientDto> GetOne(Guid id)
         {

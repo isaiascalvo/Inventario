@@ -101,6 +101,7 @@ namespace Application
             services.AddScoped<ISendMailUseCases, SendMailUseCases>();
             services.AddScoped<IProductEntryUseCases, ProductEntryUseCases>();
             services.AddScoped<IProductEntryLineUseCases, ProductEntryLineUseCases>();
+            services.AddScoped<IPurchaseUseCases, PurchaseUseCases>();
 
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IPriceRepository, PriceRepository>();
@@ -110,6 +111,7 @@ namespace Application
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductEntryRepository, ProductEntryRepository>();
             services.AddScoped<IProductEntryLineRepository, ProductEntryLineRepository>();
+            services.AddScoped<IPurchaseRepository, PurchaseRepository>();
                         
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }

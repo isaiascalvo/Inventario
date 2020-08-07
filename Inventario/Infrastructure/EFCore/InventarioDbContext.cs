@@ -21,6 +21,7 @@ namespace Infrastructure.EFCore
         public DbSet<ProductEntryLine> ProductEntryLines { get; set; }
         public DbSet<ProductEntry> ProductEntries { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Purchase> Purchases { get; set; }
 
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -94,6 +95,11 @@ namespace Infrastructure.EFCore
             modelBuilder.Entity<User>()
                 .HasIndex(c => c.Phone).IsUnique();
 
+            //Purchase
+            modelBuilder.Entity<Purchase>()
+                .HasOne(p => p.Product)
+                .WithMany()
+                .HasForeignKey(p => p.ProductId);
         }
         #endregion
 

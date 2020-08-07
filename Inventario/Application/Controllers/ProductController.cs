@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -40,6 +41,96 @@ namespace Application
                 return Ok(productsVM);
             }
             catch(Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _productUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<ProductDto> productsDto = await _productUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<ProductViewModel> productsVM = _mapper.Map<IEnumerable<ProductDto>, IEnumerable<ProductViewModel>>(productsDto);
+                return Ok(productsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("Filtered")]
+        public async Task<IActionResult> GetByFilters([FromQuery] ProductFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<ProductFiltersViewModel, ProductFiltersDto>(filtersVM);
+                IEnumerable<ProductDto> productsDto = await _productUseCases.GetByFilters(filtersDto);
+                IEnumerable<ProductViewModel> productsVM = _mapper.Map<IEnumerable<ProductDto>, IEnumerable<ProductViewModel>>(productsDto);
+                return Ok(productsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] ProductFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<ProductFiltersViewModel, ProductFiltersDto>(filtersVM);
+                int qty = await _productUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] ProductFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<ProductFiltersViewModel, ProductFiltersDto>(filtersVM);
+                IEnumerable<ProductDto> productsDto = await _productUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<ProductViewModel> productsVM = _mapper.Map<IEnumerable<ProductDto>, IEnumerable<ProductViewModel>>(productsDto);
+                return Ok(productsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetPrice")]
+        public async Task<IActionResult> GetByFilters([FromQuery] string productId, [FromQuery] string date)
+        {
+            try
+            {
+                double price = await _productUseCases.GetPriceByDate(Guid.Parse(productId), DateTime.Parse(date));
+                return Ok(price);
+            }
+            catch (Exception e)
             {
                 throw e;
             }

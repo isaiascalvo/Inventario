@@ -94,6 +94,54 @@ namespace Logic
             return productsDto;
         }
 
+        public async Task<int> GetTotalQty()
+        {
+            return (await _productRepository.GetAll()).Count();
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var products = (await _productRepository.GetAll()).OrderBy(x => x.Name).Skip(skip).Take(qty);
+            var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
+            foreach (var prodDto in productsDto)
+            {
+                var price = (await _priceRepository.GetAll()).Where(p => p.ProductId == prodDto.Id).OrderByDescending(x => x.DateTime).FirstOrDefault();
+                prodDto.Price = _mapper.Map<Price, PriceDto>(price);
+            }
+            return productsDto;
+        }
+        
+        public async Task<IEnumerable<ProductDto>> GetByFilters(ProductFiltersDto filters)
+        {
+            var tt = filters.GetExpresion();
+            var products = (await _productRepository.GetAll()).AsQueryable().Where(tt).ToList().OrderBy(x => x.Name);
+            var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
+            foreach (var prodDto in productsDto)
+            {
+                var price = (await _priceRepository.GetAll()).Where(p => p.ProductId == prodDto.Id).OrderByDescending(x => x.DateTime).FirstOrDefault();
+                prodDto.Price = _mapper.Map<Price, PriceDto>(price);
+            }
+            return productsDto;
+        }
+
+        public async Task<int> GetTotalQtyByFilters(ProductFiltersDto filters)
+        {
+            return (await _productRepository.GetAll()).AsQueryable().Where(filters.GetExpresion()).Count();
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetFilteredByPageAndQty(ProductFiltersDto filters, int skip, int qty)
+        {
+            var tt = filters.GetExpresion();
+            var products = (await _productRepository.GetAll()).AsQueryable().Where(tt).ToList().OrderBy(x => x.Name).Skip(skip).Take(qty);
+            var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
+            foreach (var prodDto in productsDto)
+            {
+                var price = (await _priceRepository.GetAll()).Where(p => p.ProductId == prodDto.Id).OrderByDescending(x => x.DateTime).FirstOrDefault();
+                prodDto.Price = _mapper.Map<Price, PriceDto>(price);
+            }
+            return productsDto;
+        }
+
         public async Task<IEnumerable<ProductDto>> GetByCategory(Guid categoryId)
         {
             var products = (await _productRepository.GetAll()).Where(x => x.CategoryId == categoryId).OrderBy(x => x.Name);
@@ -163,6 +211,21 @@ namespace Logic
 
             await _productRepository.CommitAsync();
             await _priceRepository.CommitAsync();
+        }
+
+        public async Task<double> GetPriceByDate(Guid productId, DateTime date)
+        {
+            var product = await _productRepository.GetById(productId);
+            if (product == null)
+                throw new KeyNotFoundException($"Product with id: {productId} not found.");
+
+            var price = (await _priceRepository.GetAll())
+                .OrderByDescending(x => x.DateTime)
+                .FirstOrDefault(x => x.ProductId == productId && x.DateTime <= date);
+            if (price == null)
+                throw new Exception("Price not found.");
+
+            return price.Value;
         }
     }
 }
