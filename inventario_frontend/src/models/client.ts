@@ -7,7 +7,7 @@ export class ClientForCreation {
   public active = true;
   public birthdate: Date | undefined = undefined;
 }
-  
+
 export class Client extends ClientForCreation {
   public id!: string;
 }

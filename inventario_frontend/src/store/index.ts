@@ -13,7 +13,7 @@ export default new Vuex.Store({
     // }
   },
   actions: {},
-  modules: {},
+  modules: {}
   // getters: {
   //   getCurrentUser(state) {
   //     return state.currentUser;

@@ -8,8 +8,14 @@ export interface ProductService {
   getProductsByPageAndQty(page: number, qty: number): Promise<Product[]>;
   //
   getProductsFiltered(productFilters: ProductFilters): Promise<Product[]>;
-  getTotalQtyOfProductsByFilters(productFilters: ProductFilters): Promise<number>;
-  getProductsByFiltersPageAndQty(productFilters: ProductFilters, skip: number, qty: number): Promise<Product[]>;
+  getTotalQtyOfProductsByFilters(
+    productFilters: ProductFilters
+  ): Promise<number>;
+  getProductsByFiltersPageAndQty(
+    productFilters: ProductFilters,
+    skip: number,
+    qty: number
+  ): Promise<Product[]>;
   // getOneProductByFilters(productFilters: ProductFilters): Promise<Product>;
   getProduct(id: string): Promise<Product>;
   addProduct(product: ProductForCreation): Promise<Product>;
@@ -27,8 +33,15 @@ export class NavigatorProductService implements ProductService {
     return (await apiClient.get("/products/GetTotalQty")).data;
   }
 
-  public async getProductsByPageAndQty(skip: number, qty: number): Promise<Product[]>{
-    return (await apiClient.get("/products/GetByPageAndQty?skip=" + skip + "&qty=" + qty)).data;
+  public async getProductsByPageAndQty(
+    skip: number,
+    qty: number
+  ): Promise<Product[]> {
+    return (
+      await apiClient.get(
+        "/products/GetByPageAndQty?skip=" + skip + "&qty=" + qty
+      )
+    ).data;
   }
 
   public async getProductsFiltered(
@@ -58,7 +71,12 @@ export class NavigatorProductService implements ProductService {
   ): Promise<Product[]> {
     return (
       await apiClient.get(
-        "/products/GetByFiltersPageAndQty?" + this.getQueryString(productFilters) + "&skip=" + + skip + "&qty=" + qty
+        "/products/GetByFiltersPageAndQty?" +
+          this.getQueryString(productFilters) +
+          "&skip=" +
+          skip +
+          "&qty=" +
+          qty
       )
     ).data;
   }

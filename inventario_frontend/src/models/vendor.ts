@@ -6,7 +6,7 @@ export class VendorForCreation {
   public active = true;
   public description: string | undefined = undefined;
 }
-  
+
 export class Vendor extends VendorForCreation {
   public id!: string;
 }
