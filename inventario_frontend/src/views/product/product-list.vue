@@ -1,13 +1,10 @@
 <template>
   <div>
-    <section class="hero is-light">
+    <section class="hero is-light p-1">
       <div class="hero-head">
         <div class="container level">
           <div>
-            <h1 class="title">Productos</h1>
-            <h2 class="subtitle">
-              Lista de productos
-            </h2>
+            <h1 class="title is-6">Lista de Productos</h1>
           </div>
           <div>
             <b-button
@@ -15,6 +12,7 @@
               tag="router-link"
               to="/product/new"
               class="mx-1"
+              size="is-small"
             >
               Nuevo Producto
             </b-button>
@@ -22,7 +20,10 @@
               @click="openFilters = !openFilters"
               class="is-pulled-right"
               type="is-primary"
-              :icon-right="openFilters ? 'eye-off-outline' : 'eye-outline'"
+              size="is-small"
+              :icon-right="
+                openFilters ? 'filter-variant-minus' : 'filter-variant'
+              "
             >
               {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
             </b-button>
@@ -112,8 +113,9 @@
       </div>
 
       <b-table
-        :striped="true"
-        :hoverable="true"
+        striped
+        hoverable
+        scrollable
         :data="products"
         id="my-table"
         paginated
@@ -127,6 +129,9 @@
         aria-page-label="Page"
         aria-current-label="Current page"
       >
+        <template slot="empty">
+          No hay productos registrados
+        </template>
         <template slot-scope="props">
           <b-table-column field="name" label="Nombre">
             {{ props.row.name }}
@@ -362,27 +367,54 @@ export default class ProductList extends Vue {
   cursor: pointer;
 }
 
-th {
-  /* background-color: #dbdbdb; */
-  background-color: #384caf4a;
-}
-
 .filtersClass {
   margin: 0em !important;
-  /* padding: 0em; */
+  padding: 1em;
   background-color: #e0eaff !important;
-}
-
-.actionButton {
-  margin-left: 5px;
 }
 
 table {
   font-size: 13px;
-  border: 0px !important;
+  border: 1px solid rgb(192, 192, 192) !important;
+  /* margin-left: 10px; */
 }
 
-.filtersClass select {
+th {
+  /* background-color: #dbdbdb; */
+  background-color: rgb(229, 229, 229);
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
+td {
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
+.ml-1 {
+  margin-left: 1em;
+}
+
+select {
   min-width: 120px;
+}
+
+.filterButton {
+  float: right;
+}
+
+.filtersClass select,
+.filtersClass input {
+  width: 180px;
+}
+
+select {
+  min-width: 90px;
+}
+
+input {
+  min-width: 80px;
+}
+
+.fieldWidth {
+  width: 80px;
 }
 </style>

@@ -20,11 +20,12 @@
 
     <div class="">
       <b-table
-        :striped="true"
-        :hoverable="true"
+        striped
+        hoverable
+        scrollable
         :data="categories"
         id="my-table"
-        :paginated="true"
+        paginated
         :per-page="perPage"
         :current-page.sync="currentPage"
         aria-next-label="Next page"
@@ -32,6 +33,9 @@
         aria-page-label="Page"
         aria-current-label="Current page"
       >
+        <template slot="empty">
+          No hay categorías registradas
+        </template>
         <template slot-scope="props">
           <b-table-column field="name" label="Nombre">
             {{ props.row.name }}
@@ -160,31 +164,54 @@ export default class CategoryList extends Vue {
   cursor: pointer;
 }
 
-th {
-  /* background-color: #dbdbdb; */
-  background-color: #384caf4a;
-}
-
 .filtersClass {
   margin: 0em !important;
   padding: 1em;
   background-color: #e0eaff !important;
 }
 
+table {
+  font-size: 13px;
+  border: 1px solid rgb(192, 192, 192) !important;
+  /* margin-left: 10px; */
+}
+
+th {
+  /* background-color: #dbdbdb; */
+  background-color: rgb(229, 229, 229);
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
+td {
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
 .ml-1 {
   margin-left: 1em;
 }
 
-.actionButton {
-  margin-left: 5px;
-}
-
-table {
-  font-size: 13px;
-  border: 0px !important;
-}
-
-.filtersClass select {
+select {
   min-width: 120px;
+}
+
+.filterButton {
+  float: right;
+}
+
+.filtersClass select,
+.filtersClass input {
+  width: 180px;
+}
+
+select {
+  min-width: 90px;
+}
+
+input {
+  min-width: 80px;
+}
+
+.fieldWidth {
+  width: 80px;
 }
 </style>

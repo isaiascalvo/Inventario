@@ -66,14 +66,6 @@
       <b-navbar-item v-if="!loggedIn()" tag="router-link" to="/login">
         Iniciar Sesión
       </b-navbar-item>
-
-      <!-- <b-navbar-dropdown label="">
-        <template v-slot:button-content>
-          <em>User</em>
-        </template>
-        <b-navbar-item href="#">Profile</b-navbar-item>
-        <b-navbar-item href="#">Sign Out</b-navbar-item>
-      </b-navbar-dropdown> -->
     </template>
   </b-navbar>
 </template>

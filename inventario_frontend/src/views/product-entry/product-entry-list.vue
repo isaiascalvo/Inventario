@@ -1,17 +1,19 @@
 <template>
   <div>
-    <section class="hero is-light">
+    <section class="hero is-light p-1">
       <div class="hero-head">
-        <div class="container level">
+        <div class="level">
           <div>
-            <h1 class="title">Etradas y Salidas de Productos</h1>
-            <h2 class="subtitle">
-              Lista de etradas y salidas de productos
-            </h2>
+            <h1 class="title is-6">Lista de movimientos</h1>
           </div>
           <div>
-            <b-button type="is-info" tag="router-link" to="/product-entry/new">
-              Nueva Entrada/Salida de Productos
+            <b-button
+              type="is-info"
+              size="is-small"
+              tag="router-link"
+              to="/product-entry/new"
+            >
+              Nuevo movimiento
             </b-button>
           </div>
         </div>
@@ -20,8 +22,9 @@
 
     <div class="">
       <b-table
-        :striped="true"
-        :hoverable="true"
+        striped
+        hoverable
+        scrollable
         :data="productEntries"
         id="my-table"
         :paginated="true"
@@ -32,6 +35,9 @@
         aria-page-label="Page"
         aria-current-label="Current page"
       >
+        <template slot="empty">
+          No hay entradas/salidas de productos registradas
+        </template>
         <template slot-scope="props">
           <b-table-column field="date" label="Fecha">
             {{ dateToISO(props.row.date) }}
@@ -167,31 +173,54 @@ export default class ProductEntryList extends Vue {
   cursor: pointer;
 }
 
-th {
-  /* background-color: #dbdbdb; */
-  background-color: #384caf4a;
-}
-
 .filtersClass {
   margin: 0em !important;
   padding: 1em;
   background-color: #e0eaff !important;
 }
 
+table {
+  font-size: 13px;
+  border: 1px solid rgb(192, 192, 192) !important;
+  /* margin-left: 10px; */
+}
+
+th {
+  /* background-color: #dbdbdb; */
+  background-color: rgb(229, 229, 229);
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
+td {
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
 .ml-1 {
   margin-left: 1em;
 }
 
-.actionButton {
-  margin-left: 5px;
-}
-
-table {
-  font-size: 13px;
-  border: 0px !important;
-}
-
-.filtersClass select {
+select {
   min-width: 120px;
+}
+
+.filterButton {
+  float: right;
+}
+
+.filtersClass select,
+.filtersClass input {
+  width: 180px;
+}
+
+select {
+  min-width: 90px;
+}
+
+input {
+  min-width: 80px;
+}
+
+.fieldWidth {
+  width: 80px;
 }
 </style>

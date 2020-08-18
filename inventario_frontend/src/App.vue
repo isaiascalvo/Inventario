@@ -1,17 +1,20 @@
 <template>
-  <div>
-    <Menu />
-    <router-view class="box"></router-view>
+  <div id="app">
+    <!-- <Menu /> -->
+    <SideBarMenu />
+    <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import Menu from "./components/Menu.vue";
+import SideBarMenu from "./components/SideBarMenu.vue";
 
 @Component({
   components: {
-    Menu
+    Menu,
+    SideBarMenu
   }
 })
 export default class App extends Vue {}

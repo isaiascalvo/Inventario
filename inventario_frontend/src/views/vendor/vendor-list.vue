@@ -26,6 +26,7 @@
     <b-table
       striped
       hoverable
+      scrollable
       :data="vendors"
       id="my-table"
       :paginated="true"
@@ -36,6 +37,9 @@
       aria-page-label="Page"
       aria-current-label="Current page"
     >
+      <template slot="empty">
+        No hay proveedores registrados
+      </template>
       <template slot-scope="props">
         <b-table-column field="name" label="Nombre">
           {{ props.row.name }}
@@ -164,21 +168,54 @@ export default class VendorList extends Vue {
   cursor: pointer;
 }
 
+.filtersClass {
+  margin: 0em !important;
+  padding: 1em;
+  background-color: #e0eaff !important;
+}
+
+table {
+  font-size: 13px;
+  border: 1px solid rgb(192, 192, 192) !important;
+  /* margin-left: 10px; */
+}
+
 th {
   /* background-color: #dbdbdb; */
-  background-color: #384caf4a;
+  background-color: rgb(229, 229, 229);
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
+td {
+  border: 1px solid rgb(192, 192, 192) !important;
 }
 
 .ml-1 {
   margin-left: 1em;
 }
 
-.actionButton {
-  margin-left: 5px;
+select {
+  min-width: 120px;
 }
 
-table {
-  font-size: 13px;
-  border: 0px !important;
+.filterButton {
+  float: right;
+}
+
+.filtersClass select,
+.filtersClass input {
+  width: 180px;
+}
+
+select {
+  min-width: 90px;
+}
+
+input {
+  min-width: 80px;
+}
+
+.fieldWidth {
+  width: 80px;
 }
 </style>
