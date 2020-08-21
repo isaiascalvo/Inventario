@@ -11,7 +11,7 @@
         </div>
 
         <div class="content">
-          <section>
+          <form @submit.prevent="submit()" class="flex-text-left">
             <b-field
               label="Producto"
               :type="
@@ -91,33 +91,35 @@
                 required
                 validation-message="Debe ingresar una cantidad"
                 size="is-small"
+                type="number"
               ></b-input>
             </b-field>
 
-            <b-field label="Precio Unitario:">
+            <b-field>
+              <p class="pMargin"><strong>Precio Unitario: $</strong></p>
               <b-input
                 :value="getUnitPrice()"
                 disabled
                 size="is-small"
-                icon="currency-usd"
               ></b-input>
             </b-field>
 
-            <b-field label="Importe Total:">
+            <b-field>
+              <p class="pMargin">
+                <strong>Importe Total: $</strong>
+              </p>
               <b-input
                 v-model="purchase.amount"
                 :value="getImporte()"
                 disabled
                 size="is-small"
-                icon="currency-usd"
               ></b-input>
             </b-field>
 
             <b-button
-              type="submit"
+              native-type="submit"
               class="is-success mr-1"
               :disabled="!formValid()"
-              @click="submit"
             >
               {{ purchase.id ? "Editar" : "Crear" }}
             </b-button>
@@ -128,7 +130,7 @@
             >
               Cancelar
             </b-button>
-          </section>
+          </form>
         </div>
       </div>
     </div>
@@ -424,5 +426,12 @@ export default class EditPurchase extends Vue {
 <style>
 .mr-1 {
   margin-right: 1em;
+}
+.flex-text-left {
+  display: flow-root;
+  text-align: left;
+}
+.pMargin {
+  margin-right: 5px;
 }
 </style>

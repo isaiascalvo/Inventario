@@ -10,7 +10,8 @@
       <b-sidebar
         type="has-background-dark"
         :fullheight="true"
-        :overlay="true"
+        :can-cancel="true"
+        :overlay="false"
         :open.sync="openSidebar"
       >
         <div class="p-1">
@@ -82,18 +83,21 @@ export default class Menu extends Vue {
       icon: "text-box-outline",
       text: "Productos",
       url: "/product-list"
-      // subItems: [
-      //   { text: "Rate List", url: "/rates" },
-      //   { text: "Filtered Rates", url: "/rates/filteredRates" },
-      //   { text: "Find One Rate", url: "/rates/findOne" }
-      // ]
     },
     { icon: "shape", text: "Categorías", url: "/category-list" },
-    { icon: "database", text: "Proveedores", url: "/vendor-list" },
+    {
+      icon: "truck-delivery-outline",
+      text: "Proveedores",
+      url: "/vendor-list"
+    },
     { icon: "human", text: "Clientes", url: "/client-list" },
-    { icon: "human", text: "Usuarios", url: "/user-list" },
-    { icon: "human", text: "Entrada de Productos", url: "/product-entry-list" },
-    { icon: "human", text: "Compras", url: "/purchase-list" }
+    { icon: "account-group", text: "Usuarios", url: "/user-list" },
+    {
+      icon: "ballot-recount-outline",
+      text: "Movimientos de Stock",
+      url: "/product-entry-list"
+    },
+    { icon: "briefcase-outline", text: "Compras", url: "/purchase-list" }
   ];
 
   public loggedIn() {

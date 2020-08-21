@@ -9,8 +9,9 @@
             </p>
           </div>
         </div>
+
         <div class="content">
-          <section>
+          <form @submit.prevent="submit()" class="flex-text-left">
             <b-field label="Nombre:">
               <b-input
                 v-model="category.name"
@@ -31,10 +32,9 @@
             </b-field>
 
             <b-button
-              type="submit"
+              native-type="submit"
               class="is-success mr-1"
               :disabled="!formValid()"
-              @click="submit"
             >
               {{ category.id ? "Editar" : "Crear" }}
             </b-button>
@@ -45,7 +45,7 @@
             >
               Cancelar
             </b-button>
-          </section>
+          </form>
         </div>
       </div>
     </div>
@@ -186,5 +186,9 @@ export default class EditCategory extends Vue {
 <style>
 .mr-1 {
   margin-right: 1em;
+}
+.flex-text-left {
+  display: flow-root;
+  text-align: left;
 }
 </style>

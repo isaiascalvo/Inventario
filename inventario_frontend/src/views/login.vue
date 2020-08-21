@@ -10,7 +10,7 @@
           </div>
         </div>
 
-        <div class="content">
+        <div class="content flex-text-left">
           <form @submit.prevent="submit()">
             <b-field label="Nombre de usuario:">
               <b-input
@@ -114,5 +114,10 @@ export default class Login extends Vue {
 <style>
 .mr-1 {
   margin-right: 1em;
+}
+
+.flex-text-left {
+  display: flow-root;
+  text-align: left;
 }
 </style>

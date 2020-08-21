@@ -1,16 +1,18 @@
 <template>
   <div>
-    <section class="hero is-light">
+    <section class="hero is-light p-1">
       <div class="hero-head">
-        <div class="container level">
+        <div class="level">
           <div>
-            <h1 class="title">Categorías</h1>
-            <h2 class="subtitle">
-              Lista de categorías
-            </h2>
+            <h1 class="title is-6">Lista de Categorías</h1>
           </div>
           <div>
-            <b-button type="is-info" tag="router-link" to="/category/new">
+            <b-button
+              type="is-info"
+              size="is-small"
+              tag="router-link"
+              to="/category/new"
+            >
               Nueva Categoría
             </b-button>
           </div>
@@ -213,5 +215,9 @@ input {
 
 .fieldWidth {
   width: 80px;
+}
+
+.p-1 {
+  padding: 1em;
 }
 </style>

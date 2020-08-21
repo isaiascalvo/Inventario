@@ -1,17 +1,15 @@
 <template>
   <div>
-    <section class="hero is-light">
+    <section class="hero is-light p-1">
       <div class="hero-head">
-        <div class="container level">
+        <div class="level">
           <div>
-            <h1 class="title">Proveedores</h1>
-            <h2 class="subtitle">
-              Lista de proveedores
-            </h2>
+            <h1 class="title is-6">Lista de Proveedores</h1>
           </div>
           <div>
             <b-button
               type="is-info"
+              size="is-small"
               tag="router-link"
               to="/vendor/new"
               class="mx-1"
@@ -56,9 +54,9 @@
         <b-table-column field="description" label="Descripción">
           {{ props.row.description }}
         </b-table-column>
-        <b-table-column field="active" label="Activo">
+        <!-- <b-table-column field="active" label="Activo">
           {{ props.row.active ? "Si" : "No" }}
-        </b-table-column>
+        </b-table-column> -->
 
         <b-table-column field="action" label="Acciones">
           <b-button
@@ -217,5 +215,9 @@ input {
 
 .fieldWidth {
   width: 80px;
+}
+
+.p-1 {
+  padding: 1em;
 }
 </style>

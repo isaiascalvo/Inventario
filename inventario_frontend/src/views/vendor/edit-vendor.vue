@@ -11,7 +11,7 @@
         </div>
 
         <div class="content">
-          <section>
+          <form @submit.prevent="submit()" class="flex-text-left">
             <b-field label="Nombre:">
               <b-input
                 v-model="vendor.name"
@@ -25,8 +25,6 @@
               <b-input
                 v-model="vendor.cuil"
                 placeholder="Ingrese el cuil del proveedor"
-                required
-                validation-message="Debe ingresar un cuil"
               ></b-input>
             </b-field>
 
@@ -43,9 +41,7 @@
               <b-input
                 v-model="vendor.mail"
                 placeholder="Ingrese el mail del proveedor"
-                required
                 type="email"
-                validation-message="Debe ingresar un mail válido"
               ></b-input>
             </b-field>
 
@@ -53,23 +49,20 @@
               <b-input
                 v-model="vendor.description"
                 placeholder="Ingrese la descripción del proveedor"
-                required
-                validation-message="Debe ingresar una descripción"
                 type="textarea"
               ></b-input>
             </b-field>
 
-            <div class="field">
+            <!-- <div class="field">
               <b-switch v-model="vendor.active">
                 Activo
               </b-switch>
-            </div>
+            </div> -->
 
             <b-button
-              type="submit"
+              native-type="submit"
               class="is-success mr-1"
               :disabled="!formValid()"
-              @click="submit"
             >
               {{ vendor.id ? "Editar" : "Crear" }}
             </b-button>
@@ -80,7 +73,7 @@
             >
               Cancelar
             </b-button>
-          </section>
+          </form>
         </div>
       </div>
     </div>
@@ -111,7 +104,21 @@ export default class EditVendor extends Vue {
 
   formValid() {
     const result = formValidation(this.vendor as never);
-    return result === "";
+    console.log(this.vendor.mail);
+    console.log(
+      this.vendor.mail === "" ||
+        !this.vendor.mail ||
+        fieldStateValidation(this.vendor.mail)
+    );
+    const nulleableProps = ["", "cuil", "mail", "description"];
+    const splitedResult = result.split(";");
+    return (
+      result === "" ||
+      (splitedResult.every(x => nulleableProps.some(y => y === x)) &&
+        (!splitedResult.some(x => x === "mail") ||
+          this.vendor.mail === "" ||
+          !this.vendor.mail))
+    );
   }
 
   public submit() {
@@ -207,5 +214,9 @@ export default class EditVendor extends Vue {
 <style>
 .mr-1 {
   margin-right: 1em;
+}
+.flex-text-left {
+  display: flow-root;
+  text-align: left;
 }
 </style>

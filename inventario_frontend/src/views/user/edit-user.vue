@@ -11,7 +11,7 @@
         </div>
 
         <div class="content">
-          <form @submit.prevent="submit()">
+          <form @submit.prevent="submit()" class="flex-text-left">
             <div class="columns">
               <div class="column">
                 <b-field label="Nombre de Usuario:">
@@ -290,5 +290,9 @@ export default class EditUser extends Vue {
 <style>
 .mr-1 {
   margin-right: 1em;
+}
+.flex-text-left {
+  display: flow-root;
+  text-align: left;
 }
 </style>

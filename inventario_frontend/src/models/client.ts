@@ -3,8 +3,8 @@ export class ClientForCreation {
   public lastname: string | undefined = undefined;
   public dni: string | undefined = undefined;
   public phone: string | undefined = undefined;
-  public mail: string | undefined = undefined;
-  public active = true;
+  public mail?: string;
+  public debtor = false;
   public birthdate: Date | undefined = undefined;
 }
 

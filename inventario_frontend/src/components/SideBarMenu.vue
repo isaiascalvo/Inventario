@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="sidebar-page">
-      <section class="sidebar-layout">
+      <div class="sidebar-layout">
         <b-sidebar
           class="mySidebar"
           type="has-background-dark"
@@ -9,6 +9,7 @@
           open
           :reduce="reduce"
           position="static"
+          id="my-sidebar"
         >
           <div>
             <img
@@ -26,68 +27,58 @@
             <b-menu :activable="false">
               <b-menu-list>
                 <div v-for="item in items" :key="item.id">
-                  <b-tooltip
+                  <b-menu-item
                     v-if="item.url"
                     :label="item.text"
-                    type="is-dark"
-                    position="is-top"
-                    :active="reduce"
-                    size="is-small"
+                    tag="router-link"
+                    :to="item.url"
+                    :icon="item.icon"
                   >
-                    <b-menu-item
-                      :label="item.text"
-                      tag="router-link"
-                      :to="item.url"
-                      :icon="item.icon"
-                    >
-                    </b-menu-item>
-                  </b-tooltip>
+                  </b-menu-item>
 
-                  <b-tooltip
-                    v-if="!item.url"
-                    :label="item.text"
-                    type="is-dark"
-                    position="is-top"
-                    :active="reduce"
-                    size="is-small"
-                  >
-                    <b-menu-item :icon="item.icon">
-                      <template slot="label" slot-scope="props">
-                        <span v-if="!reduce">
-                          {{ item.text }}
-                        </span>
-                        <b-icon
-                          class="is-pulled-right"
-                          :icon="props.expanded ? 'menu-down' : 'menu-right'"
-                        ></b-icon>
-                      </template>
-                      <b-menu-item
-                        v-for="subItem in item.subItems"
-                        :key="subItem.id"
-                        :label="subItem.text"
-                        tag="router-link"
-                        :to="subItem.url"
-                        :icon="subItem.icon"
-                      ></b-menu-item>
-                    </b-menu-item>
-                  </b-tooltip>
+                  <b-menu-item :icon="item.icon" v-if="!item.url">
+                    <template slot="label" slot-scope="props">
+                      <span v-if="!reduce">
+                        {{ item.text }}
+                      </span>
+                      <b-icon
+                        class="is-pulled-right"
+                        :icon="props.expanded ? 'menu-down' : 'menu-right'"
+                      ></b-icon>
+                    </template>
+                    <b-menu-item
+                      v-for="subItem in item.subItems"
+                      :key="subItem.id"
+                      :label="subItem.text"
+                      tag="router-link"
+                      :to="subItem.url"
+                      :icon="subItem.icon"
+                    ></b-menu-item>
+                  </b-menu-item>
                 </div>
               </b-menu-list>
+              <!-- <b-menu-list class="fixed-bottom-left">
+                <b-menu-item
+                  @click="reduce = !reduce"
+                  :icon="
+                    reduce ? 'chevron-double-right' : 'chevron-double-left'
+                  "
+                ></b-menu-item>
+              </b-menu-list> -->
+              <b-button
+                @click="reduce = !reduce"
+                :icon-right="
+                  reduce ? 'chevron-double-right' : 'chevron-double-left'
+                "
+                type="is-dark"
+                size="is-large"
+                class="fixed-bottom-left"
+              >
+              </b-button>
             </b-menu>
-
-            <b-button
-              @click="reduce = !reduce"
-              :icon-right="
-                reduce ? 'chevron-double-right' : 'chevron-double-left'
-              "
-              type="is-dark"
-              size="is-large"
-              class="fixed-bottom-left"
-            >
-            </b-button>
           </div>
         </b-sidebar>
-      </section>
+      </div>
     </div>
     <b-navbar type="is-navbar-color">
       <template slot="start">
@@ -172,6 +163,17 @@ export default class SideBarMenu extends Vue {
     this.title = item ? item.text : "";
     return this.title;
   }
+
+  mounted() {
+    const w = window;
+    const e = document.documentElement;
+    const g = document.getElementsByTagName("body")[0];
+    const y = w.innerHeight || e.clientHeight || g.clientHeight;
+    const elem = document.getElementById("my-sidebar");
+    if (elem) {
+      elem.style.height = y + "px";
+    }
+  }
 }
 </script>
 
@@ -185,15 +187,18 @@ export default class SideBarMenu extends Vue {
   flex-direction: column;
   width: 100%;
   min-height: 100%;
+  height: 100%;
   // min-height: 100vh;
   .sidebar-layout {
     flex-direction: row;
     min-height: 100%;
+    height: 100%;
     // min-height: 100vh;
   }
 }
 @media screen and (max-width: 1023px) {
   .b-sidebar {
+    height: 100%;
     .sidebar-content {
       &.is-mini-mobile {
         &:not(.is-mini-expand),
@@ -229,6 +234,7 @@ export default class SideBarMenu extends Vue {
 }
 @media screen and (min-width: 1024px) {
   .b-sidebar {
+    height: 100%;
     .sidebar-content {
       &.is-mini {
         &:not(.is-mini-expand),
@@ -266,8 +272,9 @@ export default class SideBarMenu extends Vue {
   text-align: left;
 }
 .mySidebar {
-  float: left !important;
-  height: 10000px;
+  float: left;
+  min-height: 100%;
+  // height: 10000px;
 }
 .b-sidebar {
   .sidebar-content {

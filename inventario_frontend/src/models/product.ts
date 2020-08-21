@@ -5,7 +5,7 @@ import { PriceForCreation, Price } from "./price";
 export class ProductForCreation {
   public name: string | undefined = undefined;
   public description: string | undefined = undefined;
-  public code: string | undefined = undefined;
+  public code?: string;
   public brand: string | undefined = undefined;
   public categoryId: string | undefined = undefined;
   public category?: Category;

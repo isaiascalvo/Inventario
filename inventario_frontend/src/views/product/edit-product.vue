@@ -11,7 +11,7 @@
         </div>
 
         <div class="content">
-          <form @submit.prevent="submit()">
+          <form @submit.prevent="submit()" class="flex-text-left">
             <div class="columns">
               <div class="column">
                 <b-field label="Nombre:">
@@ -116,8 +116,6 @@
                   <b-input
                     v-model="product.code"
                     placeholder="Ingrese el código del producto"
-                    required
-                    validation-message="Ingrese el código del producto"
                   ></b-input>
                 </b-field>
               </div>
@@ -307,5 +305,9 @@ export default class EditProduct extends Vue {
 <style>
 .mr-1 {
   margin-right: 1em;
+}
+.flex-text-left {
+  display: flow-root;
+  text-align: left;
 }
 </style>

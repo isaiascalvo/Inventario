@@ -14,7 +14,7 @@
           </div>
         </div>
         <div class="content">
-          <form @submit.prevent="submit()">
+          <form @submit.prevent="submit()" class="flex-text-left">
             <div class="columns">
               <div class="column">
                 <b-field label="Fecha">
@@ -470,5 +470,10 @@ table {
 th {
   /* background-color: #dbdbdb; */
   background-color: #384caf4a;
+}
+
+.flex-text-left {
+  display: flow-root;
+  text-align: left;
 }
 </style>

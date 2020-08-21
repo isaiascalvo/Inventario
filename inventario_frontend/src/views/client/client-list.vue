@@ -1,17 +1,15 @@
 <template>
   <div>
-    <section class="hero is-light">
+    <section class="hero is-light p-1">
       <div class="hero-head">
-        <div class="container level">
+        <div class="level">
           <div>
-            <h1 class="title">Clientes</h1>
-            <h2 class="subtitle">
-              Lista de clientes
-            </h2>
+            <h1 class="title is-6">Lista de Clientes</h1>
           </div>
           <div>
             <b-button
               type="is-info"
+              size="is-small"
               tag="router-link"
               to="/client/new"
               class="mx-1"
@@ -22,7 +20,10 @@
               @click="openFilters = !openFilters"
               class="is-pulled-right"
               type="is-primary"
-              :icon-right="openFilters ? 'eye-off-outline' : 'eye-outline'"
+              size="is-small"
+              :icon-right="
+                openFilters ? 'filter-variant-minus' : 'filter-variant'
+              "
             >
               {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
             </b-button>
@@ -109,7 +110,6 @@
           No hay clientes registrados
         </template>
         <template slot-scope="props">
-          asdasd
           <b-table-column field="name" label="Nombre">
             {{ props.row.name }}
           </b-table-column>
@@ -128,8 +128,8 @@
           <b-table-column field="birthdate" label="Fecha de Nacimiento">
             {{ dateToISO(props.row.birthdate) }}
           </b-table-column>
-          <b-table-column field="active" label="Activo">
-            {{ props.row.active ? "Si" : "No" }}
+          <b-table-column field="debtor" label="Deudor">
+            {{ props.row.debtor ? "Si" : "No" }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
@@ -351,5 +351,9 @@ input {
 
 .fieldWidth {
   width: 80px;
+}
+
+.p-1 {
+  padding: 1em;
 }
 </style>

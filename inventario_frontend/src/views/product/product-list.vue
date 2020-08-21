@@ -2,11 +2,19 @@
   <div>
     <section class="hero is-light p-1">
       <div class="hero-head">
-        <div class="container level">
+        <div class="level">
           <div>
             <h1 class="title is-6">Lista de Productos</h1>
           </div>
           <div>
+            <b-button
+              type="is-dark"
+              @click="genetarePdf()"
+              class="mx-1"
+              size="is-small"
+            >
+              Imprimir Listado
+            </b-button>
             <b-button
               type="is-info"
               tag="router-link"
@@ -99,14 +107,35 @@
                 size="is-small"
               ></b-input>
             </b-field>
+
+            <b-field label-position="on-border" label="Fecha">
+              <b-datetimepicker
+                v-model="productFilters.dateDate"
+                rounded
+                placeholder="Seleccione fecha y hora"
+                icon="calendar-today"
+                trap-focus
+                horizontal-time-picker
+                size="is-small"
+                editable
+                :date-parser="parseDate"
+                append-to-body
+              >
+              </b-datetimepicker>
+            </b-field>
           </b-field>
         </div>
 
         <div class="column level-right">
-          <b-button type="is-info" class="mx-1" @click="applyFilters()">
+          <b-button
+            type="is-dark"
+            class="mx-1"
+            size="is-small"
+            @click="applyFilters()"
+          >
             Aplicar
           </b-button>
-          <b-button @click="clearFilters()" type="is-danger">
+          <b-button @click="clearFilters()" size="is-small" type="is-default">
             Limpiar
           </b-button>
         </div>
@@ -183,8 +212,6 @@
           <span class="ml-1">
             <b-field label="Productos por página:" label-position="on-border">
               <b-select v-model="perPage" @select="getProducts()">
-                <option value="1">1 por página</option>
-                <option value="5">5 por página</option>
                 <option value="10">10 por página</option>
                 <option value="15">15 por página</option>
                 <option value="20">20 por página</option>
@@ -219,7 +246,7 @@ export default class ProductList extends Vue {
   public vendorService: NavigatorVendorService = new NavigatorVendorService();
 
   public currentPage = 1;
-  public perPage = 1;
+  public perPage = 10;
   public openFilters = false;
   public productFilters: ProductFilters = new ProductFilters();
   public dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -325,6 +352,50 @@ export default class ProductList extends Vue {
 
     this.isLoading = false;
     return rta;
+  }
+
+  genetarePdf() {
+    this.isLoading = true;
+    // this.productService.generatePdf().then(response => {
+    //   this.isLoading = false;
+    //   console.log(response);
+    //   //Create a Blob from the PDF Stream
+    //   const file = new Blob([response.data], { type: "application/pdf" });
+    //   //Build a URL from the file
+    //   const fileURL = URL.createObjectURL(file);
+    //   //Open the URL on new Window
+    //   window.open(fileURL);
+    // });
+    this.productService.generatePdf().then(
+      data => {
+        const downloadedFile = new Blob([data.data], {
+          type: data.data.type
+        });
+        const a = document.createElement("a");
+        a.setAttribute("style", "display:none;");
+        document.body.appendChild(a);
+        a.download =
+          "ListadoDeProductos-" +
+          new Date().toISOString().substring(0, 10) +
+          ".pdf";
+        a.href = URL.createObjectURL(downloadedFile);
+        a.target = "_blank";
+        a.click();
+        document.body.removeChild(a);
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
+        console.log(error);
+      }
+    );
+  }
+
+  parseDate(date: string) {
+    const dateSplited = date.split("/");
+    return new Date(
+      Date.parse(dateSplited[1] + "/" + dateSplited[0] + "/" + dateSplited[2])
+    );
   }
 
   created() {

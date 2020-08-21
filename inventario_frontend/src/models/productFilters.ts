@@ -5,4 +5,6 @@ export class ProductFilters {
   public categoryId?: string;
   public vendorId?: string;
   public brand?: string;
+  public dateDate?: Date;
+  public date?: string;
 }

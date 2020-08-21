@@ -1,17 +1,15 @@
 <template>
   <div>
-    <section class="hero is-light">
+    <section class="hero is-light p-1">
       <div class="hero-head">
-        <div class="container level">
+        <div class="level">
           <div>
-            <h1 class="title">Usuarios</h1>
-            <h2 class="subtitle">
-              Lista de usuarios
-            </h2>
+            <h1 class="title is-6">Lista de Usuarios</h1>
           </div>
           <div>
             <b-button
               type="is-info"
+              size="is-small"
               tag="router-link"
               to="/user/new"
               class="mx-1"
@@ -223,5 +221,9 @@ input {
 
 .fieldWidth {
   width: 80px;
+}
+
+.p-1 {
+  padding: 1em;
 }
 </style>

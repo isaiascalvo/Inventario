@@ -1,6 +1,7 @@
 import { Product, ProductForCreation } from "@/models/product";
 import { ProductFilters } from "@/models/productFilters";
 import { apiClient } from "./apiClient";
+import axios, { AxiosPromise } from "axios";
 
 export interface ProductService {
   getProducts(): Promise<Product[]>;
@@ -22,6 +23,7 @@ export interface ProductService {
   updateProduct(product: Product): Promise<void>;
   deleteProduct(productId: string): Promise<void>;
   getPriceByDate(productId: string, date: string): Promise<number>;
+  generatePdf(): AxiosPromise<Blob>;
 }
 
 export class NavigatorProductService implements ProductService {
@@ -118,9 +120,17 @@ export class NavigatorProductService implements ProductService {
     ).data;
   }
 
+  public generatePdf(): AxiosPromise<Blob> {
+    return axios("https://localhost:44386/api/products/Pdf", {
+      method: "GET",
+      responseType: "blob"
+    });
+  }
+
   public getQueryString(productFilters: ProductFilters): string {
+    productFilters.date = productFilters.dateDate?.toISOString();
     const queryString = Object.keys(productFilters).map(key =>
-      productFilters[key as keyof ProductFilters]
+      productFilters[key as keyof ProductFilters] && key !== "dateDate"
         ? key + "=" + productFilters[key as keyof ProductFilters]
         : null
     );
