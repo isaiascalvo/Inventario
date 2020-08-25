@@ -11,22 +11,27 @@ export class ProductForCreation {
   public category?: Category;
   public vendorId?: string;
   public vendor?: Vendor;
-  public price: PriceForCreation;
+  public purchasePrice: PriceForCreation;
+  public salePrice: PriceForCreation;
+  public minimumStock?: number;
   public stock = 0;
   public unitOfMeasurement: string | undefined = undefined;
 
   constructor() {
-    this.price = new PriceForCreation();
+    this.purchasePrice = new PriceForCreation();
+    this.salePrice = new PriceForCreation();
     this.stock = 0;
   }
 }
 
 export class Product extends ProductForCreation {
   public id!: string;
-  public price: Price;
+  public purchasePrice: Price;
+  public salePrice: Price;
 
   constructor() {
     super();
-    this.price = new Price();
+    this.purchasePrice = new Price();
+    this.salePrice = new Price();
   }
 }

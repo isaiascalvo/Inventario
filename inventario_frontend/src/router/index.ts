@@ -171,30 +171,30 @@ const routes: Array<RouteConfig> = [
     props: true
   },
   {
-    path: "/purchase-list",
-    name: "PurchaseList",
+    path: "/sale-list",
+    name: "SaleList",
     component: () =>
       import(
-        /* webpackChunkName: "purchase" */
-        "../views/purchase/purchase-list.vue"
+        /* webpackChunkName: "sale" */
+        "../views/sale/sale-list.vue"
       )
   },
   {
-    path: "/purchase/new",
-    name: "NewPurchase",
+    path: "/sale/new",
+    name: "NewSale",
     component: () =>
       import(
-        /* webpackChunkName: "purchase" */
-        "../views/purchase/edit-purchase.vue"
+        /* webpackChunkName: "sale" */
+        "../views/sale/edit-sale.vue"
       )
   },
   {
-    path: "/purchase/modify/:id",
-    name: "ModifyPurchase",
+    path: "/sale/modify/:id",
+    name: "ModifySale",
     component: () =>
       import(
-        /* webpackChunkName: "purchase" */
-        "../views/purchase/edit-purchase.vue"
+        /* webpackChunkName: "sale" */
+        "../views/sale/edit-sale.vue"
       ),
     props: true
   },

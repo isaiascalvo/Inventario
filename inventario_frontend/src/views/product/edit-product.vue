@@ -88,6 +88,32 @@
 
             <div class="columns">
               <div class="column">
+                <b-field label="Precio de Compra:">
+                  <b-input
+                    v-model="product.purchasePrice.value"
+                    type="number"
+                    placeholder="Ingrese el precio de compra del producto"
+                    required
+                    validation-message="Ingrese el precio de compra del producto"
+                  ></b-input>
+                </b-field>
+              </div>
+
+              <div class="column">
+                <b-field label="Precio de Venta:">
+                  <b-input
+                    v-model="product.salePrice.value"
+                    type="number"
+                    placeholder="Ingrese el precio de venta del producto"
+                    required
+                    validation-message="Ingrese el precio de venta del producto"
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column">
                 <b-field label="Stock:">
                   <b-input
                     v-model="product.stock"
@@ -112,22 +138,20 @@
 
             <div class="columns">
               <div class="column">
-                <b-field label="Código:">
+                <b-field label="Stock mínimo: (Opcional)">
                   <b-input
-                    v-model="product.code"
-                    placeholder="Ingrese el código del producto"
+                    v-model="product.minimumStock"
+                    type="number"
+                    placeholder="Ingrese el stock mínimo del producto"
                   ></b-input>
                 </b-field>
               </div>
 
               <div class="column">
-                <b-field label="Precio:">
+                <b-field label="Código: (Opcional)">
                   <b-input
-                    v-model="product.price.value"
-                    type="number"
-                    placeholder="Ingrese el precio del producto"
-                    required
-                    validation-message="Ingrese el precio del producto"
+                    v-model="product.code"
+                    placeholder="Ingrese el código del producto"
                   ></b-input>
                 </b-field>
               </div>
@@ -183,11 +207,29 @@ export default class EditProduct extends Vue {
   }
 
   formValid() {
+    // const result = formValidation(this.product as never);
+    // console.log(result);
+    // return (
+    //   (result === "price;" || result === "category;vendor;price;") &&
+    //   this.product.price.value
+    // );
+
     const result = formValidation(this.product as never);
-    console.log(result);
+    const nulleableProps = [
+      "",
+      "minimumStock",
+      "purchasePrice",
+      "salePrice",
+      "category",
+      "vendor",
+      "code"
+    ];
+    const splitedResult = result.split(";");
     return (
-      (result === "price;" || result === "category;vendor;price;") &&
-      this.product.price.value
+      (result === "" ||
+        splitedResult.every(x => nulleableProps.some(y => y === x))) &&
+      this.product.purchasePrice.value &&
+      this.product.salePrice.value
     );
   }
 
@@ -207,11 +249,13 @@ export default class EditProduct extends Vue {
       brand: this.product.brand,
       categoryId: this.product.categoryId,
       vendorId: this.product.vendorId,
-      price: new PriceForCreation(),
+      purchasePrice: new PriceForCreation(),
+      salePrice: new PriceForCreation(),
       stock: +this.product.stock,
       unitOfMeasurement: this.product.unitOfMeasurement
     };
-    pr.price.value = +this.product.price.value;
+    pr.purchasePrice.value = +this.product.purchasePrice.value;
+    pr.salePrice.value = +this.product.salePrice.value;
     this.isLoading = true;
     this.productService
       .addProduct(pr)
@@ -239,7 +283,8 @@ export default class EditProduct extends Vue {
 
   public updateProduct() {
     this.isLoading = true;
-    this.product.price.value = +this.product.price.value;
+    this.product.purchasePrice.value = +this.product.purchasePrice.value;
+    this.product.salePrice.value = +this.product.salePrice.value;
     this.productService
       .updateProduct(this.product)
       .then(() => {

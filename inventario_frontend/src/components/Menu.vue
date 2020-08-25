@@ -97,7 +97,7 @@ export default class Menu extends Vue {
       text: "Movimientos de Stock",
       url: "/product-entry-list"
     },
-    { icon: "briefcase-outline", text: "Compras", url: "/purchase-list" }
+    { icon: "briefcase-outline", text: "Ventas", url: "/sañe-list" }
   ];
 
   public loggedIn() {

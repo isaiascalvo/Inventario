@@ -180,14 +180,37 @@
           <b-table-column field="brand" label="Marca">
             {{ props.row.brand }}
           </b-table-column>
-          <b-table-column field="stock" label="Stock">
-            {{ props.row.stock }}
+          <b-table-column field="minimumStock" label="Stock mínimo" centered>
+            {{ props.row.minimumStock }}
+          </b-table-column>
+          <b-table-column field="stock" label="Stock" centered>
+            <span
+              :class="[
+                'tag',
+                {
+                  'is-danger':
+                    props.row.minimumStock &&
+                    props.row.stock < props.row.minimumStock
+                },
+                {
+                  'is-success': !(
+                    props.row.minimumStock &&
+                    props.row.stock < props.row.minimumStock
+                  )
+                }
+              ]"
+            >
+              {{ props.row.stock }}
+            </span>
           </b-table-column>
           <b-table-column field="unitOfMeasurement" label="Unidad">
             {{ props.row.unitOfMeasurement }}
           </b-table-column>
-          <b-table-column field="price" label="Precio">
-            $ {{ props.row.price.value }}
+          <b-table-column field="purchasePrice" label="Precio de compra">
+            $ {{ props.row.purchasePrice.value }}
+          </b-table-column>
+          <b-table-column field="salePrice" label="Precio de venta">
+            $ {{ props.row.salePrice.value }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
@@ -488,4 +511,9 @@ input {
 .fieldWidth {
   width: 80px;
 }
+
+/* tr.is-danger {
+  background: #ff000042;
+  color: black;
+} */
 </style>

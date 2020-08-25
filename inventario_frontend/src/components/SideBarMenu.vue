@@ -130,7 +130,7 @@ export default class SideBarMenu extends Vue {
       text: "Movimientos de Stock",
       url: "/product-entry-list"
     },
-    { icon: "briefcase-outline", text: "Compras", url: "/purchase-list" }
+    { icon: "briefcase-outline", text: "Ventas", url: "/sale-list" }
   ];
 
   public loggedIn() {
@@ -160,7 +160,9 @@ export default class SideBarMenu extends Vue {
   public getTitle(): string {
     const path = this.$route.path;
     const item = this.items.find(x => x.url === path);
-    this.title = item ? item.text : "";
+    if (item) {
+      this.title = item.text;
+    }
     return this.title;
   }
 

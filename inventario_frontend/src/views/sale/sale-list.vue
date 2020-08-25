@@ -4,17 +4,17 @@
       <div class="hero-head">
         <div class="level">
           <div>
-            <h1 class="title is-6">Lista de Compras</h1>
+            <h1 class="title is-6">Lista de Ventas</h1>
           </div>
           <div>
             <b-button
               type="is-info"
               size="is-small"
               tag="router-link"
-              to="/purchase/new"
+              to="/sale/new"
               class="mx-1"
             >
-              Nueva Compra
+              Nueva Venta
             </b-button>
             <!-- <b-button
               @click="openFilters = !openFilters"
@@ -37,7 +37,7 @@
           <b-field grouped group-multiline>
             <b-field label-position="on-border" label="Nombre">
               <b-input
-                v-model="purchaseFilters.name"
+                v-model="saleFilters.name"
                 placeholder="Nombre"
                 size="is-small"
                 icon-right="close-circle"
@@ -48,7 +48,7 @@
 
             <b-field label-position="on-border" label="Apellido">
               <b-input
-                v-model="purchaseFilters.lastname"
+                v-model="saleFilters.lastname"
                 placeholder="Apellido"
                 size="is-small"
                 icon-right="close-circle"
@@ -59,7 +59,7 @@
 
             <b-field label-position="on-border" label="DNI">
               <b-input
-                v-model="purchaseFilters.dni"
+                v-model="saleFilters.dni"
                 placeholder="DNI"
                 size="is-small"
                 icon-right="close-circle"
@@ -70,7 +70,7 @@
 
             <b-field label-position="on-border" label="Mail">
               <b-input
-                v-model="purchaseFilters.mail"
+                v-model="saleFilters.mail"
                 placeholder="Mail"
                 size="is-small"
                 icon-right="close-circle"
@@ -95,7 +95,7 @@
         striped
         hoverable
         scrollable
-        :data="purchases"
+        :data="sales"
         id="my-table"
         :paginated="true"
         :per-page="perPage"
@@ -106,7 +106,7 @@
         aria-current-label="Current page"
       >
         <template slot="empty">
-          No hay compras registradas
+          No hay ventas registradas
         </template>
         <template slot-scope="props">
           <b-table-column field="productId" label="Producto">
@@ -127,20 +127,23 @@
           <b-table-column field="quantity" label="Cantidad">
             {{ props.row.quantity }}
           </b-table-column>
-          <b-table-column field="amount" label="Importe">
-            {{ props.row.amount }}
+          <b-table-column field="amount" label="Importe Total">
+            $ {{ props.row.amount }}
+          </b-table-column>
+          <b-table-column field="paymentType" label="Forma de Pago">
+            Cuotas (6 de $ 4444)
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
             <b-button
               tag="router-link"
-              :to="'/purchase/modify/' + props.row.id"
+              :to="'/sale/modify/' + props.row.id"
               type="is-small"
             >
               <b-icon icon="pencil"></b-icon>
             </b-button>
             <b-button
-              @click="deletePurchase(props.row)"
+              @click="deleteSale(props.row)"
               type="is-small"
               class="actionButton"
             >
@@ -157,15 +160,15 @@
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
-import { Purchase } from "../../models/purchase";
-import { NavigatorPurchaseService } from "../../services/purchase-service";
-// import { PurchaseFilters } from "../../models/purchaseFilters";
+import { Sale } from "../../models/sale";
+import { NavigatorSaleService } from "../../services/sale-service";
+// import { SaleFilters } from "../../models/saleFilters";
 
 @Component
-export default class PurchaseList extends Vue {
-  public purchases: Purchase[] = [];
-  public purchaseService: NavigatorPurchaseService = new NavigatorPurchaseService();
-  // public purchaseFilters: PurchaseFilters = new PurchaseFilters();
+export default class SaleList extends Vue {
+  public sales: Sale[] = [];
+  public saleService: NavigatorSaleService = new NavigatorSaleService();
+  // public saleFilters: SaleFilters = new SaleFilters();
   // public openFilters = false;
   public currentPage = 1;
   public perPage = 10;
@@ -177,26 +180,26 @@ export default class PurchaseList extends Vue {
     return new Date(date).toISOString().substr(0, 10);
   }
 
-  // clearIconClick(key: keyof PurchaseFilters) {
-  //   this.purchaseFilters[key] = undefined;
+  // clearIconClick(key: keyof SaleFilters) {
+  //   this.saleFilters[key] = undefined;
   // }
 
-  deletePurchase(purchase: Purchase) {
+  deleteSale(sale: Sale) {
     this.$buefy.dialog.confirm({
-      title: "Eliminando Compra",
+      title: "Eliminando Venta",
       message:
-        "Estás seguro que deseas <b>eliminar</b> la compra? Esta acción no podrá deshacerse.",
-      confirmText: "Eliminar Compra",
+        "Estás seguro que deseas <b>eliminar</b> la venta? Esta acción no podrá deshacerse.",
+      confirmText: "Eliminar Venta",
       cancelText: "Cancelar",
       type: "is-danger",
       hasIcon: true,
       onConfirm: () => {
         this.isLoading = true;
-        this.purchaseService
-          .deletePurchase(purchase.id)
+        this.saleService
+          .deleteSale(sale.id)
           .then(() => {
             this.isLoading = false;
-            this.purchases.splice(this.purchases.indexOf(purchase), 1);
+            this.sales.splice(this.sales.indexOf(sale), 1);
           })
           .catch(e => {
             this.isLoading = false;
@@ -213,18 +216,18 @@ export default class PurchaseList extends Vue {
             });
             console.log("error: ", e);
           });
-        this.$buefy.toast.open("Compra eliminada!");
+        this.$buefy.toast.open("Venta eliminada!");
       }
     });
   }
 
   // public clearFilters() {
   //   this.isLoading = true;
-  //   this.purchaseFilters = new PurchaseFilters();
-  //   this.purchaseService
-  //     .getPurchases()
+  //   this.saleFilters = new SaleFilters();
+  //   this.saleService
+  //     .getSales()
   //     .then(response => {
-  //       this.purchases = response;
+  //       this.sales = response;
   //       this.isLoading = false;
   //     })
   //     .catch(e => {
@@ -246,10 +249,10 @@ export default class PurchaseList extends Vue {
 
   // public applyFilters() {
   //   this.isLoading = true;
-  //   this.purchaseService
-  //     .getPurchasesFiltered(this.purchaseFilters)
+  //   this.saleService
+  //     .getSalesFiltered(this.saleFilters)
   //     .then(response => {
-  //       this.purchases = response;
+  //       this.sales = response;
   //       this.isLoading = false;
   //     })
   //     .catch(e => {
@@ -271,10 +274,10 @@ export default class PurchaseList extends Vue {
 
   created() {
     this.isLoading = true;
-    this.purchaseService
-      .getPurchases()
+    this.saleService
+      .getSales()
       .then(response => {
-        this.purchases = response as Purchase[];
+        this.sales = response as Sale[];
         this.isLoading = false;
       })
       .catch(e => {
