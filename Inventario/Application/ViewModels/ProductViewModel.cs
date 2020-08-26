@@ -17,14 +17,16 @@ namespace Application.ViewModels
         public string Name { get; set; }
 
         public string Description { get; set; }
-        public string Code { get; set; }
+        public string? Code { get; set; }
         public Guid CategoryId { get; set; }
         public CategoryViewModel Category { get; set; }
         public Guid? VendorId { get; set; }
         public VendorViewModel Vendor { get; set; }
         public string Brand { get; set; }
+        public double? MinimumStock { get; set; }
         public double Stock { get; set; }
         public string UnitOfMeasurement { get; set; }
-        public PriceViewModel Price { get; set; }
+        public PriceViewModel PurchasePrice { get; set; }
+        public PriceViewModel SalePrice { get; set; }
     }
 }

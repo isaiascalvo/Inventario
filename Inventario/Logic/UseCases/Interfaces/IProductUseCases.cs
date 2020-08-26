@@ -2,6 +2,7 @@
 using Logic.Dtos;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,5 +22,6 @@ namespace Logic.Interfaces
         Task<int> GetTotalQtyByFilters(ProductFiltersDto filters);
         Task<IEnumerable<ProductDto>> GetFilteredByPageAndQty(ProductFiltersDto filters, int skip, int qty);
         Task<double> GetPriceByDate(Guid productId, DateTime date);
+        Task<MemoryStream> CreatePdf();
     }
 }

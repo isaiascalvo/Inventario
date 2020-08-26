@@ -58,11 +58,43 @@ namespace Application.Profiles
             CreateMap<ProductEntryLineDto, ProductEntryLineViewModel>();
             CreateMap<ProductEntryLineForCreationViewModel, ProductEntryLineForCreationDto>();
 
-            CreateMap<PurchaseViewModel, PurchaseDto>();
-            CreateMap<PurchaseDto, PurchaseViewModel>();
-            CreateMap<PurchaseForCreationViewModel, PurchaseForCreationDto>();
+            CreateMap<SaleViewModel, SaleDto>();
+            CreateMap<SaleDto, SaleViewModel>();
+            CreateMap<SaleForCreationViewModel, SaleForCreationDto>();
 
-            CreateMap<ProductFiltersViewModel, ProductFiltersDto>();
+            CreateMap<CashViewModel, CashDto>();
+            CreateMap<CashDto, CashViewModel>();
+            CreateMap<CashForCreationViewModel, CashForCreationDto>();
+
+            CreateMap<DebitCardViewModel, DebitCardDto>();
+            CreateMap<DebitCardDto, DebitCardViewModel>();
+            CreateMap<DebitCardForCreationViewModel, DebitCardForCreationDto>();
+
+            CreateMap<CreditCardViewModel, CreditCardDto>();
+            CreateMap<CreditCardDto, CreditCardViewModel>();
+            CreateMap<CreditCardForCreationViewModel, CreditCardForCreationDto>();
+
+            CreateMap<ChequeViewModel, ChequeDto>();
+            CreateMap<ChequeDto, ChequeViewModel>();
+            CreateMap<ChequeForCreationViewModel, ChequeForCreationDto>();
+
+            CreateMap<OwnFeesViewModel, OwnFeesDto>();
+            CreateMap<OwnFeesDto, OwnFeesViewModel>();
+            CreateMap<OwnFeesForCreationViewModel, OwnFeesForCreationDto>();
+
+            CreateMap<FeeViewModel, FeeDto>();
+            CreateMap<FeeDto, FeeViewModel>();
+            CreateMap<FeeForCreationViewModel, FeeForCreationDto>();
+
+            CreateMap<MiscellaneousExpensesViewModel, MiscellaneousExpensesDto>();
+            CreateMap<MiscellaneousExpensesDto, MiscellaneousExpensesViewModel>();
+            CreateMap<MiscellaneousExpensesViewModel, MiscellaneousExpensesDto>();
+
+            CreateMap<ProductFiltersViewModel, ProductFiltersDto>()
+                .ForMember(
+                    dest => dest.Date,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.Date))
+                );
             CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
         }
     }

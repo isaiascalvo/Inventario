@@ -1,4 +1,5 @@
 ﻿using Data;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,14 @@ namespace Infrastructure.EFCore
         public DbSet<ProductEntryLine> ProductEntryLines { get; set; }
         public DbSet<ProductEntry> ProductEntries { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<Sale> Sales { get; set; }
+        public DbSet<MiscellaneousExpenses> MiscellaneousExpenses { get; set; }
+        public DbSet<Cash> CashPayments { get; set; }
+        public DbSet<CreditCard> CreditCardPayments { get; set; }
+        public DbSet<DebitCard> DebitCardPayments { get; set; }
+        public DbSet<Cheque> ChequePayments { get; set; }
+        public DbSet<OwnFees> OwnFeesPayments { get; set; }
+        public DbSet<Fee> Fees { get; set; }
 
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -95,8 +103,8 @@ namespace Infrastructure.EFCore
             modelBuilder.Entity<User>()
                 .HasIndex(c => c.Phone).IsUnique();
 
-            //Purchase
-            modelBuilder.Entity<Purchase>()
+            //Sale
+            modelBuilder.Entity<Sale>()
                 .HasOne(p => p.Product)
                 .WithMany()
                 .HasForeignKey(p => p.ProductId);

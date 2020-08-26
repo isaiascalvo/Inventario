@@ -5,6 +5,7 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,7 +47,7 @@ namespace Logic
 
         public async Task<IEnumerable<CategoryDto>> GetAll()
         {
-            var categories = await _categoryRepositoryRepository.GetAll();
+            var categories = (await _categoryRepositoryRepository.GetAll()).OrderBy(x => x.Name);
             var categoriesDto = _mapper.Map<IEnumerable<Data.Category>, IEnumerable<CategoryDto>>(categories);
             return categoriesDto;
         }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -206,6 +207,22 @@ namespace Application
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("Pdf")]
+        public async Task<IActionResult> CreatePdf()
+        {
+            try
+            {
+                MemoryStream stream = await _productUseCases.CreatePdf();
+                stream.Position = 0;
+                return File(stream, "application/pdf");
+            }
+            catch (Exception e)
+            {
+                throw e;
             }
         }
     }

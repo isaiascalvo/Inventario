@@ -5,6 +5,7 @@ using Logic.Dtos;
 using Logic.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace Logic
                 CUIL = vendorForCreationDto.CUIL,
                 Phone = vendorForCreationDto.Phone,
                 Mail = vendorForCreationDto.Mail,
-                Active = vendorForCreationDto.Active,
+                //Active = vendorForCreationDto.Active,
                 Description = vendorForCreationDto.Description,
                 CreatedBy = userId
             };
@@ -51,7 +52,7 @@ namespace Logic
         {
             try
             {
-                var vendor = await _vendorRepository.GetAll();
+                var vendor = (await _vendorRepository.GetAll()).OrderBy(x => x.Name);
                 var vendorDto = _mapper.Map<IEnumerable<Vendor>, IEnumerable<VendorDto>>(vendor);
                 return vendorDto;
             }
@@ -77,7 +78,7 @@ namespace Logic
             vendor.CUIL = vendorDto.CUIL;
             vendor.Phone = vendorDto.Phone;
             vendor.Mail = vendorDto.Mail;
-            vendor.Active = vendorDto.Active;
+            //vendor.Active = vendorDto.Active;
             vendor.Description = vendorDto.Description;
             vendor.LastModificationBy = vendorDto.LastModificationBy;
 

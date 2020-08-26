@@ -59,23 +59,24 @@ namespace Logic
 
         public async Task<IEnumerable<UserDto>> GetAll()
         {
-            var users = (await _userRepository.GetAll()).Select(x => new User {
-                Id = x.Id,
-                Username = x.Username,
-                Password = null,
-                Name = x.Name,
-                Lastname = x.Lastname,
-                Dni = x.Dni,
-                Phone = x.Phone,
-                Mail = x.Mail,
-                IsAdmin = x.IsAdmin,
-                Active = x.Active,
-                CreatedAt = x.CreatedAt,
-                LastModificationAt = x.LastModificationAt,
-                IsDeleted = x.IsDeleted,
-                DeletedAt = x.DeletedAt,
+            var users = (await _userRepository.GetAll()).OrderBy(x => x.Name).ThenBy(x => x.Lastname)
+                .Select(x => new User {
+                    Id = x.Id,
+                    Username = x.Username,
+                    Password = null,
+                    Name = x.Name,
+                    Lastname = x.Lastname,
+                    Dni = x.Dni,
+                    Phone = x.Phone,
+                    Mail = x.Mail,
+                    IsAdmin = x.IsAdmin,
+                    Active = x.Active,
+                    CreatedAt = x.CreatedAt,
+                    LastModificationAt = x.LastModificationAt,
+                    IsDeleted = x.IsDeleted,
+                    DeletedAt = x.DeletedAt,
 
-            });
+                });
             var usersDto = _mapper.Map<IEnumerable<User>, IEnumerable<UserDto>>(users);
             return usersDto;
         }

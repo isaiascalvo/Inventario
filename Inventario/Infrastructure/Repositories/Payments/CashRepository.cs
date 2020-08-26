@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Infrastructure.Repositories
 {
-    public class PurchaseRepository : GenericRepository<Purchase>, IPurchaseRepository
+    public class CashRepository : GenericRepository<Cash>, ICashRepository
     {
-        public PurchaseRepository(InventarioDbContext context) : base(context)
+        public CashRepository(InventarioDbContext context) : base(context)
         {
 
         }

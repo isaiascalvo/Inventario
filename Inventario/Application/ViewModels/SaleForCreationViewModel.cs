@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Logic.Dtos
+namespace Application.ViewModels
 {
-    public class PurchaseForCreationDto
+    public class SaleForCreationViewModel
     {
         public Guid ProductId { get; set; }
         public Guid? ClientId { get; set; }

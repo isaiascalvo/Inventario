@@ -31,8 +31,8 @@ namespace Logic
                 Dni = clientForCreationDto.Dni,
                 Phone = clientForCreationDto.Phone,
                 Mail = clientForCreationDto.Mail,
-                Active = clientForCreationDto.Active,
-                Birthdate = clientForCreationDto.Birthdate,
+                Debtor = clientForCreationDto.Debtor,
+                Birthdate = clientForCreationDto.Birthdate.ToLocalTime(),
                 CreatedBy = userId
             };
 
@@ -52,7 +52,7 @@ namespace Logic
 
         public async Task<IEnumerable<ClientDto>> GetAll()
         {
-            var client = await _clientRepository.GetAll();
+            var client = (await _clientRepository.GetAll()).OrderBy(x => x.Name).ThenBy(x => x.Lastname);
             var clientDto = _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(client);
             return clientDto;
         }
@@ -84,8 +84,8 @@ namespace Logic
             client.Dni = clientDto.Dni;
             client.Phone = clientDto.Phone;
             client.Mail = clientDto.Mail;
-            client.Active = clientDto.Active;
-            client.Birthdate = clientDto.Birthdate;
+            client.Debtor = clientDto.Debtor;
+            client.Birthdate = clientDto.Birthdate.ToLocalTime();
             client.LastModificationBy = clientDto.LastModificationBy;
 
             await _clientRepository.Update(client);

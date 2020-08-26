@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Infrastructure.Repositories
 {
-    public interface IPurchaseRepository : IGenericRepository<Purchase>
+    public interface ICreditCardRepository: IGenericRepository<CreditCard>
     {
     }
 }

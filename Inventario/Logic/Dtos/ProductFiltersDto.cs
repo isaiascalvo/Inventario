@@ -14,10 +14,11 @@ namespace Logic.Dtos
         public Guid? CategoryId { get; set; }
         public Guid? VendorId { get; set; }
         public string? Brand { get; set; }
+        public DateTime? Date { get; set; }
 
         public bool IsEmpty()
         {
-            return Code == null && Name == null && Description == null && CategoryId == null && VendorId == null && Brand == null;
+            return Code == null && Name == null && Description == null && CategoryId == null && VendorId == null && Brand == null && Date == null;
         }
 
         public Expression<Func<Product, bool>> GetExpresion()
@@ -28,7 +29,8 @@ namespace Logic.Dtos
                 (Description == null || x.Description.Contains(Description)) &&
                 (CategoryId == null || x.CategoryId == CategoryId) &&
                 (VendorId == null || x.VendorId == VendorId) &&
-                (Brand == null || x.Brand.Contains(Brand));
+                (Brand == null || x.Brand.Contains(Brand) &&
+                (Date == null || x.CreatedAt <= Date));
         }
     }
 }

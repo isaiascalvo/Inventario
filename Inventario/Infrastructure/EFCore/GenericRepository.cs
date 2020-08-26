@@ -21,7 +21,7 @@ namespace Infrastructure.EFCore
         public async Task<TEntity> Add(TEntity entity)
         {
             //entity.CreatedBy = Guid.Parse(_auth.GetCurrentUserId());
-            entity.CreatedAt = DateTime.Now;
+            entity.CreatedAt = DateTime.Now.ToLocalTime();
             entity.IsDeleted = false;
             await _context.Set<TEntity>().AddAsync(entity);
             return entity;
@@ -36,7 +36,7 @@ namespace Infrastructure.EFCore
             }
             entity.IsDeleted = true;
             entity.DeletedBy = userId;
-            entity.DeletedAt = DateTime.Now;
+            entity.DeletedAt = DateTime.Now.ToLocalTime();
             _context.Set<TEntity>().Update(entity);
             return entity;
         }
@@ -71,7 +71,7 @@ namespace Infrastructure.EFCore
         public async Task<TEntity> Update(TEntity entity)
         {
             //entity.LastModificationBy = Guid.Parse(_auth.GetCurrentUserId());
-            entity.LastModificationAt = DateTime.Now;
+            entity.LastModificationAt = DateTime.Now.ToLocalTime();
             _context.Set<TEntity>().Update(entity);
             return entity;
         }

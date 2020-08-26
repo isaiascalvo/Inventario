@@ -101,7 +101,8 @@ namespace Application
             services.AddScoped<ISendMailUseCases, SendMailUseCases>();
             services.AddScoped<IProductEntryUseCases, ProductEntryUseCases>();
             services.AddScoped<IProductEntryLineUseCases, ProductEntryLineUseCases>();
-            services.AddScoped<IPurchaseUseCases, PurchaseUseCases>();
+            services.AddScoped<ISaleUseCases, SaleUseCases>();
+            services.AddScoped<IMiscellaneousExpensesUseCases, MiscellaneousExpensesUseCases>();
 
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IPriceRepository, PriceRepository>();
@@ -111,7 +112,14 @@ namespace Application
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductEntryRepository, ProductEntryRepository>();
             services.AddScoped<IProductEntryLineRepository, ProductEntryLineRepository>();
-            services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+            services.AddScoped<ISaleRepository, SaleRepository>();
+            services.AddScoped<ICashRepository, CashRepository>();
+            services.AddScoped<ICreditCardRepository, CreditCardRepository>();
+            services.AddScoped<IDebitCardRepository, DebitCardRepository>();
+            services.AddScoped<IChequeRepository, ChequehRepository>();
+            services.AddScoped<IOwnFeesRepository, OwnFeesRepository>();
+            services.AddScoped<IFeeRepository, FeeRepository>();
+            services.AddScoped<IMiscellaneousExpensesRepository, MiscellaneousExpensesRepository>();
                         
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }

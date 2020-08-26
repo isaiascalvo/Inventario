@@ -15,14 +15,16 @@ namespace Logic.Dtos
         //public DateTime? DeletedAt { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Code { get; set; }
+        public string? Code { get; set; }
         public Guid CategoryId { get; set; }
         public CategoryDto Category { get; set; }
         public Guid VendorId { get; set; }
         public VendorDto Vendor { get; set; }
         public string Brand { get; set; }
+        public double? MinimumStock { get; set; }
         public double Stock { get; set; }
         public string UnitOfMeasurement { get; set; }
-        public PriceDto Price { get; set; }
+        public PriceDto PurchasePrice { get; set; }
+        public PriceDto SalePrice { get; set; }
     }
 }

@@ -9,12 +9,14 @@ namespace Logic.Dtos
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Code { get; set; }
+        public string? Code { get; set; }
         public Guid CategoryId { get; set; }
         public Guid VendorId { get; set; }
         public string Brand { get; set; }
+        public double? MinimumStock { get; set; }
         public double Stock { get; set; }
         public string UnitOfMeasurement { get; set; }
-        public PriceForCreationDto Price { get; set; }
+        public PriceForCreationDto PurchasePrice { get; set; }
+        public PriceForCreationDto SalePrice { get; set; }
     }
 }

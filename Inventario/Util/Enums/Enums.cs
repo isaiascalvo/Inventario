@@ -4,10 +4,25 @@ using System.Text;
 
 namespace Util.Enums
 {
-    public enum eSex
+    public enum ePaymentTypes
     {
-        Male,
-        Female
+        Cash,
+        OwnFees,
+        CreditCard,
+        DebitCard,
+        Cheque
     }
-    
+
+    public enum ePriceTypes
+    {
+        PurchasePrice,
+        SalePrice
+    }
+
+    public static class eRoutes
+    {
+        public const string
+            Html = "/html";
+    }
+
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Util.Enums;
 
 namespace Data
 {
@@ -14,6 +15,6 @@ namespace Data
         public Product Product { get; set; }
         [Required]
         public DateTime DateTime { get; set; }
-
+        public ePriceTypes PriceType { get; set; }
     }
 }

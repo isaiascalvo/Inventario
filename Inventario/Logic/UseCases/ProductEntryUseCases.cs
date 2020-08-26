@@ -32,7 +32,7 @@ namespace Logic
             {
                 ProductEntry productEntry = new ProductEntry()
                 {
-                    Date = productEntryForCreationDto.Date,
+                    Date = productEntryForCreationDto.Date.ToLocalTime(),
                     IsEntry = productEntryForCreationDto.IsEntry,
                     CreatedBy = userId
                 };
@@ -105,7 +105,7 @@ namespace Logic
 
         public async Task<IEnumerable<ProductEntryDto>> GetAll()
         {
-            var productEntries = await _productEntryRepository.GetAll();
+            var productEntries = (await _productEntryRepository.GetAll()).OrderByDescending(x => x.Date);
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
 
@@ -126,7 +126,7 @@ namespace Logic
 
             //Delete PEL Deleted
             var deleted = productEntry.ProductEntryLines.Where(
-                pel => !productEntryDto.ProductEntryLines.Any(pelDto => pelDto.Id == pel.Id)
+                pel => !pel.IsDeleted && !productEntryDto.ProductEntryLines.Any(pelDto => pelDto.Id == pel.Id)
             );
 
             foreach (var pel in deleted)
@@ -165,10 +165,12 @@ namespace Logic
                 await _productRepository.Update(product);
             }
 
+            //Updated
+
             //Change Input/Output
             if (productEntry.IsEntry != productEntryDto.IsEntry)
             {
-                var changed = productEntry.ProductEntryLines.Where(pel => !deleted.Contains(pel));
+                var changed = productEntry.ProductEntryLines.Where(pel => !pel.IsDeleted && !deleted.Contains(pel));
                 foreach (var pel in changed)
                 {
                     var product = await _productRepository.GetById(pel.ProductId);
@@ -182,7 +184,7 @@ namespace Logic
                 }
             }
 
-            productEntry.Date = productEntryDto.Date;
+            productEntry.Date = productEntryDto.Date.ToLocalTime();
             productEntry.IsEntry = productEntryDto.IsEntry;
             productEntry.LastModificationBy = productEntryDto.LastModificationBy;
             

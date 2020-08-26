@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Data;
+using Data.Models;
 using Logic.Dtos;
 using System;
 using System.Collections.Generic;
@@ -40,8 +41,29 @@ namespace Logic.Profiles
             CreateMap<ProductEntryLineDto, ProductEntryLine>();
             CreateMap<ProductEntryLine, ProductEntryLineDto>();
             
-            CreateMap<PurchaseDto, Purchase>();
-            CreateMap<Purchase, PurchaseDto>();
+            CreateMap<SaleDto, Sale>();
+            CreateMap<Sale, SaleDto>();
+
+            CreateMap<CashDto, Cash>();
+            CreateMap<Cash, CashDto>();
+
+            CreateMap<DebitCardDto, DebitCard>();
+            CreateMap<DebitCard, DebitCardDto>();
+
+            CreateMap<CreditCardDto, CreditCard>();
+            CreateMap<CreditCard, CreditCardDto>();
+
+            CreateMap<ChequeDto, Cheque>();
+            CreateMap<Cheque, ChequeDto>();
+
+            CreateMap<OwnFeesDto, OwnFees>();
+            CreateMap<OwnFees, OwnFeesDto>();
+
+            CreateMap<FeeDto, Fee>();
+            CreateMap<Fee, FeeDto>();
+
+            CreateMap<MiscellaneousExpensesDto, MiscellaneousExpenses>();
+            CreateMap<MiscellaneousExpenses, MiscellaneousExpensesDto>();
         }
     }
 }
