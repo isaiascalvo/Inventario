@@ -23,34 +23,6 @@
           >
             <b-step-item step="1" label="Paso 1" clickable>
               <!-- <h1 class="title has-text-centered">Account</h1> -->
-              <b-field
-                label="Producto"
-                :type="
-                  prodFocus && !fieldState(sale.productId) ? 'is-danger' : ''
-                "
-                :message="
-                  prodFocus && !fieldState(sale.productId)
-                    ? 'Debe seleccionar un Producto'
-                    : ''
-                "
-              >
-                <b-autocomplete
-                  v-model="prodCodNameDesc"
-                  :data="filteredProducts()"
-                  placeholder="ej.: Producto X"
-                  icon="magnify"
-                  icon-right="close-circle"
-                  icon-right-clickable
-                  @icon-right-click="
-                    sale.productId = prodCodNameDesc = undefined
-                  "
-                  @select="option => getProductId(option)"
-                  @blur="prodFocus = true"
-                >
-                  <template slot="empty">No se encontraron resultados</template>
-                </b-autocomplete>
-              </b-field>
-
               <b-field label="Cliente comprador:">
                 <b-autocomplete
                   v-model="sale.clientName"
@@ -92,14 +64,45 @@
                 </b-datetimepicker>
               </b-field>
 
+              <b-field
+                label="Producto"
+                :type="
+                  prodFocus && !fieldState(sale.productId) ? 'is-danger' : ''
+                "
+                :message="
+                  prodFocus && !fieldState(sale.productId)
+                    ? 'Debe seleccionar un Producto'
+                    : ''
+                "
+              >
+                <b-autocomplete
+                  v-model="prodCodNameDesc"
+                  :data="filteredProducts()"
+                  placeholder="ej.: Producto X"
+                  icon="magnify"
+                  icon-right="close-circle"
+                  icon-right-clickable
+                  @icon-right-click="
+                    sale.productId = prodCodNameDesc = undefined
+                  "
+                  @select="option => getProductId(option)"
+                  @blur="prodFocus = true"
+                >
+                  <template slot="empty">No se encontraron resultados</template>
+                </b-autocomplete>
+              </b-field>
+
               <b-field label="Cantidad:">
-                <b-input
+                <b-numberinput
+                  controls-position="compact"
+                  controls-rounded
                   v-model="sale.quantity"
                   placeholder="Ingrese la cantidad"
+                  min="1"
+                  type="is-dark"
                   required
                   validation-message="Debe ingresar una cantidad"
-                  type="number"
-                ></b-input>
+                ></b-numberinput>
               </b-field>
 
               <b-field>
@@ -144,6 +147,8 @@
               <template v-if="sale.paymentType === 1">
                 <b-field label="Cantidad de cuotas:">
                   <b-numberinput
+                    controls-position="compact"
+                    controls-rounded
                     v-model="sale.payment.quantity"
                     placeholder="Ingrese la cantidad de cuotas"
                     min="1"
@@ -160,7 +165,9 @@
                   <b-input :value="getValorCuota()" disabled></b-input>
                 </b-field>
               </template>
+            </b-step-item>
 
+            <b-step-item step="3" label="Paso Final" clickable>
               <b-field>
                 <p class="pMargin">
                   <strong>Importe Total: $</strong>
@@ -171,10 +178,6 @@
                   disabled
                 ></b-input>
               </b-field>
-            </b-step-item>
-
-            <b-step-item step="3" label="Paso Final" clickable>
-              asdas
             </b-step-item>
 
             <template slot="navigation" slot-scope="{ previous, next }">
@@ -297,6 +300,7 @@ export default class EditSale extends Vue {
         break;
       case paymentTypes.ownFees:
         this.sale.payment = new OwnFeesForCreation();
+        //Get%CuotasProd
         break;
       case paymentTypes.creditcard:
         this.sale.payment = new CreditCardForCreation();
@@ -373,10 +377,12 @@ export default class EditSale extends Vue {
       const date = this.sale.date
         ? this.sale.date.toISOString()
         : new Date().toISOString();
+      this.isLoading = true;
       this.productService
         .getPriceByDate(this.sale.productId, date)
         .then(response => {
           this.priceValue = response as number;
+          this.isLoading = false;
           this.$forceUpdate();
         })
         .catch(e => {

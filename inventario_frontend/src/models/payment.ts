@@ -37,6 +37,7 @@ export class Cheque extends ChequeForCreation {
 export class DebitCardForCreation extends Payment {
   public cardType: string | undefined = undefined;
   public bank: string | undefined = undefined;
+  public surcharge: number | undefined = undefined;
 
   public getPaymentType() {
     return "Tarjeta de débito";
@@ -50,6 +51,7 @@ export class DebitCard extends DebitCardForCreation {
 export class CreditCardForCreation extends Payment {
   public cardType: string | undefined = undefined;
   public bank: string | undefined = undefined;
+  public discount: number | undefined = undefined;
 
   public getPaymentType() {
     return "Tarjeta de crédito";
