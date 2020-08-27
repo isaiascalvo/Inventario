@@ -130,7 +130,12 @@ export default class SideBarMenu extends Vue {
       text: "Movimientos de Stock",
       url: "/product-entry-list"
     },
-    { icon: "briefcase-outline", text: "Ventas", url: "/sale-list" }
+    { icon: "briefcase-outline", text: "Ventas", url: "/sale-list" },
+    {
+      icon: "briefcase-outline",
+      text: "Cuotas Aplicables",
+      url: "/fee-rule-list"
+    }
   ];
 
   public loggedIn() {

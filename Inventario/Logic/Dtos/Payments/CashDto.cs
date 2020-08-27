@@ -6,5 +6,6 @@ namespace Logic.Dtos
 {
     public class CashDto: PaymentDto
     {
+        public double Discount { get; set; }
     }
 }

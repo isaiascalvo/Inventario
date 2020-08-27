@@ -90,6 +90,12 @@ namespace Application.Profiles
             CreateMap<MiscellaneousExpensesDto, MiscellaneousExpensesViewModel>();
             CreateMap<MiscellaneousExpensesViewModel, MiscellaneousExpensesDto>();
 
+            CreateMap<FeeRuleViewModel, FeeRuleDto>();
+            CreateMap<FeeRuleDto, FeeRuleViewModel>();
+            CreateMap<FeeRuleForCreationViewModel, FeeRuleForCreationDto>();
+
+            CreateMap<FeeRuleByCategoryViewModel, FeeRuleByCategoryDto>();
+
             CreateMap<ProductFiltersViewModel, ProductFiltersDto>()
                 .ForMember(
                     dest => dest.Date,

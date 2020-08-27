@@ -11,7 +11,7 @@ namespace Logic.Interfaces
         Task<CategoryDto> GetOne(Guid id);
         Task<IEnumerable<CategoryDto>> GetAll();
         Task Delete(Guid userId, Guid id);
-        Task<CategoryDto> Create(Guid userId, CategoryForCreationDto raceDto);
-        Task Update(Guid id, CategoryDto raceDto);
+        Task<CategoryDto> Create(Guid userId, CategoryForCreationDto categoryForCreationDto);
+        Task Update(Guid id, CategoryDto categoryDto);
     }
 }

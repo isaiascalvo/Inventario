@@ -30,6 +30,7 @@ namespace Infrastructure.EFCore
         public DbSet<Cheque> ChequePayments { get; set; }
         public DbSet<OwnFees> OwnFeesPayments { get; set; }
         public DbSet<Fee> Fees { get; set; }
+        public DbSet<FeeRule> FeeRules { get; set; }
 
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -108,6 +109,22 @@ namespace Infrastructure.EFCore
                 .HasOne(p => p.Product)
                 .WithMany()
                 .HasForeignKey(p => p.ProductId);
+            modelBuilder.Entity<Sale>()
+                .HasOne(p => p.Payment)
+                .WithMany()
+                .HasForeignKey(p => p.PaymentId);
+
+            //Fee
+            modelBuilder.Entity<Fee>()
+                .HasOne(f => f.OwnFees)
+                .WithMany(x => x.FeeList)
+                .HasForeignKey(f => f.OwnFeesId);
+
+            //FeeRule
+            modelBuilder.Entity<FeeRule>()
+                .HasOne(fr => fr.Product)
+                .WithMany()
+                .HasForeignKey(fr => fr.ProductId);
         }
         #endregion
 

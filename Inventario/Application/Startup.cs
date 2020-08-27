@@ -103,6 +103,7 @@ namespace Application
             services.AddScoped<IProductEntryLineUseCases, ProductEntryLineUseCases>();
             services.AddScoped<ISaleUseCases, SaleUseCases>();
             services.AddScoped<IMiscellaneousExpensesUseCases, MiscellaneousExpensesUseCases>();
+            services.AddScoped<IFeeRuleUseCases, FeeRuleUseCases>();
 
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IPriceRepository, PriceRepository>();
@@ -120,6 +121,7 @@ namespace Application
             services.AddScoped<IOwnFeesRepository, OwnFeesRepository>();
             services.AddScoped<IFeeRepository, FeeRepository>();
             services.AddScoped<IMiscellaneousExpensesRepository, MiscellaneousExpensesRepository>();
+            services.AddScoped<IFeeRuleRepository, FeeRuleRepository>();
                         
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }

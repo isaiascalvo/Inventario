@@ -1,5 +1,6 @@
 import { apiClient } from "./apiClient";
 import { FeeRule, FeeRuleForCreation } from "@/models/feeRule";
+import { FeeRuleByCategory } from "@/models/feeRuleByCategory";
 
 export interface FeeRuleService {
   getFeeRules(): Promise<FeeRule[]>;
@@ -7,6 +8,7 @@ export interface FeeRuleService {
   addFeeRule(feeRule: FeeRuleForCreation): Promise<FeeRule>;
   updateFeeRule(feeRule: FeeRule): Promise<void>;
   deleteFeeRule(feeRuleId: string): Promise<void>;
+  addFeeRuleByCategory(feeRuleByCategory: FeeRuleByCategory): Promise<void>;
 }
 
 export class NavigatorFeeRuleService implements FeeRuleService {
@@ -28,5 +30,12 @@ export class NavigatorFeeRuleService implements FeeRuleService {
 
   public deleteFeeRule(feeRuleId: string): Promise<void> {
     return apiClient.delete("/fee-rules/" + feeRuleId);
+  }
+
+  public addFeeRuleByCategory(
+    feeRuleByCategory: FeeRuleByCategory
+  ): Promise<void> {
+    console.log("Llamó", JSON.parse(JSON.stringify(feeRuleByCategory)));
+    return apiClient.post("/fee-rules/ByCategory", feeRuleByCategory);
   }
 }

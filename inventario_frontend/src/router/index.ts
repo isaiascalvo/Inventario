@@ -199,6 +199,34 @@ const routes: Array<RouteConfig> = [
     props: true
   },
   {
+    path: "/fee-rule-list",
+    name: "FeeRuleList",
+    component: () =>
+      import(
+        /* webpackChunkName: "fee-rule" */
+        "../views/fee-rule/fee-rule-list.vue"
+      )
+  },
+  {
+    path: "/fee-rule/new",
+    name: "NewFeeRule",
+    component: () =>
+      import(
+        /* webpackChunkName: "fee-rule" */
+        "../views/fee-rule/edit-fee-rule.vue"
+      )
+  },
+  {
+    path: "/fee-rule/modify/:id",
+    name: "ModifyFeeRule",
+    component: () =>
+      import(
+        /* webpackChunkName: "fee-rule" */
+        "../views/fee-rule/edit-fee-rule.vue"
+      ),
+    props: true
+  },
+  {
     path: "/login",
     name: "Login",
     component: () =>

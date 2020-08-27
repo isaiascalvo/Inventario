@@ -7,5 +7,6 @@ namespace Logic.Dtos
 {
     public class CashForCreationDto : PaymentForCreationDto
     {
+        public double Discount { get; set; }
     }
 }

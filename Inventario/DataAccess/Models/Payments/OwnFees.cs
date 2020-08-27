@@ -8,7 +8,7 @@ namespace Data
     {
         public int Quantity { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public List<Fee> FeeList;
+        public List<Fee> FeeList { get; set; }
 
         public OwnFees(DateTime expirationDate, Guid createdBy)
         {

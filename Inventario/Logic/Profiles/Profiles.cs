@@ -64,6 +64,9 @@ namespace Logic.Profiles
 
             CreateMap<MiscellaneousExpensesDto, MiscellaneousExpenses>();
             CreateMap<MiscellaneousExpenses, MiscellaneousExpensesDto>();
+
+            CreateMap<FeeRuleDto, FeeRule>();
+            CreateMap<FeeRule, FeeRuleDto>();
         }
     }
 }

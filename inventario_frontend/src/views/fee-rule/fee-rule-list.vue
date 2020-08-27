@@ -4,7 +4,7 @@
       <div class="hero-head">
         <div class="level">
           <div>
-            <h1 class="title is-6">Lista de Reglas</h1>
+            <h1 class="title is-6">Reglas de cuotas aplicables</h1>
           </div>
           <div>
             <b-button
@@ -42,19 +42,19 @@
         <b-table-column field="product" label="Producto">
           {{ props.row.product.name }}
         </b-table-column>
-        <b-table-column field="date" label="Fecha">
+        <!-- <b-table-column field="date" label="Fecha">
           {{ props.row.date }}
+        </b-table-column> -->
+        <b-table-column field="feesAmountTo" label="Cantidad de cuotas">
+          hasta {{ props.row.feesAmountTo }} cuotas
         </b-table-column>
-        <b-table-column field="feesAmountTo" label="Cuotas desde">
-          {{ props.row.feesAmountTo }}
-        </b-table-column>
-        <b-table-column field="percentage" label="Porcentage">
-          {{ props.row.percentage }}
+        <b-table-column field="percentage" label="Interés">
+          {{ props.row.percentage }}% de interés mensual
         </b-table-column>
         <b-table-column field="action" label="Acciones">
           <b-button
             tag="router-link"
-            :to="'/feeRule/modify/' + props.row.id"
+            :to="'/fee-rule/modify/' + props.row.id"
             type="is-small"
           >
             <b-icon icon="pencil"></b-icon>

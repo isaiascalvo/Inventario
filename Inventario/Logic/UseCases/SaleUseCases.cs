@@ -89,10 +89,12 @@ namespace Logic
             switch (saleForCreationDto.PaymentType)
             {
                 case Util.Enums.ePaymentTypes.Cash:
+                    var cashDto = (CashForCreationDto)saleForCreationDto.Payment;
                     payment = new Cash()
                     {
                         SaleId = sale.Id,
                         Amount = saleForCreationDto.Payment.Amount,
+                        Discount = cashDto.Discount,
                         CreatedBy = sale.CreatedBy
                     };
                     await _cashRepository.Add((Cash)payment);
@@ -106,7 +108,8 @@ namespace Logic
                         Quantity = ownFeesDto.Quantity,
                         CreatedBy = sale.CreatedBy
                     };
-                    await _ownFeesRepository.Add((OwnFees)payment);
+
+                    payment = await _ownFeesRepository.Add((OwnFees)payment);
                     foreach (var fee in ((OwnFees)payment).FeeList)
                     {
                         await _feeRepository.Add(fee);
@@ -120,6 +123,7 @@ namespace Logic
                         Amount = saleForCreationDto.Payment.Amount,
                         CardType = creditCardDto.CardType,
                         Bank = creditCardDto.Bank,
+                        Discount = creditCardDto.Discount,
                         CreatedBy = sale.CreatedBy
                     };
                     await _creditCardRepository.Add((CreditCard)payment);
@@ -132,6 +136,7 @@ namespace Logic
                         Amount = saleForCreationDto.Payment.Amount,
                         CardType = debitCardDto.CardType,
                         Bank = debitCardDto.Bank,
+                        Surcharge = debitCardDto.Surcharge,
                         CreatedBy = sale.CreatedBy
                     };
                     await _debitCardRepository.Add((DebitCard)payment);

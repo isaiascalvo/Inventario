@@ -6,5 +6,6 @@ namespace Data
 {
     public class Cash: Payment
     {
+        public double Discount { get; set; }
     }
 }
