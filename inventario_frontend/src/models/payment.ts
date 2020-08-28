@@ -1,3 +1,6 @@
+import { FeeStates } from "@/enums/paymentTypes";
+import { FeeRule } from "./feeRule";
+
 export abstract class Payment {
   //Properties
   public amount: number | undefined = undefined;
@@ -65,6 +68,8 @@ export class CreditCard extends CreditCardForCreation {
 export class OwnFeesForCreation extends Payment {
   public quantity = 1;
   public expirationDate: Date | undefined = undefined;
+  public feeRuleId?: string;
+  public feeRule?: FeeRule;
   public feeList: Array<Fee>;
 
   /**
@@ -95,4 +100,5 @@ export class Fee {
   public ownFeesId!: string;
   public expirationDate!: Date;
   public paymentDate?: Date;
+  public state!: FeeStates;
 }

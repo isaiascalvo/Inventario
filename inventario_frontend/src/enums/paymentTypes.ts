@@ -5,3 +5,8 @@ export enum paymentTypes {
   debitcard,
   cheque
 }
+
+export enum FeeStates {
+  pending,
+  paid
+}

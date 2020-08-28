@@ -8,6 +8,7 @@ namespace Logic.Dtos
     {
         public int Quantity { get; set; }
         public DateTime ExpirationDate { get; set; }
+        public Guid? FeeRuleId { get; set; }
         public List<FeeForCreationDto> FeeList;
 
         //public OwnFeeesDto()

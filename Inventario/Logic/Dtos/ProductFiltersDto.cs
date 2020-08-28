@@ -25,11 +25,11 @@ namespace Logic.Dtos
         {
             return x =>
                 (Code == null || x.Code == Code) &&
-                (Name == null || x.Name.Contains(Name)) &&
-                (Description == null || x.Description.Contains(Description)) &&
+                (Name == null || x.Name.ToLower().Contains(Name.ToLower())) &&
+                (Description == null || x.Description.ToLower().Contains(Description.ToLower())) &&
                 (CategoryId == null || x.CategoryId == CategoryId) &&
                 (VendorId == null || x.VendorId == VendorId) &&
-                (Brand == null || x.Brand.Contains(Brand) &&
+                (Brand == null || x.Brand.ToLower().Contains(Brand.ToLower()) &&
                 (Date == null || x.CreatedAt <= Date));
         }
     }

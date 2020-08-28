@@ -45,6 +45,21 @@ namespace Application.Controllers
             }
         }
 
+        [HttpGet("ByProduct/{productId}")]
+        public async Task<IActionResult> GetByProduct(Guid productId)
+        {
+            try
+            {
+                IEnumerable<FeeRuleDto> feeRuleDto = await _feeRuleUseCases.GetByProduct(productId);
+                IEnumerable<FeeRuleViewModel> feeRuleVM = _mapper.Map<IEnumerable<FeeRuleDto>, IEnumerable<FeeRuleViewModel>>(feeRuleDto);
+                return Ok(feeRuleVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         //[HttpGet("GetTotalQty")]
         //public async Task<IActionResult> GetTotalQty()
         //{

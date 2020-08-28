@@ -146,23 +146,26 @@
 
               <template v-if="sale.paymentType === 1">
                 <b-field label="Cantidad de cuotas:">
-                  <b-numberinput
-                    controls-position="compact"
-                    controls-rounded
-                    v-model="sale.payment.quantity"
-                    placeholder="Ingrese la cantidad de cuotas"
-                    min="1"
-                    type="is-dark"
+                  <b-select
+                    v-model="sale.payment.feeRuleId"
+                    placeholder="Seleccione la cantidad de cuotas"
+                    expanded
                     required
-                    validation-message="Ingrese la cantidad de cuotas"
-                  ></b-numberinput>
-                </b-field>
-
-                <b-field>
-                  <p class="pMargin">
-                    <strong>Cuotas de $</strong>
-                  </p>
-                  <b-input :value="getValorCuota()" disabled></b-input>
+                    validation-message="Debe seleccionar la cantidad de cuotas"
+                    @input="option => getRule(option)"
+                  >
+                    <option
+                      v-for="feeRule in feeRules"
+                      :value="feeRule.id"
+                      :key="feeRule.id"
+                    >
+                      {{
+                        feeRule.feesAmountTo +
+                          " cuotas de $" +
+                          getFeeValue(feeRule.id)
+                      }}
+                    </option>
+                  </b-select>
                 </b-field>
               </template>
             </b-step-item>
@@ -192,10 +195,13 @@
               <b-button
                 v-if="activeStep !== 2"
                 outlined
-                :disabled="next.disabled"
+                :disabled="next.disabled || nextDisabled()"
                 @click.prevent="next.action"
               >
                 Siguiente
+              </b-button>
+              <b-button outlined @click="most()">
+                Mostrar
               </b-button>
               <b-button
                 v-if="activeStep === 2"
@@ -243,6 +249,8 @@ import {
   ChequeForCreation
 } from "@/models/payment";
 import { paymentTypes } from "@/enums/paymentTypes";
+import { FeeRule } from "@/models/feeRule";
+import { NavigatorFeeRuleService } from "@/services/fee-rule-service";
 
 @Component
 export default class EditSale extends Vue {
@@ -250,9 +258,11 @@ export default class EditSale extends Vue {
   public sale: Sale = new Sale();
   public products: Product[] = [];
   public clients: Client[] = [];
+  public feeRules: FeeRule[] = [];
   public saleService: NavigatorSaleService = new NavigatorSaleService();
   public productService: NavigatorProductService = new NavigatorProductService();
   public clientService: NavigatorClientService = new NavigatorClientService();
+  public feeRuleService: NavigatorFeeRuleService = new NavigatorFeeRuleService();
   public isLoading = false;
   public priceValue: number | undefined = undefined;
   public monthNames = [
@@ -293,6 +303,42 @@ export default class EditSale extends Vue {
     );
   }
 
+  most() {
+    console.log(JSON.parse(JSON.stringify(this.sale)));
+  }
+
+  getRule(key: string) {
+    const foundRule = this.feeRules.find(x => x.id === key);
+    if (foundRule) {
+      (this.sale.payment as OwnFeesForCreation).quantity =
+        foundRule.feesAmountTo ?? 1;
+      const percentage: number = foundRule.percentage ?? 0;
+      if (foundRule.feesAmountTo && this.priceValue && this.sale.quantity) {
+        console.log(percentage);
+        this.sale.amount =
+          this.priceValue *
+          this.sale.quantity *
+          (1 + (percentage * foundRule.feesAmountTo) / 100);
+      }
+    }
+  }
+
+  public nextDisabled() {
+    switch (this.activeStep) {
+      case 0:
+        return !(
+          fieldStateValidation(this.sale.productId) &&
+          fieldStateValidation(this.sale.date) &&
+          fieldStateValidation(this.sale.quantity) &&
+          fieldStateValidation(this.sale.clientName)
+        );
+      case 1:
+        return false;
+      default:
+        return false;
+    }
+  }
+
   public setPayment() {
     switch (this.sale.paymentType) {
       case paymentTypes.cash:
@@ -300,7 +346,7 @@ export default class EditSale extends Vue {
         break;
       case paymentTypes.ownFees:
         this.sale.payment = new OwnFeesForCreation();
-        //Get%CuotasProd
+        this.getFeeRules();
         break;
       case paymentTypes.creditcard:
         this.sale.payment = new CreditCardForCreation();
@@ -313,6 +359,22 @@ export default class EditSale extends Vue {
         break;
       default:
         break;
+    }
+  }
+
+  public getFeeRules() {
+    this.isLoading = true;
+    if (this.sale.productId) {
+      this.feeRuleService
+        .getFeeRulesByProduct(this.sale.productId)
+        .then(response => {
+          this.isLoading = false;
+          this.feeRules = response;
+        })
+        .catch(error => {
+          this.isLoading = true;
+          console.log(error);
+        });
     }
   }
 
@@ -334,15 +396,15 @@ export default class EditSale extends Vue {
           break;
         case paymentTypes.ownFees:
           {
-            const payOwnFee = this.sale.payment as OwnFeesForCreation;
-            if (payOwnFee.quantity && this.priceValue && this.sale.quantity) {
-              this.sale.amount =
-                this.priceValue *
-                this.sale.quantity *
-                (1 + (3 * payOwnFee.quantity) / 100);
-            } else {
-              this.sale.amount = undefined;
-            }
+            // const payOwnFee = this.sale.payment as OwnFeesForCreation;
+            // if (payOwnFee.quantity && this.priceValue && this.sale.quantity) {
+            //   this.sale.amount = this.priceValue * this.sale.quantity;
+            //   //(1 + (3 * payOwnFee.quantity) / 100)
+            //   const rule = this.feeRules.find(x => x.feesAmountTo);
+            //   console.log(rule);
+            // } else {
+            //   this.sale.amount = undefined;
+            // }
           }
           break;
         case paymentTypes.creditcard:
@@ -361,10 +423,15 @@ export default class EditSale extends Vue {
     return this.sale.amount;
   }
 
-  getValorCuota() {
-    const payment = this.sale.payment as OwnFeesForCreation;
-    if (this.sale.amount) {
-      return Math.ceil((this.sale.amount * 100) / payment.quantity) / 100;
+  getFeeValue(feeRuleId: string) {
+    if (this.sale.quantity && this.priceValue) {
+      let value = this.sale.quantity * this.priceValue;
+      const rule = this.feeRules.find(x => x.id === feeRuleId);
+      const percentage: number = rule && rule.percentage ? rule.percentage : 0;
+      if (rule && rule.feesAmountTo) {
+        value *= 1 + (percentage * rule.feesAmountTo) / 100;
+        return Math.ceil((value * 100) / rule.feesAmountTo) / 100;
+      }
     }
   }
 
@@ -563,6 +630,7 @@ export default class EditSale extends Vue {
           );
         } else {
           this.sale.date = new Date();
+          this.sale.quantity = 1;
           this.isLoading = false;
         }
       })

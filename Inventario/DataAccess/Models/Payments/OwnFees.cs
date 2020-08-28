@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Util.Enums;
 
 namespace Data
 {
@@ -8,12 +9,18 @@ namespace Data
     {
         public int Quantity { get; set; }
         public DateTime ExpirationDate { get; set; }
+        public Guid? FeeRuleId { get; set; }
+        public FeeRule? FeeRule { get; set; }
         public List<Fee> FeeList { get; set; }
 
-        public OwnFees(DateTime expirationDate, Guid createdBy)
+        public OwnFees(DateTime expirationDate, double amount, int quantity, Guid createdBy)
         {
             ExpirationDate = expirationDate.ToLocalTime();
+            Amount = amount;
+            Quantity = quantity;
             FeeList = new List<Fee>();
+
+            double feeValue = Math.Ceiling(Amount * 100 / Quantity) / 100;
 
             for (int i = 0; i < Quantity; i++)
             {
@@ -21,6 +28,8 @@ namespace Data
                 {
                     OwnFeesId = this.Id,
                     ExpirationDate = expirationDate.AddMonths(i).ToLocalTime(),
+                    Value = i != Quantity - 1 ? feeValue : Amount - feeValue * (Quantity - 1), 
+                    State = eFeeState.Pending,
                     CreatedBy = createdBy
                 };
 

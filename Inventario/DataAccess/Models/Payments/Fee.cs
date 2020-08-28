@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Util.Enums;
 
 namespace Data
 {
@@ -10,5 +11,7 @@ namespace Data
         public OwnFees OwnFees { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime? PaymentDate { get; set; }
+        public double Value { get; set; }
+        public eFeeState State { get; set; }
     }
 }

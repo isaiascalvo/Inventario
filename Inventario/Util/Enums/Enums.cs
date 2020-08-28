@@ -13,6 +13,12 @@ namespace Util.Enums
         Cheque
     }
 
+    public enum eFeeState
+    {
+        Pending,
+        Paid
+    }
+
     public enum ePriceTypes
     {
         PurchasePrice,

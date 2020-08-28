@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Util.Enums;
 
 namespace Logic.Dtos
 {
@@ -11,5 +12,7 @@ namespace Logic.Dtos
         public OwnFeesDto OwnFees { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime? PaymentDate { get; set; }
+        public double Value { get; set; }
+        public eFeeState State { get; set; }
     }
 }

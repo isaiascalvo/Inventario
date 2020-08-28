@@ -9,6 +9,7 @@ export interface FeeRuleService {
   updateFeeRule(feeRule: FeeRule): Promise<void>;
   deleteFeeRule(feeRuleId: string): Promise<void>;
   addFeeRuleByCategory(feeRuleByCategory: FeeRuleByCategory): Promise<void>;
+  getFeeRulesByProduct(productId: string): Promise<FeeRule[]>;
 }
 
 export class NavigatorFeeRuleService implements FeeRuleService {
@@ -35,7 +36,12 @@ export class NavigatorFeeRuleService implements FeeRuleService {
   public addFeeRuleByCategory(
     feeRuleByCategory: FeeRuleByCategory
   ): Promise<void> {
-    console.log("Llamó", JSON.parse(JSON.stringify(feeRuleByCategory)));
+    // console.log("Llamó", JSON.parse(JSON.stringify(feeRuleByCategory)));
     return apiClient.post("/fee-rules/ByCategory", feeRuleByCategory);
+  }
+
+  public async getFeeRulesByProduct(productId: string): Promise<FeeRule[]> {
+    return await (await apiClient.get("/fee-rules/ByProduct/" + productId))
+      .data;
   }
 }

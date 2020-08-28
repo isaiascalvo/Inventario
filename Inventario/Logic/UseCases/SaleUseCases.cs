@@ -24,6 +24,7 @@ namespace Logic
         private readonly IChequeRepository _chequeRepository;
         private readonly IOwnFeesRepository _ownFeesRepository;
         private readonly IFeeRepository _feeRepository;
+        private readonly IFeeRuleRepository _feeRuleRepository;
         private readonly IMapper _mapper;
 
         public SaleUseCases(ISaleRepository saleRepository,
@@ -36,6 +37,7 @@ namespace Logic
             IChequeRepository chequeRepository,
             IOwnFeesRepository ownFeesRepository,
             IFeeRepository feeRepository,
+            IFeeRuleRepository feeRuleRepository,
             IMapper mapper
         )
         {
@@ -49,6 +51,7 @@ namespace Logic
             _chequeRepository = chequeRepository;
             _ownFeesRepository = ownFeesRepository;
             _feeRepository = feeRepository;
+            _feeRuleRepository = feeRuleRepository;
             _mapper = mapper;
         }
 
@@ -68,7 +71,11 @@ namespace Logic
 
             var price = (await _priceRepository.GetAll())
                 .OrderByDescending(x => x.DateTime)
-                .FirstOrDefault(x => x.ProductId == saleForCreationDto.ProductId && x.DateTime <= saleForCreationDto.Date && !x.IsDeleted);
+                .FirstOrDefault(
+                    x => x.ProductId == saleForCreationDto.ProductId &&
+                    x.DateTime.ToLocalTime() <= saleForCreationDto.Date.ToLocalTime() &&
+                    !x.IsDeleted
+                );
 
             var sale = new Sale()
             {
@@ -90,22 +97,45 @@ namespace Logic
             {
                 case Util.Enums.ePaymentTypes.Cash:
                     var cashDto = (CashForCreationDto)saleForCreationDto.Payment;
-                    payment = new Cash()
+                    payment = new Cash(price.Value, cashDto.Discount)
                     {
                         SaleId = sale.Id,
-                        Amount = saleForCreationDto.Payment.Amount,
-                        Discount = cashDto.Discount,
                         CreatedBy = sale.CreatedBy
                     };
+
+                    if (saleForCreationDto.Payment.Amount != payment.Amount)
+                    {
+                        var y = 0; //Diference
+                    }
+
                     await _cashRepository.Add((Cash)payment);
                     break;
                 case Util.Enums.ePaymentTypes.OwnFees:
                     var ownFeesDto = (OwnFeesForCreationDto)saleForCreationDto.Payment;
-                    payment = new OwnFees(ownFeesDto.ExpirationDate, sale.CreatedBy)
+                    FeeRule feeRule = null;
+                    if (ownFeesDto.FeeRuleId.HasValue)
+                    {
+                        feeRule = await _feeRuleRepository.GetById(ownFeesDto.FeeRuleId.Value);
+                        if (feeRule == null)
+                            throw new KeyNotFoundException($"Fee Rule with id: {ownFeesDto.FeeRuleId.Value} not found.");
+                    }
+
+                    double amount = price.Value * saleForCreationDto.Quantity;
+                    if (feeRule != null)
+                    {
+                        double percentage = feeRule.Percentage * saleForCreationDto.Quantity / 100;
+                        amount *= (1 + percentage);
+                    }
+
+                    if (saleForCreationDto.Payment.Amount != payment.Amount)
+                    {
+                        var y = 0; //Diference
+                    }
+
+                    payment = new OwnFees(ownFeesDto.ExpirationDate, amount, ownFeesDto.Quantity, sale.CreatedBy)
                     {
                         SaleId = sale.Id,
-                        Amount = saleForCreationDto.Payment.Amount,
-                        Quantity = ownFeesDto.Quantity,
+                        FeeRuleId = ownFeesDto.FeeRuleId,
                         CreatedBy = sale.CreatedBy
                     };
 
@@ -117,28 +147,36 @@ namespace Logic
                     break;
                 case Util.Enums.ePaymentTypes.CreditCard:
                     var creditCardDto = (CreditCardForCreationDto)saleForCreationDto.Payment;
-                    payment = new CreditCard()
+                    payment = new CreditCard(price.Value, creditCardDto.Discount)
                     {
                         SaleId = sale.Id,
-                        Amount = saleForCreationDto.Payment.Amount,
                         CardType = creditCardDto.CardType,
                         Bank = creditCardDto.Bank,
-                        Discount = creditCardDto.Discount,
                         CreatedBy = sale.CreatedBy
                     };
+
+                    if (saleForCreationDto.Payment.Amount != payment.Amount)
+                    {
+                        var y = 0; //Diference
+                    }
+
                     await _creditCardRepository.Add((CreditCard)payment);
                     break;
                 case Util.Enums.ePaymentTypes.DebitCard:
                     var debitCardDto = (DebitCardForCreationDto)saleForCreationDto.Payment;
-                    payment = new DebitCard()
+                    payment = new DebitCard(price.Value, debitCardDto.Surcharge)
                     {
                         SaleId = sale.Id,
-                        Amount = saleForCreationDto.Payment.Amount,
                         CardType = debitCardDto.CardType,
                         Bank = debitCardDto.Bank,
-                        Surcharge = debitCardDto.Surcharge,
                         CreatedBy = sale.CreatedBy
                     };
+
+                    if (saleForCreationDto.Payment.Amount != payment.Amount)
+                    {
+                        var y = 0; //Diference
+                    }
+
                     await _debitCardRepository.Add((DebitCard)payment);
                     break;
                 case Util.Enums.ePaymentTypes.Cheque:
@@ -151,6 +189,12 @@ namespace Logic
                         Bank = chequeDto.Bank,
                         CreatedBy = sale.CreatedBy
                     };
+
+                    if (saleForCreationDto.Payment.Amount != payment.Amount)
+                    {
+                        var y = 0; //Diference
+                    }
+
                     await _chequeRepository.Add((Cheque)payment);
                     break;
                 default:
