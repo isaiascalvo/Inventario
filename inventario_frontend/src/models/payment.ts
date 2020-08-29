@@ -70,14 +70,12 @@ export class OwnFeesForCreation extends Payment {
   public expirationDate: Date | undefined = undefined;
   public feeRuleId?: string;
   public feeRule?: FeeRule;
-  public feeList: Array<Fee>;
 
   /**
    *
    */
   constructor() {
     super();
-    this.feeList = new Array<Fee>();
   }
 
   public getTotal(): number | void {
@@ -93,6 +91,14 @@ export class OwnFeesForCreation extends Payment {
 
 export class OwnFees extends OwnFeesForCreation {
   public id!: string;
+  public feeList: Array<Fee>;
+  /**
+   *
+   */
+  constructor() {
+    super();
+    this.feeList = new Array<Fee>();
+  }
 }
 
 export class Fee {

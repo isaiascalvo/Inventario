@@ -135,6 +135,11 @@ export default class SideBarMenu extends Vue {
       icon: "briefcase-outline",
       text: "Cuotas Aplicables",
       url: "/fee-rule-list"
+    },
+    {
+      icon: "briefcase-outline",
+      text: "Gastos Varios",
+      url: "/miscellaneous-expenses-list"
     }
   ];
 

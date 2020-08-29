@@ -31,6 +31,7 @@ export class NavigatorSaleService implements SaleService {
   }
 
   public addSale(sale: SaleForCreation): Promise<Sale> {
+    console.log(JSON.parse(JSON.stringify(sale)));
     return apiClient.post("/sales", sale);
   }
 

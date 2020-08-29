@@ -126,7 +126,7 @@
             {{ props.row.mail }}
           </b-table-column>
           <b-table-column field="birthdate" label="Fecha de Nacimiento">
-            {{ dateToISO(props.row.birthdate) }}
+            {{ dateTimeToLocal(props.row.birthdate) }}
           </b-table-column>
           <b-table-column field="debtor" label="Deudor">
             {{ props.row.debtor ? "Si" : "No" }}
@@ -174,8 +174,8 @@ export default class ClientList extends Vue {
   public confirmDialog = false;
   public isLoading = false;
 
-  dateToISO(date: Date) {
-    return new Date(date).toISOString().substr(0, 10);
+  dateTimeToLocal(date: Date) {
+    return new Date(date).toLocaleString().substr(0, 10);
   }
 
   clearIconClick(key: keyof ClientFilters) {

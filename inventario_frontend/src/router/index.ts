@@ -227,6 +227,34 @@ const routes: Array<RouteConfig> = [
     props: true
   },
   {
+    path: "/miscellaneous-expenses-list",
+    name: "MiscellaneousExpensesList",
+    component: () =>
+      import(
+        /* webpackChunkName: "miscellaneous-expenses" */
+        "../views/miscellaneous-expenses/miscellaneous-expenses-list.vue"
+      )
+  },
+  {
+    path: "/miscellaneous-expenses/new",
+    name: "NewMiscellaneousExpenses",
+    component: () =>
+      import(
+        /* webpackChunkName: "miscellaneous-expenses" */
+        "../views/miscellaneous-expenses/edit-miscellaneous-expenses.vue"
+      )
+  },
+  {
+    path: "/miscellaneous-expenses/modify/:id",
+    name: "ModifyMiscellaneousExpenses",
+    component: () =>
+      import(
+        /* webpackChunkName: "miscellaneous-expenses" */
+        "../views/miscellaneous-expenses/edit-miscellaneous-expenses.vue"
+      ),
+    props: true
+  },
+  {
     path: "/login",
     name: "Login",
     component: () =>

@@ -134,7 +134,7 @@
               <template v-if="sale.paymentType === 0">
                 <b-field label="Descuento (%):">
                   <b-numberinput
-                    v-model="sale.payment.discount"
+                    v-model="sale.cash.discount"
                     placeholder="Ingrese el descuento"
                     min="0"
                     type="is-dark"
@@ -147,7 +147,7 @@
               <template v-if="sale.paymentType === 1">
                 <b-field label="Cantidad de cuotas:">
                   <b-select
-                    v-model="sale.payment.feeRuleId"
+                    v-model="sale.ownFees.feeRuleId"
                     placeholder="Seleccione la cantidad de cuotas"
                     expanded
                     required
@@ -246,7 +246,12 @@ import {
   CashForCreation,
   CreditCardForCreation,
   DebitCardForCreation,
-  ChequeForCreation
+  ChequeForCreation,
+  Cash,
+  OwnFees,
+  CreditCard,
+  DebitCard,
+  Cheque
 } from "@/models/payment";
 import { paymentTypes } from "@/enums/paymentTypes";
 import { FeeRule } from "@/models/feeRule";
@@ -291,8 +296,23 @@ export default class EditSale extends Vue {
 
   formValid() {
     const result = formValidation(this.sale as never);
+    console.log(result);
+    const nulleableProps = [
+      "",
+      "product",
+      "clientId",
+      "client",
+      "paymentId",
+      "ownFees",
+      "cash",
+      "creditCard",
+      "debitCard",
+      "cheque"
+    ];
+    const splitedResult = result.split(";");
     return (
-      result === "product;client;" || result === "product;clientId;client;"
+      result === "" ||
+      splitedResult.every(x => nulleableProps.some(y => y === x))
     );
   }
 
@@ -310,7 +330,7 @@ export default class EditSale extends Vue {
   getRule(key: string) {
     const foundRule = this.feeRules.find(x => x.id === key);
     if (foundRule) {
-      (this.sale.payment as OwnFeesForCreation).quantity =
+      (this.sale.ownFees as OwnFeesForCreation).quantity =
         foundRule.feesAmountTo ?? 1;
       const percentage: number = foundRule.percentage ?? 0;
       if (foundRule.feesAmountTo && this.priceValue && this.sale.quantity) {
@@ -342,20 +362,40 @@ export default class EditSale extends Vue {
   public setPayment() {
     switch (this.sale.paymentType) {
       case paymentTypes.cash:
-        this.sale.payment = new CashForCreation();
+        this.sale.cash = new Cash();
+        this.sale.ownFees = undefined;
+        this.sale.creditCard = undefined;
+        this.sale.debitCard = undefined;
+        this.sale.cheque = undefined;
         break;
       case paymentTypes.ownFees:
-        this.sale.payment = new OwnFeesForCreation();
+        this.sale.ownFees = new OwnFees();
+        this.sale.cash = undefined;
+        this.sale.creditCard = undefined;
+        this.sale.debitCard = undefined;
+        this.sale.cheque = undefined;
         this.getFeeRules();
         break;
       case paymentTypes.creditcard:
-        this.sale.payment = new CreditCardForCreation();
+        this.sale.creditCard = new CreditCard();
+        this.sale.cash = undefined;
+        this.sale.ownFees = undefined;
+        this.sale.debitCard = undefined;
+        this.sale.cheque = undefined;
         break;
       case paymentTypes.debitcard:
-        this.sale.payment = new DebitCardForCreation();
+        this.sale.debitCard = new DebitCard();
+        this.sale.cash = undefined;
+        this.sale.ownFees = undefined;
+        this.sale.creditCard = undefined;
+        this.sale.cheque = undefined;
         break;
       case paymentTypes.cheque:
-        this.sale.payment = new ChequeForCreation();
+        this.sale.cheque = new Cheque();
+        this.sale.cash = undefined;
+        this.sale.ownFees = undefined;
+        this.sale.creditCard = undefined;
+        this.sale.debitCard = undefined;
         break;
       default:
         break;
@@ -379,11 +419,11 @@ export default class EditSale extends Vue {
   }
 
   getImporte() {
-    if (this.priceValue && this.sale.quantity && this.sale.payment) {
+    if (this.priceValue && this.sale.quantity) {
       switch (this.sale.paymentType) {
         case paymentTypes.cash:
           {
-            const payCash = this.sale.payment as CashForCreation;
+            const payCash = this.sale.cash as CashForCreation;
             if (payCash.discount) {
               this.sale.amount =
                 this.priceValue *

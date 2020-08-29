@@ -122,7 +122,7 @@
             {{ props.row.clientName }}
           </b-table-column>
           <b-table-column field="date" label="Fecha">
-            {{ dateToISO(props.row.date) }}
+            {{ dateTimeToLocal(props.row.date) }}
           </b-table-column>
           <b-table-column field="quantity" label="Cantidad">
             {{ props.row.quantity }}
@@ -176,8 +176,11 @@ export default class SaleList extends Vue {
   public confirmDialog = false;
   public isLoading = false;
 
-  dateToISO(date: Date) {
-    return new Date(date).toISOString().substr(0, 10);
+  dateTimeToLocal(date: Date) {
+    return new Date(date)
+      .toLocaleString()
+      .substr(0, 15)
+      .replace(" ", " - ");
   }
 
   // clearIconClick(key: keyof SaleFilters) {

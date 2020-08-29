@@ -4,16 +4,16 @@
       <div class="hero-head">
         <div class="level">
           <div>
-            <h1 class="title is-6">Lista de Movimientos</h1>
+            <h1 class="title is-6">Lista de gastos varios</h1>
           </div>
           <div>
             <b-button
               type="is-info"
               size="is-small"
               tag="router-link"
-              to="/product-entry/new"
+              to="/miscellaneous-expenses/new"
             >
-              Nuevo movimiento
+              Nuevo Gasto
             </b-button>
           </div>
         </div>
@@ -25,9 +25,9 @@
         striped
         hoverable
         scrollable
-        :data="productEntries"
+        :data="miscellaneousExpenses"
         id="my-table"
-        :paginated="true"
+        paginated
         :per-page="perPage"
         :current-page.sync="currentPage"
         aria-next-label="Next page"
@@ -36,26 +36,32 @@
         aria-current-label="Current page"
       >
         <template slot="empty">
-          No hay entradas/salidas de productos registradas
+          No hay gastos varios registradas
         </template>
         <template slot-scope="props">
+          <b-table-column field="description" label="Descripción">
+            {{ props.row.description }}
+          </b-table-column>
           <b-table-column field="date" label="Fecha y hora">
             {{ dateTimeToLocal(props.row.date) }}
           </b-table-column>
-          <b-table-column field="isEntry" label="Tipo">
-            {{ props.row.isEntry ? "Entrada" : "Salida" }}
+          <b-table-column field="value" label="Monto">
+            {{ props.row.value }}
+          </b-table-column>
+          <b-table-column field="destination" label="Destino">
+            {{ props.row.destination }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
             <b-button
               tag="router-link"
-              :to="'/product-entry/modify/' + props.row.id"
+              :to="'/miscellaneous-expenses/modify/' + props.row.id"
               type="is-small"
             >
               <b-icon icon="pencil"></b-icon>
             </b-button>
             <b-button
-              @click="deleteProductEntry(props.row)"
+              @click="deleteMiscellaneousExpenses(props.row)"
               type="is-small"
               class="actionButton"
             >
@@ -84,42 +90,42 @@
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
-import { ProductEntry } from "../../models/productEntry";
-import { NavigatorProductEntryService } from "../../services/product-entry-service";
+import { MiscellaneousExpenses } from "../../models/miscellaneousExpenses";
+import { NavigatorMiscellaneousExpensesService } from "../../services/miscellaneous-expenses-service";
 
 @Component
-export default class ProductEntryList extends Vue {
-  public productEntries: ProductEntry[] = [];
-  public productEntryService: NavigatorProductEntryService = new NavigatorProductEntryService();
+export default class MiscellaneousExpensesList extends Vue {
+  public miscellaneousExpenses: MiscellaneousExpenses[] = [];
+  public miscellaneousExpensesService: NavigatorMiscellaneousExpensesService = new NavigatorMiscellaneousExpensesService();
 
   public currentPage = 1;
   public perPage = 10;
   public isLoading = false;
 
-  dateTimeToLocal(date: Date) {
-    return new Date(date)
+  dateTimeToLocal(dateTime: Date) {
+    return new Date(dateTime)
       .toLocaleString()
       .substr(0, 15)
       .replace(" ", " - ");
   }
 
-  deleteProductEntry(productEntry: ProductEntry) {
+  deleteMiscellaneousExpenses(miscellaneousExpense: MiscellaneousExpenses) {
     this.$buefy.dialog.confirm({
-      title: "Eliminando Entrada de Productos",
+      title: "Eliminando gasto",
       message:
-        "Estás seguro que deseas <b>eliminar</b> la etrada de productos? Esta acción no podrá deshacerse.",
-      confirmText: "Eliminar Entrada de Productos",
+        "Estás seguro que deseas <b>eliminar</b> el gasto? Esta acción no podrá deshacerse.",
+      confirmText: "Eliminar Gasto",
       cancelText: "Cancelar",
       type: "is-danger",
       hasIcon: true,
       onConfirm: () => {
         this.isLoading = true;
-        this.productEntryService
-          .deleteProductEntry(productEntry.id)
+        this.miscellaneousExpensesService
+          .deleteMiscellaneousExpenses(miscellaneousExpense.id)
           .then(() => {
             this.isLoading = false;
-            this.productEntries.splice(
-              this.productEntries.indexOf(productEntry),
+            this.miscellaneousExpenses.splice(
+              this.miscellaneousExpenses.indexOf(miscellaneousExpense),
               1
             );
           })
@@ -139,17 +145,17 @@ export default class ProductEntryList extends Vue {
             console.log("error: ", e);
           });
 
-        this.$buefy.toast.open("Entrada de Productos eliminada!");
+        this.$buefy.toast.open("Gasto vario eliminado!");
       }
     });
   }
 
   created() {
     this.isLoading = true;
-    this.productEntryService
-      .getProductEntries()
+    this.miscellaneousExpensesService
+      .getMiscellaneousExpenses()
       .then(response => {
-        this.productEntries = response;
+        this.miscellaneousExpenses = response;
         this.isLoading = false;
       })
       .catch(e => {
@@ -225,5 +231,9 @@ input {
 
 .fieldWidth {
   width: 80px;
+}
+
+.p-1 {
+  padding: 1em;
 }
 </style>
