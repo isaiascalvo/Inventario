@@ -9,6 +9,11 @@ namespace Data
         public string CardType { get; set; }
         public string Bank { get; set; }
         public double Discount { get; set; }
+
+        public CreditCard()
+        {
+
+        }
         public CreditCard(double amount, double discount)
         {
             Amount = amount * (1 - discount / 100);

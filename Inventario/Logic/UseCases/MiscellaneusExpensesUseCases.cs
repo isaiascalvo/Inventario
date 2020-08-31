@@ -28,7 +28,7 @@ namespace Logic
             var miscellaneousExpenses = new MiscellaneousExpenses()
             {
                 Description = miscellaneousExpensesForCreationDto.Description,
-                Date = miscellaneousExpensesForCreationDto.Date,
+                Date = miscellaneousExpensesForCreationDto.Date.ToLocalTime(),
                 Value = miscellaneousExpensesForCreationDto.Value,
                 Destination = miscellaneousExpensesForCreationDto.Destination,
                 CreatedBy = userId
@@ -68,7 +68,7 @@ namespace Logic
         {
             var miscellaneousExpense = await _miscellaneousExpensesRepository.GetById(id);
             miscellaneousExpense.Description = miscellaneousExpenseDto.Description;
-            miscellaneousExpense.Date = miscellaneousExpenseDto.Date;
+            miscellaneousExpense.Date = miscellaneousExpenseDto.Date.ToLocalTime();
             miscellaneousExpense.Value = miscellaneousExpenseDto.Value;
             miscellaneousExpense.Destination = miscellaneousExpenseDto.Destination;
             miscellaneousExpense.LastModificationBy = miscellaneousExpenseDto.LastModificationBy;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Util.Enums;
 
 namespace Application.ViewModels
 {
@@ -12,5 +13,11 @@ namespace Application.ViewModels
         public string ClientName { get; set; }
         public DateTime Date { get; set; }
         public double Quantity { get; set; }
+        public ePaymentTypes PaymentType { get; set; }
+        public OwnFeesForCreationViewModel? OwnFees { get; set; }
+        public CashForCreationViewModel? Cash { get; set; }
+        public CreditCardForCreationViewModel? CreditCard { get; set; }
+        public DebitCardForCreationViewModel? DebitCard { get; set; }
+        public ChequeForCreationViewModel? Cheque { get; set; }
     }
 }

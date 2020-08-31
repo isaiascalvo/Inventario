@@ -167,7 +167,85 @@
                     </option>
                   </b-select>
                 </b-field>
+
+                <b-field label="Fecha">
+                  <b-datepicker
+                    v-model="sale.ownFees.expirationDate"
+                    placeholder="Seleccione una fecha"
+                    icon="calendar-today"
+                    trap-focus
+                    position="is-top-right"
+                    editable
+                    required
+                    validation-message="Debe ingresar una fecha"
+                  >
+                  </b-datepicker>
+                </b-field>
               </template>
+
+              <template v-if="sale.paymentType === 2">
+                <b-field label="Banco">
+                  <b-input
+                    v-model="sale.creditCard.bank"
+                    placeholder="Ej: Santander, Macro, etc."
+                    required
+                    validation-message="Debe ingresar el nombre del banco"
+                  >
+                  </b-input>
+                </b-field>
+                <b-field label="Tipo de Tarjeta">
+                  <b-input
+                    v-model="sale.creditCard.cardType"
+                    placeholder="Ej: Visa, Mastercard, etc."
+                    required
+                    validation-message="Debe ingresar el tipo de tarjeta"
+                  >
+                  </b-input>
+                </b-field>
+                <b-field label="Descuento (%):">
+                  <b-numberinput
+                    v-model="sale.creditCard.discount"
+                    placeholder="Ingrese el descuento"
+                    min="0"
+                    type="is-dark"
+                    required
+                    validation-message="Debe ingresar el descuento"
+                  ></b-numberinput>
+                </b-field>
+              </template>
+
+              <template v-if="sale.paymentType === 3">
+                <b-field label="Banco">
+                  <b-input
+                    v-model="sale.debitCard.bank"
+                    placeholder="Ej: Santander, Macro, etc."
+                    required
+                    validation-message="Debe ingresar el nombre del banco"
+                  >
+                  </b-input>
+                </b-field>
+                <b-field label="Tipo de Tarjeta">
+                  <b-input
+                    v-model="sale.debitCard.cardType"
+                    placeholder="Ej: Visa, Mastercard, etc."
+                    required
+                    validation-message="Debe ingresar el tipo de tarjeta"
+                  >
+                  </b-input>
+                </b-field>
+                <b-field label="Recargo (%):">
+                  <b-numberinput
+                    v-model="sale.debitCard.surcharge"
+                    placeholder="Ingrese el recargo"
+                    min="0"
+                    type="is-dark"
+                    required
+                    validation-message="Debe ingresar el recargo"
+                  ></b-numberinput>
+                </b-field>
+              </template>
+
+              <template v-if="sale.paymentType === 4"> </template>
             </b-step-item>
 
             <b-step-item step="3" label="Paso Final" clickable>

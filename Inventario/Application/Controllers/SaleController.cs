@@ -17,7 +17,7 @@ namespace Application
     [ApiController]
     [Route("api/sales")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class SaleController: Controller
+    public class SaleController : Controller
     {
         private readonly ISaleUseCases _saleUseCases;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -37,9 +37,32 @@ namespace Application
             {
                 IEnumerable<SaleDto> salesDto = await _saleUseCases.GetAll();
                 IEnumerable<SaleViewModel> salesVM = _mapper.Map<IEnumerable<SaleDto>, IEnumerable<SaleViewModel>>(salesDto);
+                //foreach (var s in salesVM)
+                //{
+                //    switch (s.PaymentType)
+                //    {
+                //        case Util.Enums.ePaymentTypes.Cash:
+                //            s.Payment = _mapper.Map<CashDto, CashViewModel>((CashDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.OwnFees:
+                //            s.Payment = _mapper.Map<OwnFeesDto, OwnFeesViewModel>((OwnFeesDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.CreditCard:
+                //            s.Payment = _mapper.Map<CreditCardDto, CreditCardViewModel>((CreditCardDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.DebitCard:
+                //            s.Payment = _mapper.Map<DebitCardDto, DebitCardViewModel>((DebitCardDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.Cheque:
+                //            s.Payment = _mapper.Map<ChequeDto, ChequeViewModel>((ChequeDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //}
                 return Ok(salesVM);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
@@ -80,8 +103,8 @@ namespace Application
         public async Task<IActionResult> Add(SaleForCreationViewModel saleForCreationVM)
         {
             var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
-            var saleForCreationDto = _mapper.Map<SaleForCreationViewModel, SaleForCreationDto>(saleForCreationVM);
-            var sale = await _saleUseCases.Create(userId, saleForCreationDto);
+            var saleAndPaymentForCreationDto = _mapper.Map<SaleForCreationViewModel, SaleForCreationDto>(saleForCreationVM);
+            var sale = await _saleUseCases.Create(userId, saleAndPaymentForCreationDto);
             var saleVM = _mapper.Map<SaleDto, SaleViewModel>(sale);
 
             return CreatedAtRoute(
@@ -123,6 +146,6 @@ namespace Application
             {
                 return NotFound();
             }
-        }
+        }       
     }
 }

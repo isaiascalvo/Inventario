@@ -6,7 +6,6 @@ export abstract class Payment {
   public amount: number | undefined = undefined;
 
   //Methods
-  public abstract getPaymentType(): string;
   public getTotal(): number | void {
     return this.amount;
   }
@@ -15,7 +14,7 @@ export abstract class Payment {
 export class CashForCreation extends Payment {
   public discount: number | undefined = undefined;
 
-  public getPaymentType() {
+  public static GetPaymentType() {
     return "Efectivo";
   }
 }
@@ -28,7 +27,7 @@ export class ChequeForCreation extends Payment {
   public nro: string | undefined = undefined;
   public bank: string | undefined = undefined;
 
-  public getPaymentType() {
+  public static GetPaymentType() {
     return "Cheque";
   }
 }
@@ -42,7 +41,7 @@ export class DebitCardForCreation extends Payment {
   public bank: string | undefined = undefined;
   public surcharge: number | undefined = undefined;
 
-  public getPaymentType() {
+  public static GetPaymentType() {
     return "Tarjeta de débito";
   }
 }
@@ -56,7 +55,7 @@ export class CreditCardForCreation extends Payment {
   public bank: string | undefined = undefined;
   public discount: number | undefined = undefined;
 
-  public getPaymentType() {
+  public static GetPaymentType() {
     return "Tarjeta de crédito";
   }
 }
@@ -84,7 +83,7 @@ export class OwnFeesForCreation extends Payment {
     }
   }
 
-  public getPaymentType() {
+  public static GetPaymentType() {
     return "Cuotas Propias";
   }
 }
@@ -107,4 +106,5 @@ export class Fee {
   public expirationDate!: Date;
   public paymentDate?: Date;
   public state!: FeeStates;
+  public value!: number;
 }

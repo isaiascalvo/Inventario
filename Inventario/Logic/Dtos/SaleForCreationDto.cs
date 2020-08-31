@@ -13,6 +13,10 @@ namespace Logic.Dtos
         public DateTime Date { get; set; }
         public double Quantity { get; set; }
         public ePaymentTypes PaymentType { get; set; }
-        public PaymentForCreationDto Payment { get; set; }
+        public OwnFeesForCreationDto? OwnFees { get; set; }
+        public CashForCreationDto? Cash { get; set; }
+        public CreditCardForCreationDto? CreditCard { get; set; }
+        public DebitCardForCreationDto? DebitCard { get; set; }
+        public ChequeForCreationDto? Cheque { get; set; }
     }
 }

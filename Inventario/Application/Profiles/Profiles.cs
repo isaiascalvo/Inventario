@@ -85,7 +85,7 @@ namespace Application.Profiles
             CreateMap<FeeViewModel, FeeDto>();
             CreateMap<FeeDto, FeeViewModel>();
             CreateMap<FeeForCreationViewModel, FeeForCreationDto>();
-
+            
             CreateMap<MiscellaneousExpensesViewModel, MiscellaneousExpensesDto>();
             CreateMap<MiscellaneousExpensesDto, MiscellaneousExpensesViewModel>();
             CreateMap<MiscellaneousExpensesViewModel, MiscellaneousExpensesDto>();

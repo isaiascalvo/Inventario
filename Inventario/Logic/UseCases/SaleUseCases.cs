@@ -55,36 +55,36 @@ namespace Logic
             _mapper = mapper;
         }
 
-        public async Task<SaleDto> Create(Guid userId, SaleForCreationDto saleForCreationDto)
+        public async Task<SaleDto> Create(Guid userId, SaleForCreationDto saletForCreationDto)
         {
-            var product = await _productRepository.GetById(saleForCreationDto.ProductId);
+            var product = await _productRepository.GetById(saletForCreationDto.ProductId);
             if (product == null)
-                throw new KeyNotFoundException($"Product with id: {saleForCreationDto.ProductId} not found.");
+                throw new KeyNotFoundException($"Product with id: {saletForCreationDto.ProductId} not found.");
 
             Client client = null;
-            if (saleForCreationDto.ClientId.HasValue)
+            if (saletForCreationDto.ClientId.HasValue)
             {
-                client = await _clientRepository.GetById(saleForCreationDto.ClientId.Value);
+                client = await _clientRepository.GetById(saletForCreationDto.ClientId.Value);
                 if (client == null)
-                    throw new KeyNotFoundException($"Client with id: {saleForCreationDto.ClientId} not found.");
+                    throw new KeyNotFoundException($"Client with id: {saletForCreationDto.ClientId} not found.");
             }
 
             var price = (await _priceRepository.GetAll())
                 .OrderByDescending(x => x.DateTime)
                 .FirstOrDefault(
-                    x => x.ProductId == saleForCreationDto.ProductId &&
-                    x.DateTime.ToLocalTime() <= saleForCreationDto.Date.ToLocalTime() &&
+                    x => x.ProductId == saletForCreationDto.ProductId &&
+                    x.DateTime.ToLocalTime() <= saletForCreationDto.Date.ToLocalTime() &&
                     !x.IsDeleted
                 );
 
             var sale = new Sale()
             {
-                ProductId = saleForCreationDto.ProductId,
-                ClientId = saleForCreationDto.ClientId,
-                ClientName = client != null ? client.Name + " " + client.Lastname : saleForCreationDto.ClientName,
-                Date = saleForCreationDto.Date.ToLocalTime(),
-                Quantity = saleForCreationDto.Quantity,
-                //Amount = price.Value * saleForCreationDto.Quantity,
+                ProductId = saletForCreationDto.ProductId,
+                ClientId = saletForCreationDto.ClientId,
+                ClientName = client != null ? client.Name + " " + client.Lastname : saletForCreationDto.ClientName,
+                Date = saletForCreationDto.Date.ToLocalTime(),
+                Quantity = saletForCreationDto.Quantity,
+                PaymentType = saletForCreationDto.PaymentType,
                 CreatedBy = userId
             };
             product.Stock -= sale.Quantity;
@@ -93,25 +93,20 @@ namespace Logic
 
             Payment payment = null;
 
-            switch (saleForCreationDto.PaymentType)
+            switch (saletForCreationDto.PaymentType)
             {
                 case Util.Enums.ePaymentTypes.Cash:
-                    var cashDto = (CashForCreationDto)saleForCreationDto.Payment;
-                    payment = new Cash(price.Value, cashDto.Discount)
+                    var cashDto = (CashForCreationDto)saletForCreationDto.Cash;
+                    payment = new Cash(price.Value * saletForCreationDto.Quantity, cashDto.Discount)
                     {
                         SaleId = sale.Id,
                         CreatedBy = sale.CreatedBy
                     };
 
-                    if (saleForCreationDto.Payment.Amount != payment.Amount)
-                    {
-                        var y = 0; //Diference
-                    }
-
                     await _cashRepository.Add((Cash)payment);
                     break;
                 case Util.Enums.ePaymentTypes.OwnFees:
-                    var ownFeesDto = (OwnFeesForCreationDto)saleForCreationDto.Payment;
+                    var ownFeesDto = (OwnFeesForCreationDto)saletForCreationDto.OwnFees;
                     FeeRule feeRule = null;
                     if (ownFeesDto.FeeRuleId.HasValue)
                     {
@@ -120,23 +115,17 @@ namespace Logic
                             throw new KeyNotFoundException($"Fee Rule with id: {ownFeesDto.FeeRuleId.Value} not found.");
                     }
 
-                    double amount = price.Value * saleForCreationDto.Quantity;
+                    double amount = price.Value * saletForCreationDto.Quantity;
                     if (feeRule != null)
                     {
-                        double percentage = feeRule.Percentage * saleForCreationDto.Quantity / 100;
+                        double percentage = feeRule.Percentage * ownFeesDto.Quantity / 100;
                         amount *= (1 + percentage);
-                    }
-
-                    if (saleForCreationDto.Payment.Amount != payment.Amount)
-                    {
-                        var y = 0; //Diference
                     }
 
                     payment = new OwnFees(ownFeesDto.ExpirationDate, amount, ownFeesDto.Quantity, sale.CreatedBy)
                     {
                         SaleId = sale.Id,
-                        FeeRuleId = ownFeesDto.FeeRuleId,
-                        CreatedBy = sale.CreatedBy
+                        FeeRuleId = ownFeesDto.FeeRuleId
                     };
 
                     payment = await _ownFeesRepository.Add((OwnFees)payment);
@@ -146,8 +135,8 @@ namespace Logic
                     }
                     break;
                 case Util.Enums.ePaymentTypes.CreditCard:
-                    var creditCardDto = (CreditCardForCreationDto)saleForCreationDto.Payment;
-                    payment = new CreditCard(price.Value, creditCardDto.Discount)
+                    var creditCardDto = (CreditCardForCreationDto)saletForCreationDto.CreditCard;
+                    payment = new CreditCard(price.Value * saletForCreationDto.Quantity, creditCardDto.Discount)
                     {
                         SaleId = sale.Id,
                         CardType = creditCardDto.CardType,
@@ -155,16 +144,11 @@ namespace Logic
                         CreatedBy = sale.CreatedBy
                     };
 
-                    if (saleForCreationDto.Payment.Amount != payment.Amount)
-                    {
-                        var y = 0; //Diference
-                    }
-
                     await _creditCardRepository.Add((CreditCard)payment);
                     break;
                 case Util.Enums.ePaymentTypes.DebitCard:
-                    var debitCardDto = (DebitCardForCreationDto)saleForCreationDto.Payment;
-                    payment = new DebitCard(price.Value, debitCardDto.Surcharge)
+                    var debitCardDto = (DebitCardForCreationDto)saletForCreationDto.DebitCard;
+                    payment = new DebitCard(price.Value * saletForCreationDto.Quantity, debitCardDto.Surcharge)
                     {
                         SaleId = sale.Id,
                         CardType = debitCardDto.CardType,
@@ -172,28 +156,18 @@ namespace Logic
                         CreatedBy = sale.CreatedBy
                     };
 
-                    if (saleForCreationDto.Payment.Amount != payment.Amount)
-                    {
-                        var y = 0; //Diference
-                    }
-
                     await _debitCardRepository.Add((DebitCard)payment);
                     break;
                 case Util.Enums.ePaymentTypes.Cheque:
-                    var chequeDto = (ChequeForCreationDto)saleForCreationDto.Payment;
+                    var chequeDto = (ChequeForCreationDto)saletForCreationDto.Cheque;
                     payment = new Cheque()
                     {
                         SaleId = sale.Id,
-                        Amount = saleForCreationDto.Payment.Amount,
+                        Amount = price.Value * saletForCreationDto.Quantity,
                         Nro = chequeDto.Nro,
                         Bank = chequeDto.Bank,
                         CreatedBy = sale.CreatedBy
                     };
-
-                    if (saleForCreationDto.Payment.Amount != payment.Amount)
-                    {
-                        var y = 0; //Diference
-                    }
 
                     await _chequeRepository.Add((Cheque)payment);
                     break;
@@ -232,9 +206,39 @@ namespace Logic
 
         public async Task<IEnumerable<SaleDto>> GetAll()
         {
-            var sale = (await _saleRepository.GetAll(x => x.Product, x => x.Client, x => x.Payment)).OrderByDescending(x => x.Date);
-            var saleDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sale);
-            return saleDto;
+            try
+            {
+                var sales = (await _saleRepository.GetAll(x => x.Product, x => x.Client, x => x.Payment)).OrderByDescending(x => x.Date);
+                var salesDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
+                foreach (var s in salesDto)
+                {
+                    switch (s.PaymentType)
+                    {
+                        case Util.Enums.ePaymentTypes.Cash:
+                            s.Cash = _mapper.Map<Cash, CashDto>((Cash)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                            break;
+                        case Util.Enums.ePaymentTypes.OwnFees:
+                            s.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>((OwnFees)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                            break;
+                        case Util.Enums.ePaymentTypes.CreditCard:
+                            s.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                            break;
+                        case Util.Enums.ePaymentTypes.DebitCard:
+                            s.DebitCard = _mapper.Map<DebitCard, DebitCardDto>((DebitCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                            break;
+                        case Util.Enums.ePaymentTypes.Cheque:
+                            s.Cheque = _mapper.Map<Cheque, ChequeDto>((Cheque)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return salesDto;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         //public async Task<IEnumerable<SaleDto>> GetByFilters(SaleFiltersDto filters)
@@ -251,7 +255,28 @@ namespace Logic
             if (sale == null)
                 throw new KeyNotFoundException($"Sale with id: {id} not found.");
 
-            return _mapper.Map<Sale, SaleDto>(sale);
+            var saleDto = _mapper.Map<Sale, SaleDto>(sale);
+            switch (saleDto.PaymentType)
+            {
+                case Util.Enums.ePaymentTypes.Cash:
+                    saleDto.Cash = _mapper.Map<Cash, CashDto>((Cash)sale.Payment);
+                    break;
+                case Util.Enums.ePaymentTypes.OwnFees:
+                    saleDto.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>((OwnFees)sale.Payment);
+                    break;
+                case Util.Enums.ePaymentTypes.CreditCard:
+                    saleDto.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)sale.Payment);
+                    break;
+                case Util.Enums.ePaymentTypes.DebitCard:
+                    saleDto.DebitCard = _mapper.Map<DebitCard, DebitCardDto>((DebitCard)sale.Payment);
+                    break;
+                case Util.Enums.ePaymentTypes.Cheque:
+                    saleDto.Cheque = _mapper.Map<Cheque, ChequeDto>((Cheque)sale.Payment);
+                    break;
+                default:
+                    break;
+            }
+            return saleDto;
         }
 
         public async Task Update(Guid id, SaleDto saleDto)

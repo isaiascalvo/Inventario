@@ -118,30 +118,31 @@
                 props.row.product.description
             }}
           </b-table-column>
-          <b-table-column field="clientName" label="Cliente">
+          <b-table-column field="clientName" label="Cliente" centered>
             {{ props.row.clientName }}
           </b-table-column>
-          <b-table-column field="date" label="Fecha">
+          <b-table-column field="date" label="Fecha y hora" centered>
             {{ dateTimeToLocal(props.row.date) }}
           </b-table-column>
-          <b-table-column field="quantity" label="Cantidad">
+          <b-table-column field="quantity" label="Cantidad" centered>
             {{ props.row.quantity }}
           </b-table-column>
-          <b-table-column field="amount" label="Importe Total">
-            $ {{ props.row.amount }}
+          <b-table-column field="amount" label="Importe Total" centered>
+            $ {{ getTotal(props.row) }}
           </b-table-column>
           <b-table-column field="paymentType" label="Forma de Pago">
-            Cuotas (6 de $ 4444)
+            {{ getPaymentType(props.row) }}
+            <!-- Cuotas (6 de $ 4444) -->
           </b-table-column>
 
-          <b-table-column field="action" label="Acciones">
-            <b-button
+          <b-table-column field="action" label="Acciones" centered>
+            <!-- <b-button
               tag="router-link"
               :to="'/sale/modify/' + props.row.id"
               type="is-small"
             >
               <b-icon icon="pencil"></b-icon>
-            </b-button>
+            </b-button> -->
             <b-button
               @click="deleteSale(props.row)"
               type="is-small"
@@ -162,6 +163,8 @@
 import { Vue, Component } from "vue-property-decorator";
 import { Sale } from "../../models/sale";
 import { NavigatorSaleService } from "../../services/sale-service";
+import { paymentTypes } from "@/enums/paymentTypes";
+import { Cash, OwnFees, CreditCard, DebitCard, Cheque } from "@/models/payment";
 // import { SaleFilters } from "../../models/saleFilters";
 
 @Component
@@ -183,9 +186,66 @@ export default class SaleList extends Vue {
       .replace(" ", " - ");
   }
 
-  // clearIconClick(key: keyof SaleFilters) {
-  //   this.saleFilters[key] = undefined;
-  // }
+  public getTotal(sale: Sale) {
+    switch (sale.paymentType) {
+      case paymentTypes.cash:
+        return sale.cash?.amount;
+      case paymentTypes.ownFees:
+        return sale.ownFees?.amount;
+      case paymentTypes.creditcard:
+        return sale.creditCard?.amount;
+      case paymentTypes.debitcard:
+        return sale.debitCard?.amount;
+      case paymentTypes.cheque:
+        return sale.cheque?.amount;
+      default:
+        break;
+    }
+  }
+
+  getPaymentType(sale: Sale) {
+    switch (sale.paymentType) {
+      case paymentTypes.cash:
+        return (
+          Cash.GetPaymentType() + " (Descuento: " + sale.cash?.discount + "%)"
+        );
+      case paymentTypes.ownFees:
+        return (
+          OwnFees.GetPaymentType() +
+          " (" +
+          sale.ownFees?.quantity +
+          " de $" +
+          sale.ownFees?.feeList[0]?.value +
+          ")"
+        );
+      case paymentTypes.creditcard:
+        return (
+          CreditCard.GetPaymentType() +
+          " (" +
+          sale.creditCard?.bank +
+          " - " +
+          sale.creditCard?.cardType +
+          " - Descuento: " +
+          sale.creditCard?.discount +
+          "%)"
+        );
+      case paymentTypes.debitcard:
+        return (
+          DebitCard.GetPaymentType() +
+          " (" +
+          sale.debitCard?.bank +
+          " - " +
+          sale.debitCard?.cardType +
+          " - Recargo: " +
+          sale.debitCard?.surcharge +
+          "%)"
+        );
+      case paymentTypes.cheque:
+        return Cheque.GetPaymentType();
+      default:
+        break;
+    }
+  }
 
   deleteSale(sale: Sale) {
     this.$buefy.dialog.confirm({

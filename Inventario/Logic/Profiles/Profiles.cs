@@ -44,6 +44,9 @@ namespace Logic.Profiles
             CreateMap<SaleDto, Sale>();
             CreateMap<Sale, SaleDto>();
 
+            CreateMap<PaymentDto, Payment>();
+            CreateMap<Payment, PaymentDto>();
+
             CreateMap<CashDto, Cash>();
             CreateMap<Cash, CashDto>();
 

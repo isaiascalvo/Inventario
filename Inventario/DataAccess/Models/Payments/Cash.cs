@@ -7,10 +7,14 @@ namespace Data
     public class Cash: Payment
     {
         public double Discount { get; set; }
+        public Cash()
+        {
+                
+        }
         public Cash(double amount, double discount)
         {
-            Amount = amount * (1 - Discount / 100);
             Discount = discount;
+            Amount = amount * (1 - Discount / 100);
         }
     }
 }

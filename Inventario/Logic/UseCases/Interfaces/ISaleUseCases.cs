@@ -12,7 +12,7 @@ namespace Logic.Interfaces
         Task<IEnumerable<SaleDto>> GetAll();
         //Task<IEnumerable<SaleDto>> GetByFilters(ClientFiltersDto filters);
         Task Delete(Guid userId, Guid id);
-        Task<SaleDto> Create(Guid userId, SaleForCreationDto saleDto);
+        Task<SaleDto> Create(Guid userId, SaleForCreationDto saleForCreationDto);
         Task Update(Guid id, SaleDto saleDto);
     }
 }

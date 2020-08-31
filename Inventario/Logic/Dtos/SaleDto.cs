@@ -15,9 +15,13 @@ namespace Logic.Dtos
         public string ClientName { get; set; }
         public DateTime Date { get; set; }
         public double Quantity { get; set; }
-        public double Amount { get; set; }
+        //public double Amount { get; set; }
         public ePaymentTypes PaymentType { get; set; }
         public Guid PaymentId { get; set; }
-        public PaymentDto Payment { get; set; }
+        public OwnFeesDto? OwnFees { get; set; }
+        public CashDto? Cash { get; set; }
+        public CreditCardDto? CreditCard { get; set; }
+        public DebitCardDto? DebitCard { get; set; }
+        public ChequeDto? Cheque { get; set; }
     }
 }

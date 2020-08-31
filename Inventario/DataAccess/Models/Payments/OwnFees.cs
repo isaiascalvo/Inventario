@@ -19,16 +19,23 @@ namespace Data
             Amount = amount;
             Quantity = quantity;
             FeeList = new List<Fee>();
+            CreatedBy = createdBy;
 
             double feeValue = Math.Ceiling(Amount * 100 / Quantity) / 100;
 
             for (int i = 0; i < Quantity; i++)
             {
+                if (i == Quantity - 1)
+                {
+                    var acum = feeValue * 100 * (Quantity - 1);
+                    feeValue = (Amount * 100 - acum) / 100;
+
+                }
                 var fee = new Fee
                 {
                     OwnFeesId = this.Id,
                     ExpirationDate = expirationDate.AddMonths(i).ToLocalTime(),
-                    Value = i != Quantity - 1 ? feeValue : Amount - feeValue * (Quantity - 1), 
+                    Value = feeValue, 
                     State = eFeeState.Pending,
                     CreatedBy = createdBy
                 };

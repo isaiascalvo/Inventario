@@ -15,7 +15,7 @@ namespace Data
         public string ClientName { get; set; }
         public DateTime Date { get; set; }
         public double Quantity { get; set; }
-        public double Amount { get { return Payment.GetTotal(); } }
+        //public double Amount { get { return Payment.GetTotal(); } }
         public ePaymentTypes PaymentType { get; set; }
         public Guid PaymentId { get; set; }
         public Payment Payment { get; set; }
