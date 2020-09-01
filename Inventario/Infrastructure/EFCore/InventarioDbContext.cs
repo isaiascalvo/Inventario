@@ -27,7 +27,8 @@ namespace Infrastructure.EFCore
         public DbSet<Cash> CashPayments { get; set; }
         public DbSet<CreditCard> CreditCardPayments { get; set; }
         public DbSet<DebitCard> DebitCardPayments { get; set; }
-        public DbSet<Cheque> ChequePayments { get; set; }
+        public DbSet<ChequesPayment> ChequePayments { get; set; }
+        public DbSet<Cheque> Cheques { get; set; }
         public DbSet<OwnFees> OwnFeesPayments { get; set; }
         public DbSet<Fee> Fees { get; set; }
         public DbSet<FeeRule> FeeRules { get; set; }
@@ -125,6 +126,14 @@ namespace Infrastructure.EFCore
                 .HasOne(fr => fr.Product)
                 .WithMany()
                 .HasForeignKey(fr => fr.ProductId);
+
+            //Cheque
+            modelBuilder.Entity<Cheque>()
+                .HasOne(ch => ch.ChequesPayment)
+                .WithMany(chP => chP.ListOfCheques)
+                .HasForeignKey(ch => ch.ChequesPaymentId);
+            modelBuilder.Entity<Cheque>()
+                .HasIndex(ch => ch.Nro).IsUnique();
         }
         #endregion
 

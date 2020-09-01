@@ -117,7 +117,8 @@ namespace Application
             services.AddScoped<ICashRepository, CashRepository>();
             services.AddScoped<ICreditCardRepository, CreditCardRepository>();
             services.AddScoped<IDebitCardRepository, DebitCardRepository>();
-            services.AddScoped<IChequeRepository, ChequehRepository>();
+            services.AddScoped<IChequesPaymentRepository, ChequesPaymentRepository>();
+            services.AddScoped<IChequeRepository, ChequeRepository>();
             services.AddScoped<IOwnFeesRepository, OwnFeesRepository>();
             services.AddScoped<IFeeRepository, FeeRepository>();
             services.AddScoped<IMiscellaneousExpensesRepository, MiscellaneousExpensesRepository>();

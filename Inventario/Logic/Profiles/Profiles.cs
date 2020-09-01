@@ -56,6 +56,9 @@ namespace Logic.Profiles
             CreateMap<CreditCardDto, CreditCard>();
             CreateMap<CreditCard, CreditCardDto>();
 
+            CreateMap<ChequesPaymentDto, ChequesPayment>();
+            CreateMap<ChequesPayment, ChequesPaymentDto>();
+
             CreateMap<ChequeDto, Cheque>();
             CreateMap<Cheque, ChequeDto>();
 

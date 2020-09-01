@@ -23,7 +23,7 @@ namespace Application.ViewModels
         public CashViewModel? Cash { get; set; }
         public CreditCardViewModel? CreditCard { get; set; }
         public DebitCardViewModel? DebitCard { get; set; }
-        public ChequeViewModel? Cheque { get; set; }
+        public ChequesPaymentViewModel? Cheques { get; set; }
         public double GetTotal { get; }
         public string GetPaymentType { get; }
     }

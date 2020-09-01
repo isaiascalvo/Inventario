@@ -4,14 +4,16 @@ using Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(InventarioDbContext))]
-    partial class InventarioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200901170244_Cheques")]
+    partial class Cheques
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,18 +299,11 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Nro")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<double>("Value")
-                        .HasColumnType("float");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChequesPaymentId");
-
-                    b.HasIndex("Nro")
-                        .IsUnique()
-                        .HasFilter("[Nro] IS NOT NULL");
 
                     b.ToTable("Cheques");
                 });

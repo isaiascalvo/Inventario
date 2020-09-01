@@ -22,6 +22,6 @@ namespace Logic.Dtos
         public CashDto? Cash { get; set; }
         public CreditCardDto? CreditCard { get; set; }
         public DebitCardDto? DebitCard { get; set; }
-        public ChequeDto? Cheque { get; set; }
+        public ChequesPaymentDto? Cheques { get; set; }
     }
 }

@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Infrastructure.Repositories
 {
-    public class ChequeRepository : GenericRepository<Cheque>, IChequeRepository
+    public class ChequesPaymentRepository : GenericRepository<ChequesPayment>, IChequesPaymentRepository
     {
-        public ChequeRepository(InventarioDbContext context) : base(context)
+        public ChequesPaymentRepository(InventarioDbContext context) : base(context)
         {
 
         }

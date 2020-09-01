@@ -10,7 +10,7 @@ namespace Util.Enums
         OwnFees,
         CreditCard,
         DebitCard,
-        Cheque
+        Cheques
     }
 
     public enum eFeeState

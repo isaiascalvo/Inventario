@@ -74,6 +74,10 @@ namespace Application.Profiles
             CreateMap<CreditCardDto, CreditCardViewModel>();
             CreateMap<CreditCardForCreationViewModel, CreditCardForCreationDto>();
 
+            CreateMap<ChequesPaymentViewModel, ChequesPaymentDto>();
+            CreateMap<ChequesPaymentDto, ChequesPaymentViewModel>();
+            CreateMap<ChequesPaymentForCreationViewModel, ChequesPaymentForCreationDto>();
+            
             CreateMap<ChequeViewModel, ChequeDto>();
             CreateMap<ChequeDto, ChequeViewModel>();
             CreateMap<ChequeForCreationViewModel, ChequeForCreationDto>();

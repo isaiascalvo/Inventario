@@ -18,6 +18,6 @@ namespace Application.ViewModels
         public CashForCreationViewModel? Cash { get; set; }
         public CreditCardForCreationViewModel? CreditCard { get; set; }
         public DebitCardForCreationViewModel? DebitCard { get; set; }
-        public ChequeForCreationViewModel? Cheque { get; set; }
+        public ChequesPaymentForCreationViewModel? Cheques { get; set; }
     }
 }

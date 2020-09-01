@@ -130,22 +130,22 @@ namespace Application
             }
         }
 
-        [HttpPut("{saleId}")]
-        public async Task<IActionResult> Update(Guid saleId, [FromBody] SaleViewModel saleVM)
-        {
-            try
-            {
-                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+        //[HttpPut("{saleId}")]
+        //public async Task<IActionResult> Update(Guid saleId, [FromBody] SaleViewModel saleVM)
+        //{
+        //    try
+        //    {
+        //        var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
 
-                var saleDto = _mapper.Map<SaleViewModel, SaleDto>(saleVM);
-                saleDto.LastModificationBy = userId;
-                await _saleUseCases.Update(saleId, saleDto);
-                return Ok("Sale successfully updated");
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }       
+        //        var saleDto = _mapper.Map<SaleViewModel, SaleDto>(saleVM);
+        //        saleDto.LastModificationBy = userId;
+        //        await _saleUseCases.Update(saleId, saleDto);
+        //        return Ok("Sale successfully updated");
+        //    }
+        //    catch (KeyNotFoundException)
+        //    {
+        //        return NotFound();
+        //    }
+        //}
     }
 }
