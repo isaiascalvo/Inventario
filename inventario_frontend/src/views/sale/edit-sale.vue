@@ -1,6 +1,12 @@
 <template>
   <div>
-    <div class="card  column is-4 is-offset-4">
+    <div
+      class="card column"
+      v-bind:class="{
+        'is-4 is-offset-4': activeStep !== 1 || sale.paymentType !== 4,
+        'is-6 is-offset-3': activeStep === 1 && sale.paymentType === 4
+      }"
+    >
       <div class="card-content">
         <div class="media">
           <div class="media-content">
@@ -140,6 +146,7 @@
                     type="is-dark"
                     required
                     validation-message="Debe ingresar el descuento"
+                    @input="forceUpdate()"
                   ></b-numberinput>
                 </b-field>
               </template>
@@ -168,7 +175,7 @@
                   </b-select>
                 </b-field>
 
-                <b-field label="Fecha">
+                <b-field label="Fecha de vencimiento (primer cuota)">
                   <b-datepicker
                     v-model="sale.ownFees.expirationDate"
                     placeholder="Seleccione una fecha"
@@ -178,6 +185,7 @@
                     editable
                     required
                     validation-message="Debe ingresar una fecha"
+                    @input="forceUpdate()"
                   >
                   </b-datepicker>
                 </b-field>
@@ -190,6 +198,7 @@
                     placeholder="Ej: Santander, Macro, etc."
                     required
                     validation-message="Debe ingresar el nombre del banco"
+                    @input="forceUpdate()"
                   >
                   </b-input>
                 </b-field>
@@ -199,6 +208,7 @@
                     placeholder="Ej: Visa, Mastercard, etc."
                     required
                     validation-message="Debe ingresar el tipo de tarjeta"
+                    @input="forceUpdate()"
                   >
                   </b-input>
                 </b-field>
@@ -210,6 +220,7 @@
                     type="is-dark"
                     required
                     validation-message="Debe ingresar el descuento"
+                    @input="forceUpdate()"
                   ></b-numberinput>
                 </b-field>
               </template>
@@ -221,6 +232,7 @@
                     placeholder="Ej: Santander, Macro, etc."
                     required
                     validation-message="Debe ingresar el nombre del banco"
+                    @input="forceUpdate()"
                   >
                   </b-input>
                 </b-field>
@@ -230,6 +242,7 @@
                     placeholder="Ej: Visa, Mastercard, etc."
                     required
                     validation-message="Debe ingresar el tipo de tarjeta"
+                    @input="forceUpdate()"
                   >
                   </b-input>
                 </b-field>
@@ -241,11 +254,80 @@
                     type="is-dark"
                     required
                     validation-message="Debe ingresar el recargo"
+                    @input="forceUpdate()"
                   ></b-numberinput>
                 </b-field>
               </template>
 
-              <template v-if="sale.paymentType === 4"> </template>
+              <template v-if="sale.paymentType === 4">
+                <div class="">
+                  <b-table striped hoverable :data="sale.cheques.listOfCheques">
+                    <template slot-scope="props">
+                      <b-table-column field="bank" label="Banco">
+                        <b-field>
+                          <b-input
+                            v-model="props.row.bank"
+                            placeholder="Ej: Santander, Macro, etc."
+                            size="is-small"
+                            required
+                            validation-message="Debe ingresar el nombre del banco"
+                            @input="forceUpdate()"
+                          >
+                          </b-input>
+                        </b-field>
+                      </b-table-column>
+
+                      <b-table-column field="quantity" label="Número">
+                        <b-field>
+                          <b-input
+                            v-model="props.row.nro"
+                            placeholder="Número de cheque"
+                            size="is-small"
+                            required
+                            validation-message="Debe ingresar el número del cheque"
+                            @input="forceUpdate()"
+                          >
+                          </b-input>
+                        </b-field>
+                      </b-table-column>
+
+                      <b-table-column field="quantity" label="Monto">
+                        <b-field>
+                          <b-input
+                            v-model="props.row.value"
+                            placeholder="Monto del cheque"
+                            size="is-small"
+                            required
+                            validation-message="Debe ingresar el monto del cheque"
+                            @input="forceUpdate()"
+                          >
+                          </b-input>
+                        </b-field>
+                      </b-table-column>
+
+                      <b-table-column field="action">
+                        <b-button
+                          @click="deleteCheque(props.row)"
+                          type="is-small"
+                          class="actionButton"
+                        >
+                          <b-icon icon="delete"></b-icon>
+                        </b-button>
+                      </b-table-column>
+                    </template>
+
+                    <template slot="footer">
+                      <b-button
+                        class="is-blue"
+                        size="is-small"
+                        @click="pushCheque()"
+                      >
+                        Agregar Cheque
+                      </b-button>
+                    </template>
+                  </b-table>
+                </div>
+              </template>
             </b-step-item>
 
             <b-step-item step="3" label="Paso Final" clickable>
@@ -277,9 +359,6 @@
                 @click.prevent="next.action"
               >
                 Siguiente
-              </b-button>
-              <b-button outlined @click="most()">
-                Mostrar
               </b-button>
               <b-button
                 v-if="activeStep === 2"
@@ -329,7 +408,8 @@ import {
   OwnFees,
   CreditCard,
   DebitCard,
-  Cheque
+  Cheque,
+  ChequesPayment
 } from "@/models/payment";
 import { paymentTypes } from "@/enums/paymentTypes";
 import { FeeRule } from "@/models/feeRule";
@@ -385,7 +465,7 @@ export default class EditSale extends Vue {
       "cash",
       "creditCard",
       "debitCard",
-      "cheque"
+      "cheques"
     ];
     const splitedResult = result.split(";");
     return (
@@ -401,8 +481,19 @@ export default class EditSale extends Vue {
     );
   }
 
-  most() {
-    console.log(JSON.parse(JSON.stringify(this.sale)));
+  forceUpdate() {
+    this.$forceUpdate();
+  }
+
+  pushCheque() {
+    this.sale.cheques?.listOfCheques.push(new Cheque());
+  }
+
+  deleteCheque(cheque: Cheque) {
+    const index = this.sale.cheques?.listOfCheques.indexOf(cheque);
+    if (index) {
+      this.sale.cheques?.listOfCheques.splice(index, 1);
+    }
   }
 
   getRule(key: string) {
@@ -412,7 +503,6 @@ export default class EditSale extends Vue {
         foundRule.feesAmountTo ?? 1;
       const percentage: number = foundRule.percentage ?? 0;
       if (foundRule.feesAmountTo && this.priceValue && this.sale.quantity) {
-        console.log(percentage);
         this.sale.amount =
           this.priceValue *
           this.sale.quantity *
@@ -431,45 +521,95 @@ export default class EditSale extends Vue {
           fieldStateValidation(this.sale.clientName)
         );
       case 1:
-        return false;
+        return !this.validatePayment();
       default:
         return false;
     }
   }
 
+  validatePayment() {
+    console.log(this.sale.paymentType);
+    switch (this.sale.paymentType) {
+      case paymentTypes.cash: {
+        console.log(this.sale.cash, this.fieldState(this.sale.cash?.discount));
+        return this.sale.cash && this.fieldState(this.sale.cash?.discount);
+      }
+      case paymentTypes.ownFees: {
+        return (
+          this.sale.ownFees &&
+          this.sale.ownFees.quantity &&
+          this.sale.ownFees.expirationDate
+        );
+      }
+      case paymentTypes.creditcard: {
+        console.log(
+          this.sale.creditCard,
+          this.sale.creditCard?.bank,
+          this.sale.creditCard?.cardType,
+          this.fieldState(this.sale.creditCard?.discount)
+        );
+        return (
+          this.sale.creditCard &&
+          this.sale.creditCard.bank &&
+          this.sale.creditCard.cardType &&
+          this.fieldState(this.sale.creditCard.discount)
+        );
+      }
+      case paymentTypes.debitcard:
+        return (
+          this.sale.debitCard &&
+          this.fieldState(this.sale.debitCard?.bank) &&
+          this.fieldState(this.sale.debitCard?.cardType) &&
+          this.fieldState(this.sale.debitCard?.surcharge)
+        );
+      case paymentTypes.cheque:
+        return this.sale.cheques && this.sale.cheques.listOfCheques.length > 0;
+      default:
+        break;
+    }
+  }
+
   public setPayment() {
+    console.log(this.activeStep, this.sale.paymentType);
     switch (this.sale.paymentType) {
       case paymentTypes.cash:
         this.sale.cash = new Cash();
+        this.sale.cash.discount = 0;
         this.sale.ownFees = undefined;
         this.sale.creditCard = undefined;
         this.sale.debitCard = undefined;
-        this.sale.cheque = undefined;
+        this.sale.cheques = undefined;
         break;
       case paymentTypes.ownFees:
         this.sale.ownFees = new OwnFees();
+        this.sale.ownFees.expirationDate = new Date(
+          new Date().setMonth(new Date().getMonth() + 1)
+        );
         this.sale.cash = undefined;
         this.sale.creditCard = undefined;
         this.sale.debitCard = undefined;
-        this.sale.cheque = undefined;
+        this.sale.cheques = undefined;
         this.getFeeRules();
         break;
       case paymentTypes.creditcard:
         this.sale.creditCard = new CreditCard();
+        this.sale.creditCard.discount = 0;
         this.sale.cash = undefined;
         this.sale.ownFees = undefined;
         this.sale.debitCard = undefined;
-        this.sale.cheque = undefined;
+        this.sale.cheques = undefined;
         break;
       case paymentTypes.debitcard:
         this.sale.debitCard = new DebitCard();
+        this.sale.debitCard.surcharge = 0;
         this.sale.cash = undefined;
         this.sale.ownFees = undefined;
         this.sale.creditCard = undefined;
-        this.sale.cheque = undefined;
+        this.sale.cheques = undefined;
         break;
       case paymentTypes.cheque:
-        this.sale.cheque = new Cheque();
+        this.sale.cheques = new ChequesPayment();
+        this.sale.cheques.listOfCheques.push(new Cheque());
         this.sale.cash = undefined;
         this.sale.ownFees = undefined;
         this.sale.creditCard = undefined;
@@ -643,15 +783,15 @@ export default class EditSale extends Vue {
     this.sale.clientId = client ? client.id : undefined;
   }
 
-  public submit() {
-    if (!this.sale.id) {
-      this.newSale();
-    } else {
-      this.updateSale();
-    }
-  }
+  // public submit() {
+  //   if (!this.sale.id) {
+  //     this.newSale();
+  //   } else {
+  //     this.updateSale();
+  //   }
+  // }
 
-  public newSale() {
+  public submit() {
     this.isLoading = true;
     // this.sale.quantity = +(this.sale.quantity ?? 0);
     this.saleService
@@ -678,32 +818,32 @@ export default class EditSale extends Vue {
       });
   }
 
-  public updateSale() {
-    this.isLoading = true;
-    // this.sale.quantity = +(this.sale.quantity ?? 0);
-    this.saleService
-      .updateSale(this.sale)
-      .then(() => {
-        this.isLoading = false;
-        this.$router.push({ name: "SaleList" });
-      })
-      .catch(e => {
-        this.isLoading = false;
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
-        });
-        console.log("error: ", e);
-        this.$router.push({ name: "SaleList" });
-      });
-  }
+  // public updateSale() {
+  //   this.isLoading = true;
+  //   // this.sale.quantity = +(this.sale.quantity ?? 0);
+  //   this.saleService
+  //     .updateSale(this.sale)
+  //     .then(() => {
+  //       this.isLoading = false;
+  //       this.$router.push({ name: "SaleList" });
+  //     })
+  //     .catch(e => {
+  //       this.isLoading = false;
+  //       this.$buefy.dialog.alert({
+  //         title: "Error",
+  //         message:
+  //           "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+  //         type: "is-danger",
+  //         hasIcon: true,
+  //         icon: "times-circle",
+  //         iconPack: "fa",
+  //         ariaRole: "alertdialog",
+  //         ariaModal: true
+  //       });
+  //       console.log("error: ", e);
+  //       this.$router.push({ name: "SaleList" });
+  //     });
+  // }
 
   created() {
     this.isLoading = true;
@@ -786,5 +926,21 @@ export default class EditSale extends Vue {
 }
 .mx-1 {
   margin: 0em 1em 0em 1em;
+}
+
+table {
+  font-size: 13px;
+  border: 1px solid rgb(192, 192, 192) !important;
+  /* margin-left: 10px; */
+}
+
+th {
+  /* background-color: #dbdbdb; */
+  background-color: rgb(229, 229, 229);
+  border: 1px solid rgb(192, 192, 192) !important;
+}
+
+td {
+  border: 1px solid rgb(192, 192, 192) !important;
 }
 </style>

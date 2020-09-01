@@ -110,22 +110,58 @@
         </template>
         <template slot-scope="props">
           <b-table-column field="productId" label="Producto">
-            {{
-              props.row.product.code +
-                " - " +
-                props.row.product.name +
-                " - " +
-                props.row.product.description
-            }}
+            <span
+              v-if="
+                (
+                  props.row.product.code +
+                  ' - ' +
+                  props.row.product.name +
+                  ' - ' +
+                  props.row.product.description
+                ).length < 40
+              "
+            >
+              {{
+                props.row.product.code +
+                  " - " +
+                  props.row.product.name +
+                  " - " +
+                  props.row.product.description
+              }}
+            </span>
+            <b-tooltip
+              v-else
+              :label="
+                props.row.product.code +
+                  ' - ' +
+                  props.row.product.name +
+                  ' - ' +
+                  props.row.product.description
+              "
+              position="is-right"
+              size="is-large"
+              type="is-dark"
+              multilined
+            >
+              {{
+                getProductDescription(
+                  props.row.product.code +
+                    " - " +
+                    props.row.product.name +
+                    " - " +
+                    props.row.product.description
+                )
+              }}
+            </b-tooltip>
+          </b-table-column>
+          <b-table-column field="quantity" label="Cantidad" centered>
+            {{ props.row.quantity }}
           </b-table-column>
           <b-table-column field="clientName" label="Cliente" centered>
             {{ props.row.clientName }}
           </b-table-column>
           <b-table-column field="date" label="Fecha y hora" centered>
             {{ dateTimeToLocal(props.row.date) }}
-          </b-table-column>
-          <b-table-column field="quantity" label="Cantidad" centered>
-            {{ props.row.quantity }}
           </b-table-column>
           <b-table-column field="amount" label="Importe Total" centered>
             $ {{ getTotal(props.row) }}
@@ -136,13 +172,6 @@
           </b-table-column>
 
           <b-table-column field="action" label="Acciones" centered>
-            <!-- <b-button
-              tag="router-link"
-              :to="'/sale/modify/' + props.row.id"
-              type="is-small"
-            >
-              <b-icon icon="pencil"></b-icon>
-            </b-button> -->
             <b-button
               @click="deleteSale(props.row)"
               type="is-small"
@@ -164,7 +193,14 @@ import { Vue, Component } from "vue-property-decorator";
 import { Sale } from "../../models/sale";
 import { NavigatorSaleService } from "../../services/sale-service";
 import { paymentTypes } from "@/enums/paymentTypes";
-import { Cash, OwnFees, CreditCard, DebitCard, Cheque } from "@/models/payment";
+import {
+  Cash,
+  OwnFees,
+  CreditCard,
+  DebitCard,
+  ChequesPayment
+} from "@/models/payment";
+import { dateTimeToLocal } from "@/utils/common-functions";
 // import { SaleFilters } from "../../models/saleFilters";
 
 @Component
@@ -180,10 +216,11 @@ export default class SaleList extends Vue {
   public isLoading = false;
 
   dateTimeToLocal(date: Date) {
-    return new Date(date)
-      .toLocaleString()
-      .substr(0, 15)
-      .replace(" ", " - ");
+    return dateTimeToLocal(date);
+  }
+
+  getProductDescription(description: string): string {
+    return description.substring(0, 40) + "...";
   }
 
   public getTotal(sale: Sale) {
@@ -197,7 +234,7 @@ export default class SaleList extends Vue {
       case paymentTypes.debitcard:
         return sale.debitCard?.amount;
       case paymentTypes.cheque:
-        return sale.cheque?.amount;
+        return sale.cheques?.amount;
       default:
         break;
     }
@@ -241,7 +278,12 @@ export default class SaleList extends Vue {
           "%)"
         );
       case paymentTypes.cheque:
-        return Cheque.GetPaymentType();
+        return (
+          ChequesPayment.GetPaymentType() +
+          " (" +
+          sale.cheques?.listOfCheques.length +
+          ")"
+        );
       default:
         break;
     }

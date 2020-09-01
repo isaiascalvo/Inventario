@@ -44,3 +44,14 @@ export function getCurrentUser(): JwtResult | null {
     return null;
   }
 }
+
+export function dateTimeToLocal(date: Date): string {
+  const options = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  };
+  return new Date(date).toLocaleString("es", options).replace(" ", " - ");
+}

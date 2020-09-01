@@ -23,17 +23,28 @@ export class Cash extends CashForCreation {
   public id!: string;
 }
 
-export class ChequeForCreation extends Payment {
-  public nro: string | undefined = undefined;
-  public bank: string | undefined = undefined;
+export class ChequesPaymentForCreation extends Payment {
+  public listOfCheques: ChequeForCreation[] = [];
 
   public static GetPaymentType() {
-    return "Cheque";
+    return "Cheque/s";
   }
+}
+
+export class ChequesPayment extends ChequesPaymentForCreation {
+  public id!: string;
+  public listOfCheques: Cheque[] = [];
+}
+
+export class ChequeForCreation {
+  public nro: string | undefined = undefined;
+  public bank: string | undefined = undefined;
+  public value: number | undefined = undefined;
 }
 
 export class Cheque extends ChequeForCreation {
   public id!: string;
+  public chequesPaymentId!: string;
 }
 
 export class DebitCardForCreation extends Payment {
@@ -65,7 +76,7 @@ export class CreditCard extends CreditCardForCreation {
 }
 
 export class OwnFeesForCreation extends Payment {
-  public quantity = 1;
+  public quantity: number | undefined = undefined;
   public expirationDate: Date | undefined = undefined;
   public feeRuleId?: string;
   public feeRule?: FeeRule;

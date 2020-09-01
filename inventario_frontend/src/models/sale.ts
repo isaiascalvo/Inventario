@@ -6,12 +6,12 @@ import {
   Cash,
   CreditCard,
   DebitCard,
-  Cheque,
   OwnFeesForCreation,
   CashForCreation,
   CreditCardForCreation,
   DebitCardForCreation,
-  ChequeForCreation
+  ChequesPaymentForCreation,
+  ChequesPayment
 } from "./payment";
 
 export class SaleForCreation {
@@ -29,7 +29,7 @@ export class SaleForCreation {
   public cash?: CashForCreation;
   public creditCard?: CreditCardForCreation;
   public debitCard?: DebitCardForCreation;
-  public cheque?: ChequeForCreation;
+  public cheques?: ChequesPaymentForCreation;
 }
 
 export class Sale extends SaleForCreation {
@@ -38,5 +38,5 @@ export class Sale extends SaleForCreation {
   public cash?: Cash;
   public creditCard?: CreditCard;
   public debitCard?: DebitCard;
-  public cheque?: Cheque;
+  public cheques?: ChequesPayment;
 }

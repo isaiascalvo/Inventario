@@ -7,7 +7,7 @@ export interface SaleService {
   // getSalesFiltered(saleFilters: SaleFilters): Promise<Sale[]>;
   getSale(id: string): Promise<Sale>;
   addSale(sale: SaleForCreation): Promise<Sale>;
-  updateSale(sale: Sale): Promise<void>;
+  // updateSale(sale: Sale): Promise<void>;
   deleteSale(saleId: string): Promise<void>;
 }
 
@@ -35,9 +35,9 @@ export class NavigatorSaleService implements SaleService {
     return apiClient.post("/sales", sale);
   }
 
-  public updateSale(sale: Sale): Promise<void> {
-    return apiClient.put("/sales/" + sale.id, sale);
-  }
+  // public updateSale(sale: Sale): Promise<void> {
+  //   return apiClient.put("/sales/" + sale.id, sale);
+  // }
 
   public deleteSale(saleId: string): Promise<void> {
     return apiClient.delete("/sales/" + saleId);
