@@ -132,15 +132,16 @@ export default class SideBarMenu extends Vue {
     },
     { icon: "briefcase-outline", text: "Ventas", url: "/sale-list" },
     {
-      icon: "briefcase-outline",
-      text: "Cuotas Aplicables",
+      icon: "buffer",
+      text: "Cuotas Aplicables", //tune
       url: "/fee-rule-list"
     },
     {
-      icon: "briefcase-outline",
+      icon: "cash-multiple", //"script-text-outline",
       text: "Gastos Varios",
       url: "/miscellaneous-expenses-list"
     }
+    //finance
   ];
 
   public loggedIn() {

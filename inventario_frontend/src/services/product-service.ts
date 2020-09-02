@@ -1,5 +1,5 @@
 import { Product, ProductForCreation } from "@/models/product";
-import { ProductFilters } from "@/models/productFilters";
+import { ProductFilters } from "@/models/filters/productFilters";
 import { apiClient } from "./apiClient";
 import axios, { AxiosPromise } from "axios";
 

@@ -239,34 +239,35 @@ namespace Logic
             {
                 var sales = (await _saleRepository.GetAll(x => x.Product, x => x.Client, x => x.Payment)).OrderByDescending(x => x.Date);
                 var salesDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
-                foreach (var s in salesDto)
-                {
-                    switch (s.PaymentType)
-                    {
-                        case Util.Enums.ePaymentTypes.Cash:
-                            s.Cash = _mapper.Map<Cash, CashDto>((Cash)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
-                            break;
-                        case Util.Enums.ePaymentTypes.OwnFees:
-                            s.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>((OwnFees)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
-                            break;
-                        case Util.Enums.ePaymentTypes.CreditCard:
-                            s.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
-                            break;
-                        case Util.Enums.ePaymentTypes.DebitCard:
-                            s.DebitCard = _mapper.Map<DebitCard, DebitCardDto>((DebitCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
-                            break;
-                        case Util.Enums.ePaymentTypes.Cheques:
-                            s.Cheques = _mapper.Map<ChequesPayment, ChequesPaymentDto>((ChequesPayment)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
-                            s.Cheques.ListOfCheques = 
-                                _mapper.Map<IEnumerable<Cheque>, IEnumerable<ChequeDto>>(
-                                    (await _chequeRepository.GetAll()).Where(x => x.ChequesPaymentId == s.Cheques.Id)
-                                ).ToList();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                return salesDto;
+                //foreach (var s in salesDto)
+                //{
+                //    switch (s.PaymentType)
+                //    {
+                //        case Util.Enums.ePaymentTypes.Cash:
+                //            s.Cash = _mapper.Map<Cash, CashDto>((Cash)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.OwnFees:
+                //            s.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>((OwnFees)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.CreditCard:
+                //            s.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.DebitCard:
+                //            s.DebitCard = _mapper.Map<DebitCard, DebitCardDto>((DebitCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            break;
+                //        case Util.Enums.ePaymentTypes.Cheques:
+                //            s.Cheques = _mapper.Map<ChequesPayment, ChequesPaymentDto>((ChequesPayment)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                //            s.Cheques.ListOfCheques =
+                //                _mapper.Map<IEnumerable<Cheque>, IEnumerable<ChequeDto>>(
+                //                    (await _chequeRepository.GetAll()).Where(x => x.ChequesPaymentId == s.Cheques.Id)
+                //                ).ToList();
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //}
+                //return salesDto;
+                return await SetSalePayments(sales, salesDto);
             }
             catch (Exception e)
             {
@@ -274,13 +275,30 @@ namespace Logic
             }
         }
 
-        //public async Task<IEnumerable<SaleDto>> GetByFilters(SaleFiltersDto filters)
-        //{
-        //    var tt = filters.GetExpresion();
-        //    var sales = (await _saleRepository.GetAll()).AsQueryable().Where(tt).ToList().OrderBy(x => x.Name);
-        //    return _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
-        //}
+        public async Task<int> GetTotalQty()
+        {
+            return (await _saleRepository.GetAll()).Count();
+        }
 
+        public async Task<int> GetTotalQtyByFilters(SaleFiltersDto filtersDto)
+        {
+            return (await _saleRepository.GetAll()).AsQueryable().Where(filtersDto.GetExpresion()).Count();
+        }
+
+        public async Task<IEnumerable<SaleDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var sales = (await _saleRepository.GetAll(x => x.Product, x => x.Client, x => x.Payment)).OrderByDescending(x => x.Date).Skip(skip).Take(qty);
+            var salesDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
+            return await SetSalePayments(sales, salesDto);
+        }
+
+        public async Task<IEnumerable<SaleDto>> GetFilteredByPageAndQty(SaleFiltersDto filtersDto, int skip, int qty)
+        {
+            var sales = (await _saleRepository.GetAll(x => x.Product, x => x.Client, x => x.Payment))
+                .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Date).Skip(skip).Take(qty);
+            var salesDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
+            return await SetSalePayments(sales, salesDto);
+        }
 
         public async Task<SaleDto> GetOne(Guid id)
         {
@@ -316,56 +334,89 @@ namespace Logic
             return saleDto;
         }
 
-        public async Task Update(Guid id, SaleDto saleDto)
+
+        //public async Task Update(Guid id, SaleDto saleDto)
+        //{
+        //    var newProduct = await _productRepository.GetById(saleDto.ProductId);
+        //    if (newProduct == null)
+        //        throw new KeyNotFoundException($"Product with id: {saleDto.ProductId} not found.");
+
+        //    Client client = null;
+        //    if (saleDto.ClientId.HasValue)
+        //    {
+        //        client = await _clientRepository.GetById(saleDto.ClientId.Value);
+        //        if (client == null)
+        //            throw new KeyNotFoundException($"Client with id: {saleDto.ClientId} not found.");
+        //    }
+
+        //    var sale = await _saleRepository.GetById(id);
+        //    if (sale == null)
+        //        throw new KeyNotFoundException($"Sale with id: {id} not found.");
+
+        //    var price = (await _priceRepository.GetAll())
+        //        .OrderByDescending(x => x.DateTime)
+        //        .FirstOrDefault(x => x.ProductId == saleDto.ProductId && x.DateTime <= saleDto.Date && !x.IsDeleted);
+
+        //    if (saleDto.ProductId != sale.ProductId)
+        //    {
+        //        var oldProduct = await _productRepository.GetById(sale.ProductId);
+        //        if (oldProduct == null)
+        //            throw new KeyNotFoundException($"Product with id: {sale.ProductId} not found.");
+
+        //        oldProduct.Stock += sale.Quantity;
+        //        newProduct.Stock -= saleDto.Quantity;
+        //        await _productRepository.Update(oldProduct);
+        //        await _productRepository.Update(newProduct);
+        //    }
+        //    else
+        //    {
+        //        newProduct.Stock += sale.Quantity - saleDto.Quantity;
+        //        await _productRepository.Update(newProduct);
+        //    }
+
+        //    sale.ProductId = saleDto.ProductId;
+        //    sale.ClientId = saleDto.ClientId;
+        //    sale.ClientName = client != null ? client.Name + " " + client.Lastname : saleDto.ClientName;
+        //    sale.Date = saleDto.Date.ToLocalTime();
+        //    sale.Quantity = saleDto.Quantity;
+        //    //sale.Amount = price.Value * saleDto.Quantity;
+        //    sale.LastModificationBy = saleDto.LastModificationBy;
+
+        //    await _saleRepository.Update(sale);
+        //    await _productRepository.CommitAsync();
+        //    await _saleRepository.CommitAsync();
+        //}
+
+        private async Task<IEnumerable<SaleDto>> SetSalePayments(IEnumerable<Sale> sales, IEnumerable<SaleDto> salesDto)
         {
-            var newProduct = await _productRepository.GetById(saleDto.ProductId);
-            if (newProduct == null)
-                throw new KeyNotFoundException($"Product with id: {saleDto.ProductId} not found.");
-
-            Client client = null;
-            if (saleDto.ClientId.HasValue)
+            foreach (var s in salesDto)
             {
-                client = await _clientRepository.GetById(saleDto.ClientId.Value);
-                if (client == null)
-                    throw new KeyNotFoundException($"Client with id: {saleDto.ClientId} not found.");
+                switch (s.PaymentType)
+                {
+                    case Util.Enums.ePaymentTypes.Cash:
+                        s.Cash = _mapper.Map<Cash, CashDto>((Cash)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                        break;
+                    case Util.Enums.ePaymentTypes.OwnFees:
+                        s.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>((OwnFees)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                        break;
+                    case Util.Enums.ePaymentTypes.CreditCard:
+                        s.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                        break;
+                    case Util.Enums.ePaymentTypes.DebitCard:
+                        s.DebitCard = _mapper.Map<DebitCard, DebitCardDto>((DebitCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                        break;
+                    case Util.Enums.ePaymentTypes.Cheques:
+                        s.Cheques = _mapper.Map<ChequesPayment, ChequesPaymentDto>((ChequesPayment)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                        s.Cheques.ListOfCheques =
+                            _mapper.Map<IEnumerable<Cheque>, IEnumerable<ChequeDto>>(
+                                (await _chequeRepository.GetAll()).Where(x => x.ChequesPaymentId == s.Cheques.Id)
+                            ).ToList();
+                        break;
+                    default:
+                        break;
+                }
             }
-
-            var sale = await _saleRepository.GetById(id);
-            if (sale == null)
-                throw new KeyNotFoundException($"Sale with id: {id} not found.");
-
-            var price = (await _priceRepository.GetAll())
-                .OrderByDescending(x => x.DateTime)
-                .FirstOrDefault(x => x.ProductId == saleDto.ProductId && x.DateTime <= saleDto.Date && !x.IsDeleted);
-
-            if (saleDto.ProductId != sale.ProductId)
-            {
-                var oldProduct = await _productRepository.GetById(sale.ProductId);
-                if (oldProduct == null)
-                    throw new KeyNotFoundException($"Product with id: {sale.ProductId} not found.");
-
-                oldProduct.Stock += sale.Quantity;
-                newProduct.Stock -= saleDto.Quantity;
-                await _productRepository.Update(oldProduct);
-                await _productRepository.Update(newProduct);
-            }
-            else
-            {
-                newProduct.Stock += sale.Quantity - saleDto.Quantity;
-                await _productRepository.Update(newProduct);
-            }
-
-            sale.ProductId = saleDto.ProductId;
-            sale.ClientId = saleDto.ClientId;
-            sale.ClientName = client != null ? client.Name + " " + client.Lastname : saleDto.ClientName;
-            sale.Date = saleDto.Date.ToLocalTime();
-            sale.Quantity = saleDto.Quantity;
-            //sale.Amount = price.Value * saleDto.Quantity;
-            sale.LastModificationBy = saleDto.LastModificationBy;
-
-            await _saleRepository.Update(sale);
-            await _productRepository.CommitAsync();
-            await _saleRepository.CommitAsync();
+            return salesDto;
         }
     }
 }

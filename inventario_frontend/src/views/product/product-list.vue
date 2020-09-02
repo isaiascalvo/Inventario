@@ -40,7 +40,7 @@
       </div>
     </section>
 
-    <div class="">
+    <div>
       <div class="columns filtersClass level" v-if="openFilters">
         <div class="column is-10">
           <b-field grouped group-multiline>
@@ -253,7 +253,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import { Product } from "../../models/product";
 import { NavigatorProductService } from "../../services/product-service";
-import { ProductFilters } from "../../models/productFilters";
+import { ProductFilters } from "../../models/filters/productFilters";
 import { NavigatorCategoryService } from "../../services/category-service";
 import { NavigatorVendorService } from "../../services/vendor-service";
 import { Category } from "../../models/category";

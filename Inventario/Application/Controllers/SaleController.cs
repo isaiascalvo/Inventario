@@ -37,29 +37,34 @@ namespace Application
             {
                 IEnumerable<SaleDto> salesDto = await _saleUseCases.GetAll();
                 IEnumerable<SaleViewModel> salesVM = _mapper.Map<IEnumerable<SaleDto>, IEnumerable<SaleViewModel>>(salesDto);
-                //foreach (var s in salesVM)
-                //{
-                //    switch (s.PaymentType)
-                //    {
-                //        case Util.Enums.ePaymentTypes.Cash:
-                //            s.Payment = _mapper.Map<CashDto, CashViewModel>((CashDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
-                //            break;
-                //        case Util.Enums.ePaymentTypes.OwnFees:
-                //            s.Payment = _mapper.Map<OwnFeesDto, OwnFeesViewModel>((OwnFeesDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
-                //            break;
-                //        case Util.Enums.ePaymentTypes.CreditCard:
-                //            s.Payment = _mapper.Map<CreditCardDto, CreditCardViewModel>((CreditCardDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
-                //            break;
-                //        case Util.Enums.ePaymentTypes.DebitCard:
-                //            s.Payment = _mapper.Map<DebitCardDto, DebitCardViewModel>((DebitCardDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
-                //            break;
-                //        case Util.Enums.ePaymentTypes.Cheque:
-                //            s.Payment = _mapper.Map<ChequeDto, ChequeViewModel>((ChequeDto)salesDto.FirstOrDefault(x => x.Id == s.Id).Payment);
-                //            break;
-                //        default:
-                //            break;
-                //    }
-                //}
+                return Ok(salesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _saleUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<SaleDto> salesDto = await _saleUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<SaleViewModel> salesVM = _mapper.Map<IEnumerable<SaleDto>, IEnumerable<SaleViewModel>>(salesDto);
                 return Ok(salesVM);
             }
             catch (Exception e)
@@ -68,21 +73,37 @@ namespace Application
             }
         }
 
-        //[HttpGet("Filtered")]
-        //public async Task<IActionResult> GetByFilters([FromQuery] SaleFiltersViewModel filtersVM)
-        //{
-        //    try
-        //    {
-        //        var filtersDto = _mapper.Map<SaleFiltersViewModel, SaleFiltersDto>(filtersVM);
-        //        IEnumerable<SaleDto> salesDto = await _saleUseCases.GetByFilters(filtersDto);
-        //        IEnumerable<SaleViewModel> salesVM = _mapper.Map<IEnumerable<SaleDto>, IEnumerable<SaleViewModel>>(salesDto);
-        //        return Ok(salesVM);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw e;
-        //    }
-        //}
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] SaleFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<SaleFiltersViewModel, SaleFiltersDto>(filtersVM);
+                int qty = await _saleUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] SaleFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<SaleFiltersViewModel, SaleFiltersDto>(filtersVM);
+                IEnumerable<SaleDto> salesDto = await _saleUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<SaleViewModel> productsVM = _mapper.Map<IEnumerable<SaleDto>, IEnumerable<SaleViewModel>>(salesDto);
+                return Ok(productsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
 
         [HttpGet("{saleId}", Name = "GetSale")]
         public async Task<IActionResult> GetOne(Guid saleId)

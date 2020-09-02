@@ -16,80 +16,121 @@
             >
               Nueva Venta
             </b-button>
-            <!-- <b-button
+            <b-button
               @click="openFilters = !openFilters"
               class="is-pulled-right"
               type="is-primary"
+              size="is-small"
               :icon-right="
                 openFilters ? 'filter-variant-minus' : 'filter-variant'
               "
             >
               {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
-            </b-button> -->
+            </b-button>
           </div>
         </div>
       </div>
     </section>
 
     <div>
-      <!-- <div class="columns filtersClass level" v-if="openFilters">
+      <div class="columns filtersClass level" v-if="openFilters">
         <div class="column is-10">
           <b-field grouped group-multiline>
-            <b-field label-position="on-border" label="Nombre">
-              <b-input
-                v-model="saleFilters.name"
-                placeholder="Nombre"
+            <b-field label-position="on-border" label="Cliente">
+              <b-autocomplete
+                v-model="saleFilters.clientName"
+                :data="filteredClients()"
+                placeholder="ej.: Cliente X"
+                icon="magnify"
                 size="is-small"
                 icon-right="close-circle"
                 icon-right-clickable
-                @icon-right-click="clearIconClick('name')"
-              ></b-input>
+                @icon-right-click="
+                  saleFilters.clientId = saleFilters.clientName = undefined
+                "
+                @select="option => getClientId(option)"
+              >
+                <template slot="empty">No se encontraron resultados</template>
+              </b-autocomplete>
             </b-field>
 
-            <b-field label-position="on-border" label="Apellido">
-              <b-input
-                v-model="saleFilters.lastname"
-                placeholder="Apellido"
+            <b-field label-position="on-border" label="Producto">
+              <b-autocomplete
+                v-model="prodCodNameDesc"
+                :data="filteredProducts()"
+                placeholder="ej.: Producto X"
+                icon="magnify"
                 size="is-small"
                 icon-right="close-circle"
                 icon-right-clickable
-                @icon-right-click="clearIconClick('lastname')"
-              ></b-input>
+                @icon-right-click="
+                  saleFilters.productId = prodCodNameDesc = undefined
+                "
+                @select="option => getProductId(option)"
+              >
+                <template slot="empty">No se encontraron resultados</template>
+              </b-autocomplete>
             </b-field>
 
-            <b-field label-position="on-border" label="DNI">
-              <b-input
-                v-model="saleFilters.dni"
-                placeholder="DNI"
+            <b-field label-position="on-border" label="Fecha desde">
+              <b-datetimepicker
+                v-model="saleFilters.dateDateFrom"
+                rounded
+                placeholder="Seleccione fecha y hora"
+                icon="calendar-today"
+                trap-focus
                 size="is-small"
-                icon-right="close-circle"
-                icon-right-clickable
-                @icon-right-click="clearIconClick('dni')"
-              ></b-input>
+                editable
+              >
+              </b-datetimepicker>
             </b-field>
 
-            <b-field label-position="on-border" label="Mail">
-              <b-input
-                v-model="saleFilters.mail"
-                placeholder="Mail"
+            <b-field label-position="on-border" label="Fecha hasta">
+              <b-datetimepicker
+                v-model="saleFilters.dateDateTo"
+                rounded
+                placeholder="Seleccione fecha y hora"
+                icon="calendar-today"
+                trap-focus
                 size="is-small"
-                icon-right="close-circle"
-                icon-right-clickable
-                @icon-right-click="clearIconClick('mail')"
-              ></b-input>
+                editable
+              >
+              </b-datetimepicker>
+            </b-field>
+
+            <b-field label-position="on-border" label="Forma de pago">
+              <b-select
+                v-model="saleFilters.paymentType"
+                placeholder="Seleccione un método de pago"
+                expanded
+                size="is-small"
+                required
+                validation-message="Seleccione un método de pago"
+              >
+                <option :value="0">Efectivo</option>
+                <option :value="1">Cuotas</option>
+                <option :value="2">Tarjeta de crédito</option>
+                <option :value="3">Tarjeta de débito</option>
+                <option :value="4">Cheque</option>
+              </b-select>
             </b-field>
           </b-field>
         </div>
 
         <div class="column level-right">
-          <b-button type="is-info" class="mx-1" @click="applyFilters()">
+          <b-button
+            type="is-dark"
+            class="mx-1"
+            size="is-small"
+            @click="applyFilters()"
+          >
             Aplicar
           </b-button>
-          <b-button @click="clearFilters()" type="is-danger">
+          <b-button @click="clearFilters()" size="is-small" type="is-default">
             Limpiar
           </b-button>
         </div>
-      </div> -->
+      </div>
 
       <b-table
         striped
@@ -201,19 +242,30 @@ import {
   ChequesPayment
 } from "@/models/payment";
 import { dateTimeToLocal } from "@/utils/common-functions";
-// import { SaleFilters } from "../../models/saleFilters";
+import { SaleFilters } from "../../models/filters/saleFilters";
+import { Client } from "@/models/client";
+import { Product } from "@/models/product";
+import { NavigatorClientService } from "@/services/client-service";
+import { NavigatorProductService } from "@/services/product-service";
 
 @Component
 export default class SaleList extends Vue {
   public sales: Sale[] = [];
+  public clients: Client[] = [];
+  public products: Product[] = [];
   public saleService: NavigatorSaleService = new NavigatorSaleService();
-  // public saleFilters: SaleFilters = new SaleFilters();
-  // public openFilters = false;
+  public clientService: NavigatorClientService = new NavigatorClientService();
+  public productService: NavigatorProductService = new NavigatorProductService();
+  public saleFilters: SaleFilters = new SaleFilters();
+  public openFilters = false;
   public currentPage = 1;
   public perPage = 10;
   public errorDialog = false;
   public confirmDialog = false;
   public isLoading = false;
+  public filtersApplied = false;
+  public totalPages = 0;
+  public prodCodNameDesc = "";
 
   dateTimeToLocal(date: Date) {
     return dateTimeToLocal(date);
@@ -326,67 +378,122 @@ export default class SaleList extends Vue {
     });
   }
 
-  // public clearFilters() {
-  //   this.isLoading = true;
-  //   this.saleFilters = new SaleFilters();
-  //   this.saleService
-  //     .getSales()
-  //     .then(response => {
-  //       this.sales = response;
-  //       this.isLoading = false;
-  //     })
-  //     .catch(e => {
-  //       this.$buefy.dialog.alert({
-  //         title: "Error",
-  //         message:
-  //           "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-  //         type: "is-danger",
-  //         hasIcon: true,
-  //         icon: "times-circle",
-  //         iconPack: "fa",
-  //         ariaRole: "alertdialog",
-  //         ariaModal: true
-  //       });
-  //       this.isLoading = false;
-  //       console.log("error: ", e);
-  //     });
-  // }
+  public clearFilters() {
+    this.filtersApplied = false;
+    this.saleFilters = new SaleFilters();
+    this.getSales();
+  }
 
-  // public applyFilters() {
-  //   this.isLoading = true;
-  //   this.saleService
-  //     .getSalesFiltered(this.saleFilters)
-  //     .then(response => {
-  //       this.sales = response;
-  //       this.isLoading = false;
-  //     })
-  //     .catch(e => {
-  //       this.$buefy.dialog.alert({
-  //         title: "Error",
-  //         message:
-  //           "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-  //         type: "is-danger",
-  //         hasIcon: true,
-  //         icon: "times-circle",
-  //         iconPack: "fa",
-  //         ariaRole: "alertdialog",
-  //         ariaModal: true
-  //       });
-  //       this.isLoading = false;
-  //       console.log("error: ", e);
-  //     });
-  // }
+  public applyFilters() {
+    this.isLoading = true;
+    this.filtersApplied = true;
+    this.getSales();
+  }
+
+  getSales(): Promise<void> {
+    this.isLoading = true;
+    let rta: Promise<void>;
+    if (this.filtersApplied) {
+      rta = this.saleService
+        .getTotalQtyByFilters(this.saleFilters)
+        .then(qty => {
+          this.totalPages = qty;
+          return this.saleService.getByFiltersPageAndQty(
+            this.saleFilters,
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.sales = response;
+        });
+    } else {
+      rta = this.saleService
+        .getTotalQty()
+        .then(qty => {
+          this.totalPages = qty;
+          return this.saleService.getByPageAndQty(
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.sales = response;
+        });
+    }
+
+    this.isLoading = false;
+    return rta;
+  }
+
+  filteredProducts() {
+    const filtered = this.products.filter(option => {
+      return option.name
+        ? option.name
+            .toString()
+            .toLowerCase()
+            .indexOf((this.prodCodNameDesc ?? "").toLowerCase()) >= 0
+        : false;
+    });
+
+    const codNameDescArray: string[] = [];
+
+    filtered.forEach(x => {
+      if (x.name) {
+        codNameDescArray.push(x.code + " - " + x.name + " - " + x.description);
+      }
+    });
+    return codNameDescArray;
+  }
+
+  getProductId(option: string) {
+    const prod = this.products.find(
+      x => x.code + " - " + x.name + " - " + x.description === option
+    );
+    this.saleFilters.productId = prod ? prod.id : undefined;
+  }
+
+  filteredClients() {
+    const filtered = this.clients.filter(option => {
+      return option.name
+        ? option.name
+            .toString()
+            .toLowerCase()
+            .indexOf((this.saleFilters.clientName ?? "").toLowerCase()) >= 0
+        : false;
+    });
+
+    const dniNameArray: string[] = [];
+
+    filtered.forEach(x => {
+      if (x.name) {
+        dniNameArray.push(x.name + " - " + x.lastname + " - " + x.dni);
+      }
+    });
+    return dniNameArray;
+  }
+
+  getClientId(option: string) {
+    const client = this.clients.find(
+      x => x.name + " - " + x.lastname + " - " + x.dni === option
+    );
+    this.saleFilters.clientId = client ? client.id : undefined;
+  }
 
   created() {
-    this.isLoading = true;
-    this.saleService
-      .getSales()
+    this.getSales()
+      .then(() => {
+        this.isLoading = true;
+        return this.clientService.getClients();
+      })
       .then(response => {
-        this.sales = response as Sale[];
-        this.isLoading = false;
+        this.clients = response;
+        return this.productService.getProducts();
+      })
+      .then(response => {
+        this.products = response;
       })
       .catch(e => {
-        this.isLoading = false;
         this.$buefy.dialog.alert({
           title: "Error",
           message:
@@ -398,7 +505,11 @@ export default class SaleList extends Vue {
           ariaRole: "alertdialog",
           ariaModal: true
         });
+        this.isLoading = false;
         console.log("error: ", e);
+      })
+      .finally(() => {
+        this.isLoading = false;
       });
   }
 }

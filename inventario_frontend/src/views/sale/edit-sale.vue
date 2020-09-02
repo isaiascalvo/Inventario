@@ -297,6 +297,7 @@
                             v-model="props.row.value"
                             placeholder="Monto del cheque"
                             size="is-small"
+                            type="number"
                             required
                             validation-message="Debe ingresar el monto del cheque"
                             @input="forceUpdate()"
@@ -370,7 +371,7 @@
               </b-button>
               <b-button
                 type="button"
-                class="is-danger"
+                class="is-danger mr-1"
                 style="float: right;"
                 @click="$router.push('/sale-list')"
               >
@@ -403,7 +404,6 @@ import {
   CashForCreation,
   CreditCardForCreation,
   DebitCardForCreation,
-  ChequeForCreation,
   Cash,
   OwnFees,
   CreditCard,
@@ -454,7 +454,6 @@ export default class EditSale extends Vue {
 
   formValid() {
     const result = formValidation(this.sale as never);
-    console.log(result);
     const nulleableProps = [
       "",
       "product",
@@ -491,7 +490,7 @@ export default class EditSale extends Vue {
 
   deleteCheque(cheque: Cheque) {
     const index = this.sale.cheques?.listOfCheques.indexOf(cheque);
-    if (index) {
+    if (index !== undefined) {
       this.sale.cheques?.listOfCheques.splice(index, 1);
     }
   }
@@ -528,11 +527,9 @@ export default class EditSale extends Vue {
   }
 
   validatePayment() {
-    console.log(this.sale.paymentType);
     switch (this.sale.paymentType) {
       case paymentTypes.cash: {
-        console.log(this.sale.cash, this.fieldState(this.sale.cash?.discount));
-        return this.sale.cash && this.fieldState(this.sale.cash?.discount);
+        return this.sale.cash && this.sale.cash.discount;
       }
       case paymentTypes.ownFees: {
         return (
@@ -542,35 +539,42 @@ export default class EditSale extends Vue {
         );
       }
       case paymentTypes.creditcard: {
-        console.log(
-          this.sale.creditCard,
-          this.sale.creditCard?.bank,
-          this.sale.creditCard?.cardType,
-          this.fieldState(this.sale.creditCard?.discount)
-        );
         return (
           this.sale.creditCard &&
           this.sale.creditCard.bank &&
           this.sale.creditCard.cardType &&
-          this.fieldState(this.sale.creditCard.discount)
+          this.sale.creditCard.discount
         );
       }
       case paymentTypes.debitcard:
         return (
           this.sale.debitCard &&
-          this.fieldState(this.sale.debitCard?.bank) &&
-          this.fieldState(this.sale.debitCard?.cardType) &&
-          this.fieldState(this.sale.debitCard?.surcharge)
+          this.sale.debitCard.bank &&
+          this.sale.debitCard.cardType &&
+          this.sale.debitCard.surcharge
         );
-      case paymentTypes.cheque:
-        return this.sale.cheques && this.sale.cheques.listOfCheques.length > 0;
+      case paymentTypes.cheque: {
+        let band =
+          this.sale.cheques && this.sale.cheques.listOfCheques.length > 0;
+        this.sale.cheques?.listOfCheques.forEach(che => {
+          if (
+            !(
+              this.fieldState(che.nro) &&
+              this.fieldState(che.bank) &&
+              this.fieldState(che.value)
+            )
+          ) {
+            band = false;
+          }
+        });
+        return band;
+      }
       default:
         break;
     }
   }
 
   public setPayment() {
-    console.log(this.activeStep, this.sale.paymentType);
     switch (this.sale.paymentType) {
       case paymentTypes.cash:
         this.sale.cash = new Cash();
@@ -666,10 +670,30 @@ export default class EditSale extends Vue {
           }
           break;
         case paymentTypes.creditcard:
-          this.sale.amount = this.priceValue * this.sale.quantity;
+          {
+            const payCredit = this.sale.creditCard as CreditCardForCreation;
+            if (payCredit.discount) {
+              this.sale.amount =
+                this.priceValue *
+                this.sale.quantity *
+                (1 - payCredit.discount / 100);
+            } else {
+              this.sale.amount = undefined;
+            }
+          }
           break;
         case paymentTypes.debitcard:
-          this.sale.amount = this.priceValue * this.sale.quantity;
+          {
+            const payDebit = this.sale.debitCard as DebitCardForCreation;
+            if (payDebit.surcharge) {
+              this.sale.amount =
+                this.priceValue *
+                this.sale.quantity *
+                (1 - payDebit.surcharge / 100);
+            } else {
+              this.sale.amount = undefined;
+            }
+          }
           break;
         case paymentTypes.cheque:
           this.sale.amount = this.priceValue * this.sale.quantity;
@@ -793,7 +817,6 @@ export default class EditSale extends Vue {
 
   public submit() {
     this.isLoading = true;
-    // this.sale.quantity = +(this.sale.quantity ?? 0);
     this.saleService
       .addSale(this.sale)
       .then(() => {

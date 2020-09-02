@@ -13,6 +13,10 @@ namespace Logic.Interfaces
         //Task<IEnumerable<SaleDto>> GetByFilters(ClientFiltersDto filters);
         Task Delete(Guid userId, Guid id);
         Task<SaleDto> Create(Guid userId, SaleForCreationDto saleForCreationDto);
-        Task Update(Guid id, SaleDto saleDto);
+        //Task Update(Guid id, SaleDto saleDto);
+        Task<int> GetTotalQty();
+        Task<IEnumerable<SaleDto>> GetByPageAndQty(int skip, int qty);
+        Task<int> GetTotalQtyByFilters(SaleFiltersDto filtersDto);
+        Task<IEnumerable<SaleDto>> GetFilteredByPageAndQty(SaleFiltersDto filtersDto, int skip, int qty);
     }
 }

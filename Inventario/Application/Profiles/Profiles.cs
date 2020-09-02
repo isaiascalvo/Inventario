@@ -105,6 +105,16 @@ namespace Application.Profiles
                     dest => dest.Date,
                     opt => opt.MapFrom(src => DateTime.Parse(src.Date))
                 );
+
+            CreateMap<SaleFiltersViewModel, SaleFiltersDto>()
+                .ForMember(
+                    dest => dest.DateFrom,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateFrom))
+                )
+                .ForMember(
+                    dest => dest.DateTo,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
+                );
             CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
         }
     }
