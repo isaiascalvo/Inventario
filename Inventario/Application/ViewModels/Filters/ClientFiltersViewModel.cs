@@ -11,10 +11,12 @@ namespace Application.ViewModels
         public string? Lastname { get; set; }
         public string? Dni { get; set; }
         public string? Mail { get; set; }
+        public string? Phone { get; set; }
+        public bool? Debtor { get; set; }
 
         public bool IsEmpty()
         {
-            return Name == null && Lastname == null && Dni == null && Mail == null;
+            return Name == null && Lastname == null && Dni == null && Mail == null && Phone == null && Debtor == null;
         }
     }
 }

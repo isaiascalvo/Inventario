@@ -52,6 +52,17 @@ namespace Logic
             return categoriesDto;
         }
 
+        public async Task<int> GetTotalQty()
+        {
+            return (await _categoryRepositoryRepository.GetAll()).Count();
+        }
+
+        public async Task<IEnumerable<CategoryDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var categories = (await _categoryRepositoryRepository.GetAll()).OrderByDescending(x => x.Name).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<Category>, IEnumerable<CategoryDto>>(categories);
+        }
+
         public async Task<CategoryDto> GetOne(Guid id)
         {
             var category = await _categoryRepositoryRepository.GetById(id);

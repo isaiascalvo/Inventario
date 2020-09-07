@@ -19,21 +19,24 @@ export interface SaleService {
 }
 
 export class NavigatorSaleService implements SaleService {
-  async getTotalQty(): Promise<number> {
+  public async getTotalQty(): Promise<number> {
     return (await apiClient.get("/sales/GetTotalQty")).data;
   }
-  async getTotalQtyByFilters(saleFilters: SaleFilters): Promise<number> {
+
+  public async getTotalQtyByFilters(saleFilters: SaleFilters): Promise<number> {
     return (
       await apiClient.get(
         "/sales/GetTotalQtyByFilters?" + this.getQueryString(saleFilters)
       )
     ).data;
   }
-  async getByPageAndQty(skip: number, qty: number): Promise<Sale[]> {
+
+  public async getByPageAndQty(skip: number, qty: number): Promise<Sale[]> {
     return (
       await apiClient.get("/sales/GetByPageAndQty?skip=" + skip + "&qty=" + qty)
     ).data;
   }
+
   async getByFiltersPageAndQty(
     saleFilters: SaleFilters,
     skip: number,
@@ -50,6 +53,7 @@ export class NavigatorSaleService implements SaleService {
       )
     ).data;
   }
+
   public async getSales(): Promise<Sale[]> {
     return await (await apiClient.get("/sales")).data;
   }

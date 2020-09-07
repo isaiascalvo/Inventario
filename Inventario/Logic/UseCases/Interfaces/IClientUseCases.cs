@@ -14,5 +14,9 @@ namespace Logic.Interfaces
         Task Delete(Guid userId, Guid id);
         Task<ClientDto> Create(Guid userId, ClientForCreationDto diseaseDto);
         Task Update(Guid id, ClientDto diseaseDto);
+        Task<int> GetTotalQty();
+        Task<IEnumerable<ClientDto>> GetByPageAndQty(int skip, int qty);
+        Task<int> GetTotalQtyByFilters(ClientFiltersDto filtersDto);
+        Task<IEnumerable<ClientDto>> GetFilteredByPageAndQty(ClientFiltersDto filtersDto, int skip, int qty);
     }
 }

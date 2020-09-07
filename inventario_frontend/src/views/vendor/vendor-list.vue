@@ -16,66 +16,138 @@
             >
               Nuevo Proveedor
             </b-button>
+            <b-button
+              @click="openFilters = !openFilters"
+              class="is-pulled-right"
+              type="is-primary"
+              size="is-small"
+              :icon-right="
+                openFilters ? 'filter-variant-minus' : 'filter-variant'
+              "
+            >
+              {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
+            </b-button>
           </div>
         </div>
       </div>
     </section>
+    <div>
+      <div class="columns filtersClass level" v-if="openFilters">
+        <div class="column is-10">
+          <b-field grouped group-multiline>
+            <b-field label-position="on-border" label="Nombre">
+              <b-input
+                v-model="vendorFilters.name"
+                placeholder="Nombre"
+                size="is-small"
+              ></b-input>
+            </b-field>
 
-    <b-table
-      striped
-      hoverable
-      scrollable
-      :data="vendors"
-      id="my-table"
-      :paginated="true"
-      :per-page="perPage"
-      :current-page.sync="currentPage"
-      aria-next-label="Next page"
-      aria-previous-label="Previous page"
-      aria-page-label="Page"
-      aria-current-label="Current page"
-    >
-      <template slot="empty">
-        No hay proveedores registrados
-      </template>
-      <template slot-scope="props">
-        <b-table-column field="name" label="Nombre">
-          {{ props.row.name }}
-        </b-table-column>
-        <b-table-column field="cuil" label="CUIL">
-          {{ props.row.cuil }}
-        </b-table-column>
-        <b-table-column field="phone" label="Teléfono">
-          {{ props.row.phone }}
-        </b-table-column>
-        <b-table-column field="mail" label="Mail">
-          {{ props.row.mail }}
-        </b-table-column>
-        <b-table-column field="description" label="Descripción">
-          {{ props.row.description }}
-        </b-table-column>
-        <!-- <b-table-column field="active" label="Activo">
-          {{ props.row.active ? "Si" : "No" }}
-        </b-table-column> -->
+            <b-field label-position="on-border" label="CUIL">
+              <b-input
+                v-model="vendorFilters.cuil"
+                placeholder="CUIL"
+                size="is-small"
+              ></b-input>
+            </b-field>
 
-        <b-table-column field="action" label="Acciones">
+            <b-field label-position="on-border" label="Teléfono">
+              <b-input
+                v-model="vendorFilters.phone"
+                placeholder="Teléfono"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Mail">
+              <b-input
+                v-model="vendorFilters.mail"
+                placeholder="Mail"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Descripción">
+              <b-input
+                v-model="vendorFilters.description"
+                placeholder="Descripción"
+                size="is-small"
+              ></b-input>
+            </b-field>
+          </b-field>
+        </div>
+
+        <div class="column level-right">
           <b-button
-            tag="router-link"
-            :to="'/vendor/modify/' + props.row.id"
-            type="is-small"
+            type="is-dark"
+            class="mx-1"
+            size="is-small"
+            @click="applyFilters()"
           >
-            <b-icon icon="pencil"></b-icon>
+            Aplicar
           </b-button>
-          <b-button
-            @click="deleteVendor(props.row)"
-            type="is-small"
-            class="actionButton"
-          >
-            <b-icon icon="delete"></b-icon>
+          <b-button @click="clearFilters()" size="is-small" type="is-default">
+            Limpiar
           </b-button>
-        </b-table-column>
-      </template>
-    </b-table>
+        </div>
+      </div>
+
+      <b-table
+        striped
+        hoverable
+        scrollable
+        :data="vendors"
+        id="my-table"
+        :paginated="true"
+        backend-pagination
+        :total="totalPages"
+        :per-page="perPage"
+        :current-page.sync="currentPage"
+        @page-change="onPageChange"
+        aria-next-label="Next page"
+        aria-previous-label="Previous page"
+        aria-page-label="Page"
+        aria-current-label="Current page"
+      >
+        <template slot="empty">
+          No hay proveedores registrados
+        </template>
+        <template slot-scope="props">
+          <b-table-column field="name" label="Nombre">
+            {{ props.row.name }}
+          </b-table-column>
+          <b-table-column field="cuil" label="CUIL">
+            {{ props.row.cuil }}
+          </b-table-column>
+          <b-table-column field="phone" label="Teléfono">
+            {{ props.row.phone }}
+          </b-table-column>
+          <b-table-column field="mail" label="Mail">
+            {{ props.row.mail }}
+          </b-table-column>
+          <b-table-column field="description" label="Descripción">
+            {{ props.row.description }}
+          </b-table-column>
+
+          <b-table-column field="action" label="Acciones">
+            <b-button
+              tag="router-link"
+              :to="'/vendor/modify/' + props.row.id"
+              type="is-small"
+            >
+              <b-icon icon="pencil"></b-icon>
+            </b-button>
+            <b-button
+              @click="deleteVendor(props.row)"
+              type="is-small"
+              class="actionButton"
+            >
+              <b-icon icon="delete"></b-icon>
+            </b-button>
+          </b-table-column>
+        </template>
+      </b-table>
+    </div>
 
     <b-loading is-full-page :active.sync="isLoading"></b-loading>
   </div>
@@ -85,6 +157,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import { Vendor } from "../../models/vendor";
 import { NavigatorVendorService } from "../../services/vendor-service";
+import { VendorFilters } from "@/models/filters/vendorFilters";
 
 @Component
 export default class VendorList extends Vue {
@@ -96,6 +169,10 @@ export default class VendorList extends Vue {
   public errorDialog = false;
   public confirmDialog = false;
   public isLoading = false;
+  public vendorFilters: VendorFilters = new VendorFilters();
+  public filtersApplied = false;
+  public totalPages = 0;
+  public openFilters = false;
 
   deleteVendor(vendor: Vendor) {
     this.$buefy.dialog.confirm({
@@ -134,29 +211,76 @@ export default class VendorList extends Vue {
     });
   }
 
-  created() {
+  public clearFilters() {
+    this.filtersApplied = false;
+    this.vendorFilters = new VendorFilters();
+    this.getVendors();
+  }
+
+  public applyFilters() {
     this.isLoading = true;
-    this.vendorService
-      .getVendors()
-      .then(response => {
-        this.vendors = response as Vendor[];
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.isLoading = false;
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
+    this.filtersApplied = true;
+    this.getVendors();
+  }
+
+  getVendors() {
+    this.isLoading = true;
+    let rta: Promise<void>;
+    if (this.filtersApplied) {
+      rta = this.vendorService
+        .getTotalQtyByFilters(this.vendorFilters)
+        .then(qty => {
+          this.totalPages = qty;
+          return this.vendorService.getByFiltersPageAndQty(
+            this.vendorFilters,
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.vendors = response;
+          this.isLoading = false;
         });
-        console.log("error: ", e);
+    } else {
+      rta = this.vendorService
+        .getTotalQty()
+        .then(qty => {
+          this.totalPages = qty;
+          return this.vendorService.getByPageAndQty(
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.vendors = response;
+          this.isLoading = false;
+        });
+    }
+
+    rta.catch(e => {
+      this.isLoading = false;
+      this.$buefy.dialog.alert({
+        title: "Error",
+        message:
+          "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+        type: "is-danger",
+        hasIcon: true,
+        icon: "times-circle",
+        iconPack: "fa",
+        ariaRole: "alertdialog",
+        ariaModal: true
       });
+      console.log("error: ", e);
+    });
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getVendors();
+  }
+
+  created() {
+    this.getVendors();
   }
 }
 </script>

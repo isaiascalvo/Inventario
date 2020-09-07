@@ -13,5 +13,7 @@ namespace Logic.Interfaces
         Task Delete(Guid userId, Guid id);
         Task<CategoryDto> Create(Guid userId, CategoryForCreationDto categoryForCreationDto);
         Task Update(Guid id, CategoryDto categoryDto);
+        Task<int> GetTotalQty();
+        Task<IEnumerable<CategoryDto>> GetByPageAndQty(int skip, int qty);
     }
 }

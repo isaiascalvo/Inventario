@@ -62,11 +62,8 @@
                 placeholder="Seleccione una fecha"
                 icon="calendar-today"
                 trap-focus
-                :day-names="dayNames"
-                :month-names="monthNames"
                 position="is-top-right"
                 editable
-                :date-parser="parseDate"
                 required
                 validation-message="Debe ingresar una fecha"
               >
@@ -74,7 +71,7 @@
             </b-field>
 
             <div class="field">
-              <b-switch v-model="client.debtor">
+              <b-switch v-model="client.debtor" disabled>
                 Deudor
               </b-switch>
             </div>
@@ -117,21 +114,6 @@ export default class EditClient extends Vue {
   public client: Client = new Client();
   public clientService: NavigatorClientService = new NavigatorClientService();
   public isLoading = false;
-  public monthNames = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diceimbre"
-  ];
-  public dayNames = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
 
   fieldState(field: unknown) {
     return fieldStateValidation(field);
@@ -139,15 +121,7 @@ export default class EditClient extends Vue {
 
   formValid() {
     const result = formValidation(this.client as never);
-    console.log(result);
     return result === "";
-  }
-
-  parseDate(date: string) {
-    const dateSplited = date.split("/");
-    return new Date(
-      Date.parse(dateSplited[1] + "/" + dateSplited[0] + "/" + dateSplited[2])
-    );
   }
 
   public submit() {
@@ -217,6 +191,7 @@ export default class EditClient extends Vue {
       this.clientService.getClient(this.client.id).then(
         response => {
           this.client = response as Client;
+          this.client.birthdate = new Date(this.client.birthdate ?? "");
           this.isLoading = false;
         },
         error => {

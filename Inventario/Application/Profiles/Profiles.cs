@@ -115,7 +115,9 @@ namespace Application.Profiles
                     dest => dest.DateTo,
                     opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
                 );
+
             CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
+            CreateMap<VendorFiltersViewModel, VendorFiltersDto>();
         }
     }
 }

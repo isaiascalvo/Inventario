@@ -44,14 +44,6 @@
       <div class="columns filtersClass level" v-if="openFilters">
         <div class="column is-10">
           <b-field grouped group-multiline>
-            <b-field label-position="on-border" label="Código">
-              <b-input
-                v-model="productFilters.code"
-                placeholder="Código"
-                size="is-small"
-              ></b-input>
-            </b-field>
-
             <b-field label-position="on-border" label="Nombre">
               <b-input
                 v-model="productFilters.name"
@@ -64,6 +56,14 @@
               <b-input
                 v-model="productFilters.description"
                 placeholder="Descripción"
+                size="is-small"
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Código">
+              <b-input
+                v-model="productFilters.code"
+                placeholder="Código"
                 size="is-small"
               ></b-input>
             </b-field>

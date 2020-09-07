@@ -62,6 +62,30 @@ namespace Logic
             }
         }
 
+        public async Task<int> GetTotalQty()
+        {
+            return (await _vendorRepository.GetAll()).Count();
+        }
+
+        public async Task<int> GetTotalQtyByFilters(VendorFiltersDto filtersDto)
+        {
+            var exp = filtersDto.GetExpresion();
+            return (await _vendorRepository.GetAll()).AsQueryable().Where(exp).Count();
+        }
+
+        public async Task<IEnumerable<VendorDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var vendors = (await _vendorRepository.GetAll()).OrderByDescending(x => x.Name).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<Vendor>, IEnumerable<VendorDto>>(vendors);
+        }
+
+        public async Task<IEnumerable<VendorDto>> GetFilteredByPageAndQty(VendorFiltersDto filtersDto, int skip, int qty)
+        {
+            var vendors = (await _vendorRepository.GetAll())
+                .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Name).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<Vendor>, IEnumerable<VendorDto>>(vendors);
+        }
+
         public async Task<VendorDto> GetOne(Guid id)
         {
             var vendor = await _vendorRepository.GetById(id);

@@ -63,6 +63,31 @@ namespace Logic
             return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
         }
 
+        public async Task<int> GetTotalQty()
+        {
+            return (await _clientRepository.GetAll()).Count();
+        }
+
+        public async Task<int> GetTotalQtyByFilters(ClientFiltersDto filtersDto)
+        {
+            var exp = filtersDto.GetExpresion();
+            return (await _clientRepository.GetAll()).AsQueryable().Where(exp).Count();
+        }
+
+        public async Task<IEnumerable<ClientDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var clients = (await _clientRepository.GetAll()).OrderByDescending(x => x.Lastname).ThenByDescending(x => x.Name).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+        }
+
+        public async Task<IEnumerable<ClientDto>> GetFilteredByPageAndQty(ClientFiltersDto filtersDto, int skip, int qty)
+        {
+            var clients = (await _clientRepository.GetAll())
+                .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Lastname).ThenByDescending(x => x.Name).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+        }
+
+
 
         public async Task<ClientDto> GetOne(Guid id)
         {

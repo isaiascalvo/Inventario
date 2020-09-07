@@ -38,6 +38,35 @@ namespace Application.Controllers
             return Ok(categories);
         }
 
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _categoryUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<CategoryDto> categoriesDto = await _categoryUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<CategoryViewModel> categoriesVM = _mapper.Map<IEnumerable<CategoryDto>, IEnumerable<CategoryViewModel>>(categoriesDto);
+                return Ok(categoriesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         [HttpGet("{categoryId}", Name = "GetCategory")]
         public async Task<IActionResult> GetOne(Guid categoryId)
         {

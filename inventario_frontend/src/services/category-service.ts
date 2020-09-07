@@ -7,11 +7,25 @@ export interface CategoryService {
   addCategory(category: CategoryForCreation): Promise<Category>;
   updateCategory(category: Category): Promise<void>;
   deleteCategory(categoryId: string): Promise<void>;
+  getTotalQty(): Promise<number>;
+  getByPageAndQty(skip: number, qty: number): Promise<Category[]>;
 }
 
 export class NavigatorCategoryService implements CategoryService {
   public async getCategories(): Promise<Category[]> {
     return await (await apiClient.get("/categories")).data;
+  }
+
+  public async getTotalQty(): Promise<number> {
+    return (await apiClient.get("/categories/GetTotalQty")).data;
+  }
+
+  public async getByPageAndQty(skip: number, qty: number): Promise<Category[]> {
+    return (
+      await apiClient.get(
+        "/categories/GetByPageAndQty?skip=" + skip + "&qty=" + qty
+      )
+    ).data;
   }
 
   public async getCategory(id: string): Promise<Category> {

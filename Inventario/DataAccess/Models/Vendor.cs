@@ -9,7 +9,6 @@ namespace Data
     {
         [Required]
         public string Name { get; set; }
-        [Required]
         public string? CUIL { get; set; }
         public string Phone { get; set; }
         public string? Mail { get; set; }

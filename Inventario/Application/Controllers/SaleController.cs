@@ -44,6 +44,7 @@ namespace Application
                 throw e;
             }
         }
+
         [HttpGet("GetTotalQty")]
         public async Task<IActionResult> GetTotalQty()
         {
@@ -96,8 +97,8 @@ namespace Application
             {
                 var filtersDto = _mapper.Map<SaleFiltersViewModel, SaleFiltersDto>(filtersVM);
                 IEnumerable<SaleDto> salesDto = await _saleUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
-                IEnumerable<SaleViewModel> productsVM = _mapper.Map<IEnumerable<SaleDto>, IEnumerable<SaleViewModel>>(salesDto);
-                return Ok(productsVM);
+                IEnumerable<SaleViewModel> salesVM = _mapper.Map<IEnumerable<SaleDto>, IEnumerable<SaleViewModel>>(salesDto);
+                return Ok(salesVM);
             }
             catch (Exception e)
             {

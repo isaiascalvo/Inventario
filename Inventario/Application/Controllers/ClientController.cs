@@ -47,6 +47,67 @@ namespace Application.Controllers
             return Ok(clientsVM);
         }
 
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _clientUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<ClientDto> clientsDto = await _clientUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<ClientViewModel> clientsVM = _mapper.Map<IEnumerable<ClientDto>, IEnumerable<ClientViewModel>>(clientsDto);
+                return Ok(clientsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] ClientFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<ClientFiltersViewModel, ClientFiltersDto>(filtersVM);
+                int qty = await _clientUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] ClientFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<ClientFiltersViewModel, ClientFiltersDto>(filtersVM);
+                IEnumerable<ClientDto> clientsDto = await _clientUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<ClientViewModel> clientsVM = _mapper.Map<IEnumerable<ClientDto>, IEnumerable<ClientViewModel>>(clientsDto);
+                return Ok(clientsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         [HttpGet("{clientId}", Name = "GetClient")]
         public async Task<IActionResult> GetOne(Guid clientId)
         {

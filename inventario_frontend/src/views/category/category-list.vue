@@ -28,8 +28,11 @@
         :data="categories"
         id="my-table"
         paginated
+        backend-pagination
+        :total="totalPages"
         :per-page="perPage"
         :current-page.sync="currentPage"
+        @page-change="onPageChange"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
         aria-page-label="Page"
@@ -95,6 +98,7 @@ export default class CategoryList extends Vue {
   public currentPage = 1;
   public perPage = 10;
   public isLoading = false;
+  public totalPages = 0;
 
   deleteCategory(category: Category) {
     this.$buefy.dialog.confirm({
@@ -134,10 +138,17 @@ export default class CategoryList extends Vue {
     });
   }
 
-  created() {
+  getCategories() {
     this.isLoading = true;
     this.categoryService
-      .getCategories()
+      .getTotalQty()
+      .then(qty => {
+        this.totalPages = qty;
+        return this.categoryService.getByPageAndQty(
+          (this.currentPage - 1) * this.perPage,
+          this.perPage
+        );
+      })
       .then(response => {
         this.categories = response;
         this.isLoading = false;
@@ -157,6 +168,15 @@ export default class CategoryList extends Vue {
         });
         console.log("error: ", e);
       });
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getCategories();
+  }
+
+  created() {
+    this.getCategories();
   }
 }
 </script>

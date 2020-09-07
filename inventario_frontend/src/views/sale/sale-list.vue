@@ -139,8 +139,11 @@
         :data="sales"
         id="my-table"
         :paginated="true"
+        backend-pagination
+        :total="totalPages"
         :per-page="perPage"
         :current-page.sync="currentPage"
+        @page-change="onPageChange"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
         aria-page-label="Page"
@@ -151,55 +154,36 @@
         </template>
         <template slot-scope="props">
           <b-table-column field="productId" label="Producto">
-            <span
-              v-if="
-                (
-                  props.row.product.code +
-                  ' - ' +
-                  props.row.product.name +
-                  ' - ' +
-                  props.row.product.description
-                ).length < 40
-              "
-            >
-              {{
-                props.row.product.code +
-                  " - " +
-                  props.row.product.name +
-                  " - " +
-                  props.row.product.description
-              }}
-            </span>
             <b-tooltip
-              v-else
-              :label="
-                props.row.product.code +
-                  ' - ' +
-                  props.row.product.name +
-                  ' - ' +
-                  props.row.product.description
-              "
+              :label="getProductDescription(props.row.product)"
               position="is-right"
               size="is-large"
               type="is-dark"
+              :active="getProductDescription(props.row.product).length > 40"
               multilined
             >
-              {{
-                getProductDescription(
-                  props.row.product.code +
-                    " - " +
-                    props.row.product.name +
-                    " - " +
-                    props.row.product.description
-                )
-              }}
+              <span
+                class="link"
+                @click="openModalProductPreview(props.row.productId)"
+              >
+                {{ getShortProductDescription(props.row.product) }}
+              </span>
             </b-tooltip>
           </b-table-column>
           <b-table-column field="quantity" label="Cantidad" centered>
             {{ props.row.quantity }}
           </b-table-column>
           <b-table-column field="clientName" label="Cliente" centered>
-            {{ props.row.clientName }}
+            <span
+              v-if="props.row.clientId"
+              class="link"
+              @click="openModalClientPreview(props.row.clientId)"
+            >
+              {{ props.row.clientName }}
+            </span>
+            <span v-else>
+              {{ props.row.clientName }}
+            </span>
           </b-table-column>
           <b-table-column field="date" label="Fecha y hora" centered>
             {{ dateTimeToLocal(props.row.date) }}
@@ -209,7 +193,6 @@
           </b-table-column>
           <b-table-column field="paymentType" label="Forma de Pago">
             {{ getPaymentType(props.row) }}
-            <!-- Cuotas (6 de $ 4444) -->
           </b-table-column>
 
           <b-table-column field="action" label="Acciones" centered>
@@ -247,8 +230,14 @@ import { Client } from "@/models/client";
 import { Product } from "@/models/product";
 import { NavigatorClientService } from "@/services/client-service";
 import { NavigatorProductService } from "@/services/product-service";
+import ModalClientPreview from "@/components/modals/ModalClientPreview.vue";
+import ModalProductPreview from "@/components/modals/ModalProductPreview.vue";
 
-@Component
+@Component({
+  components: {
+    ModalClientPreview
+  }
+})
 export default class SaleList extends Vue {
   public sales: Sale[] = [];
   public clients: Client[] = [];
@@ -271,8 +260,17 @@ export default class SaleList extends Vue {
     return dateTimeToLocal(date);
   }
 
-  getProductDescription(description: string): string {
-    return description.substring(0, 40) + "...";
+  getProductDescription(product: Product): string {
+    return (
+      product.name +
+      " - " +
+      product.description +
+      (product.code ? " - " + product.code : "")
+    );
+  }
+
+  getShortProductDescription(product: Product): string {
+    return this.getProductDescription(product).substring(0, 40) + "...";
   }
 
   public getTotal(sale: Sale) {
@@ -390,6 +388,11 @@ export default class SaleList extends Vue {
     this.getSales();
   }
 
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getSales();
+  }
+
   getSales(): Promise<void> {
     this.isLoading = true;
     let rta: Promise<void>;
@@ -478,6 +481,32 @@ export default class SaleList extends Vue {
       x => x.name + " - " + x.lastname + " - " + x.dni === option
     );
     this.saleFilters.clientId = client ? client.id : undefined;
+  }
+
+  openModalClientPreview(clientId: string) {
+    this.$buefy.modal.open({
+      parent: this,
+      component: ModalClientPreview,
+      hasModalCard: true,
+      customClass: "custom-class custom-class-2",
+      trapFocus: true,
+      props: {
+        clientId: clientId
+      }
+    });
+  }
+
+  openModalProductPreview(productId: string) {
+    this.$buefy.modal.open({
+      parent: this,
+      component: ModalProductPreview,
+      hasModalCard: true,
+      customClass: "custom-class custom-class-2",
+      trapFocus: true,
+      props: {
+        productId: productId
+      }
+    });
   }
 
   created() {
@@ -573,5 +602,10 @@ input {
 
 p-1 {
   padding: 1em;
+}
+
+.link {
+  cursor: pointer;
+  color: blue;
 }
 </style>

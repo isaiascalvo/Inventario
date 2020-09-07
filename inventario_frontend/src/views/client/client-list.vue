@@ -36,17 +36,6 @@
       <div class="columns filtersClass level" v-if="openFilters">
         <div class="column is-10">
           <b-field grouped group-multiline>
-            <b-field label-position="on-border" label="Nombre">
-              <b-input
-                v-model="clientFilters.name"
-                placeholder="Nombre"
-                size="is-small"
-                icon-right="close-circle"
-                icon-right-clickable
-                @icon-right-click="clearIconClick('name')"
-              ></b-input>
-            </b-field>
-
             <b-field label-position="on-border" label="Apellido">
               <b-input
                 v-model="clientFilters.lastname"
@@ -55,6 +44,17 @@
                 icon-right="close-circle"
                 icon-right-clickable
                 @icon-right-click="clearIconClick('lastname')"
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Nombre">
+              <b-input
+                v-model="clientFilters.name"
+                placeholder="Nombre"
+                size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="clearIconClick('name')"
               ></b-input>
             </b-field>
 
@@ -69,6 +69,17 @@
               ></b-input>
             </b-field>
 
+            <b-field label-position="on-border" label="Teléfono">
+              <b-input
+                v-model="clientFilters.phone"
+                placeholder="Teléfono"
+                size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="clearIconClick('phone')"
+              ></b-input>
+            </b-field>
+
             <b-field label-position="on-border" label="Mail">
               <b-input
                 v-model="clientFilters.mail"
@@ -79,14 +90,31 @@
                 @icon-right-click="clearIconClick('mail')"
               ></b-input>
             </b-field>
+
+            <b-field label-position="on-border" label="Tipo de cliente">
+              <b-select
+                v-model="clientFilters.debtor"
+                placeholder="Seleccione una opción"
+                size="is-small"
+              >
+                <option :value="null"></option>
+                <option :value="true">Deudor</option>
+                <option :value="false">No deudor</option>
+              </b-select>
+            </b-field>
           </b-field>
         </div>
 
         <div class="column level-right">
-          <b-button type="is-info" class="mx-1" @click="applyFilters()">
+          <b-button
+            type="is-dark"
+            class="mx-1"
+            size="is-small"
+            @click="applyFilters()"
+          >
             Aplicar
           </b-button>
-          <b-button @click="clearFilters()" type="is-danger">
+          <b-button @click="clearFilters()" size="is-small" type="is-default">
             Limpiar
           </b-button>
         </div>
@@ -99,8 +127,11 @@
         :data="clients"
         id="my-table"
         :paginated="true"
+        backend-pagination
+        :total="totalPages"
         :per-page="perPage"
         :current-page.sync="currentPage"
+        @page-change="onPageChange"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
         aria-page-label="Page"
@@ -110,11 +141,11 @@
           No hay clientes registrados
         </template>
         <template slot-scope="props">
-          <b-table-column field="name" label="Nombre">
-            {{ props.row.name }}
-          </b-table-column>
           <b-table-column field="lastname" label="Apellido">
             {{ props.row.lastname }}
+          </b-table-column>
+          <b-table-column field="name" label="Nombre">
+            {{ props.row.name }}
           </b-table-column>
           <b-table-column field="dni" label="DNI">
             {{ props.row.dni }}
@@ -160,7 +191,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import { Client } from "../../models/client";
 import { NavigatorClientService } from "../../services/client-service";
-import { ClientFilters } from "../../models/clientFilters";
+import { ClientFilters } from "../../models/filters/clientFilters";
 
 @Component
 export default class ClientList extends Vue {
@@ -173,6 +204,8 @@ export default class ClientList extends Vue {
   public errorDialog = false;
   public confirmDialog = false;
   public isLoading = false;
+  public filtersApplied = false;
+  public totalPages = 0;
 
   dateTimeToLocal(date: Date) {
     return new Date(date).toLocaleString().substr(0, 10);
@@ -220,79 +253,75 @@ export default class ClientList extends Vue {
   }
 
   public clearFilters() {
-    this.isLoading = true;
+    this.filtersApplied = false;
     this.clientFilters = new ClientFilters();
-    this.clientService
-      .getClients()
-      .then(response => {
-        this.clients = response;
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
-        });
-        this.isLoading = false;
-        console.log("error: ", e);
-      });
+    this.getClients();
   }
 
   public applyFilters() {
     this.isLoading = true;
-    this.clientService
-      .getClientsFiltered(this.clientFilters)
-      .then(response => {
-        this.clients = response;
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
+    this.filtersApplied = true;
+    this.getClients();
+  }
+
+  getClients() {
+    this.isLoading = true;
+    let rta: Promise<void>;
+    if (this.filtersApplied) {
+      rta = this.clientService
+        .getTotalQtyByFilters(this.clientFilters)
+        .then(qty => {
+          this.totalPages = qty;
+          return this.clientService.getByFiltersPageAndQty(
+            this.clientFilters,
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.clients = response;
+          this.isLoading = false;
         });
-        this.isLoading = false;
-        console.log("error: ", e);
+    } else {
+      rta = this.clientService
+        .getTotalQty()
+        .then(qty => {
+          this.totalPages = qty;
+          return this.clientService.getByPageAndQty(
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.clients = response;
+          this.isLoading = false;
+        });
+    }
+
+    rta.catch(e => {
+      this.isLoading = false;
+      this.$buefy.dialog.alert({
+        title: "Error",
+        message:
+          "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+        type: "is-danger",
+        hasIcon: true,
+        icon: "times-circle",
+        iconPack: "fa",
+        ariaRole: "alertdialog",
+        ariaModal: true
       });
+      console.log("error: ", e);
+    });
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getClients();
   }
 
   created() {
-    this.isLoading = true;
-    this.clientService
-      .getClients()
-      .then(response => {
-        this.clients = response as Client[];
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.isLoading = false;
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
-        });
-        console.log("error: ", e);
-      });
+    this.getClients();
   }
 }
 </script>

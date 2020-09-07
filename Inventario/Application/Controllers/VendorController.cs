@@ -53,6 +53,67 @@ namespace Application.Controllers
             }
         }
 
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _vendorUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<VendorDto> vendorsDto = await _vendorUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<VendorViewModel> vendorsVM = _mapper.Map<IEnumerable<VendorDto>, IEnumerable<VendorViewModel>>(vendorsDto);
+                return Ok(vendorsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] VendorFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<VendorFiltersViewModel, VendorFiltersDto>(filtersVM);
+                int qty = await _vendorUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] VendorFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<VendorFiltersViewModel,VendorFiltersDto>(filtersVM);
+                IEnumerable<VendorDto> vendorsDto = await _vendorUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<VendorViewModel> vendorsVM = _mapper.Map<IEnumerable<VendorDto>, IEnumerable<VendorViewModel>>(vendorsDto);
+                return Ok(vendorsVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Add(VendorForCreationViewModel vendorForCrationVM)
         {
