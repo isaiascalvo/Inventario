@@ -14,5 +14,9 @@ namespace Logic.Interfaces
         Task<UserDto> Create(Guid userId, UserForCreationDto userDTO);
         Task Update(Guid id, UserDto USERdTO);
         Task<UserDto> Login(string userName, string password);
+        Task<int> GetTotalQty();
+        Task<IEnumerable<UserDto>> GetByPageAndQty(int skip, int qty);
+        Task<int> GetTotalQtyByFilters(UserFiltersDto filtersDto);
+        Task<IEnumerable<UserDto>> GetFilteredByPageAndQty(UserFiltersDto filtersDto, int skip, int qty);
     }
 }

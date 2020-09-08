@@ -109,6 +109,29 @@ namespace Logic
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
 
+        public async Task<int> GetTotalQty()
+        {
+            return (await _productEntryRepository.GetAll()).Count();
+        }
+
+        public async Task<int> GetTotalQtyByFilters(ProductEntryFiltersDto filtersDto)
+        {
+            return (await _productEntryRepository.GetAll()).AsQueryable().Where(filtersDto.GetExpresion()).Count();
+        }
+
+        public async Task<IEnumerable<ProductEntryDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var productEntries = (await _productEntryRepository.GetAll()).OrderByDescending(x => x.Date).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
+        }
+
+        public async Task<IEnumerable<ProductEntryDto>> GetFilteredByPageAndQty(ProductEntryFiltersDto filtersDto, int skip, int qty)
+        {
+            var productEntries = (await _productEntryRepository.GetAll())
+                .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Date).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
+        }
+
         public async Task<ProductEntryDto> GetOne(Guid id)
         {
             var productEntry = await _productEntryRepository.GetById(id, x => x.ProductEntryLines);

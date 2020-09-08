@@ -42,7 +42,7 @@ export class NavigatorClientService implements ClientService {
     ).data;
   }
 
-  async getByFiltersPageAndQty(
+  public async getByFiltersPageAndQty(
     clientFilters: ClientFilters,
     skip: number,
     qty: number
@@ -58,6 +58,7 @@ export class NavigatorClientService implements ClientService {
       )
     ).data;
   }
+
   public async getClients(): Promise<Client[]> {
     return await (await apiClient.get("/clients")).data;
   }

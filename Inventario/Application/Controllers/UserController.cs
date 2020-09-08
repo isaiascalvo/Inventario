@@ -45,6 +45,67 @@ namespace Application.Controllers
             return Ok(usersVM);
         }
 
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _userUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<UserDto> usersDto = await _userUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<UserViewModel> usersVM = _mapper.Map<IEnumerable<UserDto>, IEnumerable<UserViewModel>>(usersDto);
+                return Ok(usersVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] UserFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<UserFiltersViewModel, UserFiltersDto>(filtersVM);
+                int qty = await _userUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] UserFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<UserFiltersViewModel, UserFiltersDto>(filtersVM);
+                IEnumerable<UserDto> usersDto = await _userUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<UserViewModel> usersVM = _mapper.Map<IEnumerable<UserDto>, IEnumerable<UserViewModel>>(usersDto);
+                return Ok(usersVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         [HttpGet("{userId}", Name = "GetUser")]
         public async Task<IActionResult> GetOne(Guid userId)
         {

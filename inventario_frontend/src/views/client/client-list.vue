@@ -192,6 +192,7 @@ import { Vue, Component } from "vue-property-decorator";
 import { Client } from "../../models/client";
 import { NavigatorClientService } from "../../services/client-service";
 import { ClientFilters } from "../../models/filters/clientFilters";
+import { dateTimeToLocal } from "@/utils/common-functions";
 
 @Component
 export default class ClientList extends Vue {
@@ -208,7 +209,7 @@ export default class ClientList extends Vue {
   public totalPages = 0;
 
   dateTimeToLocal(date: Date) {
-    return new Date(date).toLocaleString().substr(0, 10);
+    return dateTimeToLocal(date);
   }
 
   clearIconClick(key: keyof ClientFilters) {
@@ -384,5 +385,9 @@ input {
 
 .p-1 {
   padding: 1em;
+}
+
+.actionButton {
+  margin-left: 5px;
 }
 </style>

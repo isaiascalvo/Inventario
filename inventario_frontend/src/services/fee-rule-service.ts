@@ -1,6 +1,7 @@
 import { apiClient } from "./apiClient";
 import { FeeRule, FeeRuleForCreation } from "@/models/feeRule";
 import { FeeRuleByCategory } from "@/models/feeRuleByCategory";
+import { FeeRuleFilters } from "@/models/filters/feeRuleFilters";
 
 export interface FeeRuleService {
   getFeeRules(): Promise<FeeRule[]>;
@@ -10,9 +11,56 @@ export interface FeeRuleService {
   deleteFeeRule(feeRuleId: string): Promise<void>;
   addFeeRuleByCategory(feeRuleByCategory: FeeRuleByCategory): Promise<void>;
   getFeeRulesByProduct(productId: string): Promise<FeeRule[]>;
+  getTotalQty(): Promise<number>;
+  getTotalQtyByFilters(feeRuleFilters: FeeRuleFilters): Promise<number>;
+  getByPageAndQty(skip: number, qty: number): Promise<FeeRule[]>;
+  getByFiltersPageAndQty(
+    feeRuleFilters: FeeRuleFilters,
+    skip: number,
+    qty: number
+  ): Promise<FeeRule[]>;
 }
 
 export class NavigatorFeeRuleService implements FeeRuleService {
+  public async getTotalQty(): Promise<number> {
+    return (await apiClient.get("/fee-rules/GetTotalQty")).data;
+  }
+
+  public async getTotalQtyByFilters(
+    feeRuleFilters: FeeRuleFilters
+  ): Promise<number> {
+    return (
+      await apiClient.get(
+        "/fee-rules/GetTotalQtyByFilters?" + this.getQueryString(feeRuleFilters)
+      )
+    ).data;
+  }
+
+  public async getByPageAndQty(skip: number, qty: number): Promise<FeeRule[]> {
+    return (
+      await apiClient.get(
+        "/fee-rules/GetByPageAndQty?skip=" + skip + "&qty=" + qty
+      )
+    ).data;
+  }
+
+  public async getByFiltersPageAndQty(
+    feeRuleFilters: FeeRuleFilters,
+    skip: number,
+    qty: number
+  ): Promise<FeeRule[]> {
+    return (
+      await apiClient.get(
+        "/fee-rules/GetByFiltersPageAndQty?" +
+          this.getQueryString(feeRuleFilters) +
+          "&skip=" +
+          skip +
+          "&qty=" +
+          qty
+      )
+    ).data;
+  }
+
   public async getFeeRules(): Promise<FeeRule[]> {
     return await (await apiClient.get("/fee-rules")).data;
   }
@@ -43,5 +91,14 @@ export class NavigatorFeeRuleService implements FeeRuleService {
   public async getFeeRulesByProduct(productId: string): Promise<FeeRule[]> {
     return await (await apiClient.get("/fee-rules/ByProduct/" + productId))
       .data;
+  }
+
+  public getQueryString(feeRuleFilters: FeeRuleFilters): string {
+    const queryString = Object.keys(feeRuleFilters).map(key =>
+      feeRuleFilters[key as keyof FeeRuleFilters]
+        ? key + "=" + feeRuleFilters[key as keyof FeeRuleFilters]
+        : null
+    );
+    return queryString.filter(x => x !== null).join("&");
   }
 }

@@ -47,6 +47,67 @@ namespace Application.Controllers
             }
         }
 
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _productEntryUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<ProductEntryDto> productEntriesDto = await _productEntryUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<ProductEntryViewModel> productEntriesVM = _mapper.Map<IEnumerable<ProductEntryDto>, IEnumerable<ProductEntryViewModel>>(productEntriesDto);
+                return Ok(productEntriesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] ProductEntryFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<ProductEntryFiltersViewModel, ProductEntryFiltersDto>(filtersVM);
+                int qty = await _productEntryUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] ProductEntryFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<ProductEntryFiltersViewModel, ProductEntryFiltersDto>(filtersVM);
+                IEnumerable<ProductEntryDto> productEntriesDto = await _productEntryUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<ProductEntryViewModel> productEntriesVM = _mapper.Map<IEnumerable<ProductEntryDto>, IEnumerable<ProductEntryViewModel>>(productEntriesDto);
+                return Ok(productEntriesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         [HttpGet("{productEntryId}", Name = "GetProductEntry")]
         public async Task<IActionResult> GetOne(Guid productEntryId)
         {

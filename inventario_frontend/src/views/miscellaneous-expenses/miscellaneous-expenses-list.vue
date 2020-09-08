@@ -15,12 +15,108 @@
             >
               Nuevo Gasto
             </b-button>
+            <b-button
+              @click="openFilters = !openFilters"
+              class="is-pulled-right"
+              type="is-primary"
+              size="is-small"
+              :icon-right="
+                openFilters ? 'filter-variant-minus' : 'filter-variant'
+              "
+            >
+              {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
+            </b-button>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="">
+    <div>
+      <div class="columns filtersClass level" v-if="openFilters">
+        <div class="column is-10">
+          <b-field grouped group-multiline>
+            <b-field label-position="on-border" label="Descripción">
+              <b-input
+                v-model="miscellaneousExpensesFilters.description"
+                placeholder="Descripción"
+                size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="
+                  miscellaneousExpensesFilters.description = undefined
+                "
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Fecha desde">
+              <b-datetimepicker
+                v-model="miscellaneousExpensesFilters.dateDateFrom"
+                rounded
+                placeholder="Seleccione fecha y hora"
+                icon="calendar-today"
+                trap-focus
+                size="is-small"
+                editable
+              >
+              </b-datetimepicker>
+            </b-field>
+
+            <b-field label-position="on-border" label="Fecha hasta">
+              <b-datetimepicker
+                v-model="miscellaneousExpensesFilters.dateDateTo"
+                rounded
+                placeholder="Seleccione fecha y hora"
+                icon="calendar-today"
+                trap-focus
+                size="is-small"
+                editable
+              >
+              </b-datetimepicker>
+            </b-field>
+
+            <b-field label-position="on-border" label="Monto">
+              <b-input
+                v-model="miscellaneousExpensesFilters.value"
+                placeholder="Monto"
+                size="is-small"
+                type="number"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="
+                  miscellaneousExpensesFilters.value = undefined
+                "
+              ></b-input>
+            </b-field>
+
+            <b-field label-position="on-border" label="Destino">
+              <b-input
+                v-model="miscellaneousExpensesFilters.destination"
+                placeholder="Destino"
+                size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="
+                  miscellaneousExpensesFilters.destination = undefined
+                "
+              ></b-input>
+            </b-field>
+          </b-field>
+        </div>
+
+        <div class="column level-right">
+          <b-button
+            type="is-dark"
+            class="mx-1"
+            size="is-small"
+            @click="applyFilters()"
+          >
+            Aplicar
+          </b-button>
+          <b-button @click="clearFilters()" size="is-small" type="is-default">
+            Limpiar
+          </b-button>
+        </div>
+      </div>
       <b-table
         striped
         hoverable
@@ -28,8 +124,11 @@
         :data="miscellaneousExpenses"
         id="my-table"
         paginated
+        backend-pagination
+        :total="totalPages"
         :per-page="perPage"
         :current-page.sync="currentPage"
+        @page-change="onPageChange"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
         aria-page-label="Page"
@@ -89,6 +188,8 @@
 </template>
 
 <script lang="ts">
+import { MiscellaneousExpensesFilters } from "@/models/filters/miscellaneousExpensesFilters";
+import { dateTimeToLocal } from "@/utils/common-functions";
 import { Vue, Component } from "vue-property-decorator";
 import { MiscellaneousExpenses } from "../../models/miscellaneousExpenses";
 import { NavigatorMiscellaneousExpensesService } from "../../services/miscellaneous-expenses-service";
@@ -101,12 +202,13 @@ export default class MiscellaneousExpensesList extends Vue {
   public currentPage = 1;
   public perPage = 10;
   public isLoading = false;
+  public openFilters = false;
+  public miscellaneousExpensesFilters: MiscellaneousExpensesFilters = new MiscellaneousExpensesFilters();
+  public totalPages = 0;
+  public filtersApplied = false;
 
-  dateTimeToLocal(dateTime: Date) {
-    return new Date(dateTime)
-      .toLocaleString()
-      .substr(0, 15)
-      .replace(" ", " - ");
+  dateTimeToLocal(date: Date) {
+    return dateTimeToLocal(date);
   }
 
   deleteMiscellaneousExpenses(miscellaneousExpense: MiscellaneousExpenses) {
@@ -150,30 +252,102 @@ export default class MiscellaneousExpensesList extends Vue {
     });
   }
 
-  created() {
-    this.isLoading = true;
-    this.miscellaneousExpensesService
-      .getMiscellaneousExpenses()
-      .then(response => {
-        this.miscellaneousExpenses = response;
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.isLoading = false;
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
-        });
-        console.log("error: ", e);
-      });
+  public clearFilters() {
+    this.filtersApplied = false;
+    this.miscellaneousExpensesFilters = new MiscellaneousExpensesFilters();
+    this.getMiscellaneousExpenses();
   }
+
+  public applyFilters() {
+    this.isLoading = true;
+    this.filtersApplied = true;
+    this.getMiscellaneousExpenses();
+  }
+
+  getMiscellaneousExpenses() {
+    this.isLoading = true;
+    let rta: Promise<void>;
+    if (this.filtersApplied) {
+      rta = this.miscellaneousExpensesService
+        .getTotalQtyByFilters(this.miscellaneousExpensesFilters)
+        .then(qty => {
+          this.totalPages = qty;
+          return this.miscellaneousExpensesService.getByFiltersPageAndQty(
+            this.miscellaneousExpensesFilters,
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.miscellaneousExpenses = response;
+          this.isLoading = false;
+        });
+    } else {
+      rta = this.miscellaneousExpensesService
+        .getTotalQty()
+        .then(qty => {
+          this.totalPages = qty;
+          return this.miscellaneousExpensesService.getByPageAndQty(
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.miscellaneousExpenses = response;
+          this.isLoading = false;
+        });
+    }
+
+    rta.catch(e => {
+      this.isLoading = false;
+      this.$buefy.dialog.alert({
+        title: "Error",
+        message:
+          "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+        type: "is-danger",
+        hasIcon: true,
+        icon: "times-circle",
+        iconPack: "fa",
+        ariaRole: "alertdialog",
+        ariaModal: true
+      });
+      console.log("error: ", e);
+    });
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getMiscellaneousExpenses();
+  }
+
+  created() {
+    this.getMiscellaneousExpenses();
+  }
+
+  // created() {
+  //   this.isLoading = true;
+  //   this.miscellaneousExpensesService
+  //     .getMiscellaneousExpenses()
+  //     .then(response => {
+  //       this.miscellaneousExpenses = response;
+  //       this.isLoading = false;
+  //     })
+  //     .catch(e => {
+  //       this.isLoading = false;
+  //       this.$buefy.dialog.alert({
+  //         title: "Error",
+  //         message:
+  //           "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+  //         type: "is-danger",
+  //         hasIcon: true,
+  //         icon: "times-circle",
+  //         iconPack: "fa",
+  //         ariaRole: "alertdialog",
+  //         ariaModal: true
+  //       });
+  //       console.log("error: ", e);
+  //     });
+  // }
 }
 </script>
 
@@ -235,5 +409,9 @@ input {
 
 .p-1 {
   padding: 1em;
+}
+
+.actionButton {
+  margin-left: 5px;
 }
 </style>

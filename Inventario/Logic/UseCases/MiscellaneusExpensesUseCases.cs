@@ -54,6 +54,28 @@ namespace Logic
             var miscellaneousExpensesDto = _mapper.Map<IEnumerable<MiscellaneousExpenses>, IEnumerable<MiscellaneousExpensesDto>>(miscellaneousExpenses);
             return miscellaneousExpensesDto;
         }
+        public async Task<int> GetTotalQty()
+        {
+            return (await _miscellaneousExpensesRepository.GetAll()).Count();
+        }
+
+        public async Task<int> GetTotalQtyByFilters(MiscellaneousExpensesFiltersDto filtersDto)
+        {
+            return (await _miscellaneousExpensesRepository.GetAll()).AsQueryable().Where(filtersDto.GetExpresion()).Count();
+        }
+
+        public async Task<IEnumerable<MiscellaneousExpensesDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var miscellaneousExpenses = (await _miscellaneousExpensesRepository.GetAll()).OrderByDescending(x => x.Date).ThenBy(x => x.Description).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<MiscellaneousExpenses>, IEnumerable<MiscellaneousExpensesDto>>(miscellaneousExpenses);
+        }
+
+        public async Task<IEnumerable<MiscellaneousExpensesDto>> GetFilteredByPageAndQty(MiscellaneousExpensesFiltersDto filtersDto, int skip, int qty)
+        {
+            var miscellaneousExpenses = (await _miscellaneousExpensesRepository.GetAll())
+                .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Date).ThenBy(x => x.Description).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<MiscellaneousExpenses>, IEnumerable<MiscellaneousExpensesDto>>(miscellaneousExpenses);
+        }
 
         public async Task<MiscellaneousExpensesDto> GetOne(Guid id)
         {

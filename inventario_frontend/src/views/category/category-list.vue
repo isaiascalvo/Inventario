@@ -240,4 +240,8 @@ input {
 .p-1 {
   padding: 1em;
 }
+
+.actionButton {
+  margin-left: 5px;
+}
 </style>

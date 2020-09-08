@@ -49,6 +49,9 @@
                 v-model="productFilters.name"
                 placeholder="Nombre"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="productFilters.name = undefined"
               ></b-input>
             </b-field>
 
@@ -57,6 +60,9 @@
                 v-model="productFilters.description"
                 placeholder="Descripción"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="productFilters.description = undefined"
               ></b-input>
             </b-field>
 
@@ -65,6 +71,9 @@
                 v-model="productFilters.code"
                 placeholder="Código"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="productFilters.code = undefined"
               ></b-input>
             </b-field>
 
@@ -105,6 +114,9 @@
                 v-model="productFilters.brand"
                 placeholder="Marca"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="productFilters.brand = undefined"
               ></b-input>
             </b-field>
 
@@ -118,7 +130,6 @@
                 horizontal-time-picker
                 size="is-small"
                 editable
-                :date-parser="parseDate"
                 append-to-body
               >
               </b-datetimepicker>
@@ -272,7 +283,6 @@ export default class ProductList extends Vue {
   public perPage = 10;
   public openFilters = false;
   public productFilters: ProductFilters = new ProductFilters();
-  public dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
   public isLoading = false;
   public totalPages = 0;
   public filtersApplied = false;
@@ -314,11 +324,6 @@ export default class ProductList extends Vue {
     });
   }
 
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.getProducts();
-  }
-
   getCategory(id: string) {
     const elem = this.categories.find(x => x.id === id);
     return elem ? elem.name : "";
@@ -327,6 +332,11 @@ export default class ProductList extends Vue {
   getVendor(id: string) {
     const elem = this.vendors.find(x => x.id === id);
     return elem ? elem.name : "";
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getProducts();
   }
 
   public clearFilters() {
@@ -512,8 +522,7 @@ input {
   width: 80px;
 }
 
-/* tr.is-danger {
-  background: #ff000042;
-  color: black;
-} */
+.actionButton {
+  margin-left: 5px;
+}
 </style>

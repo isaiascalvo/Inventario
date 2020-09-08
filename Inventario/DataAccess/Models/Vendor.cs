@@ -12,7 +12,6 @@ namespace Data
         public string? CUIL { get; set; }
         public string Phone { get; set; }
         public string? Mail { get; set; }
-        [Required]
         //public bool Active { get; set; }
         public string? Description { get; set; }
     }

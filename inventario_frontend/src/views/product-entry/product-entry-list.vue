@@ -12,8 +12,20 @@
               size="is-small"
               tag="router-link"
               to="/product-entry/new"
+              class="mx-1"
             >
               Nuevo movimiento
+            </b-button>
+            <b-button
+              @click="openFilters = !openFilters"
+              class="is-pulled-right"
+              type="is-primary"
+              size="is-small"
+              :icon-right="
+                openFilters ? 'filter-variant-minus' : 'filter-variant'
+              "
+            >
+              {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
             </b-button>
           </div>
         </div>
@@ -21,6 +33,64 @@
     </section>
 
     <div class="">
+      <div class="columns filtersClass level" v-if="openFilters">
+        <div class="column is-10">
+          <b-field grouped group-multiline>
+            <b-field label-position="on-border" label="Fecha desde">
+              <b-datetimepicker
+                v-model="productEntryFilters.dateDateFrom"
+                rounded
+                placeholder="Seleccione fecha y hora"
+                icon="calendar-today"
+                trap-focus
+                size="is-small"
+                editable
+              >
+              </b-datetimepicker>
+            </b-field>
+
+            <b-field label-position="on-border" label="Fecha hasta">
+              <b-datetimepicker
+                v-model="productEntryFilters.dateDateTo"
+                rounded
+                placeholder="Seleccione fecha y hora"
+                icon="calendar-today"
+                trap-focus
+                size="is-small"
+                editable
+              >
+              </b-datetimepicker>
+            </b-field>
+
+            <b-field label-position="on-border" label="Tipo de movimiento">
+              <b-select
+                v-model="productEntryFilters.isEntry"
+                placeholder="Seleccione un tipo de movimiento"
+                expanded
+                size="is-small"
+              >
+                <option :value="null"></option>
+                <option :value="true">Entrada</option>
+                <option :value="false">Salida</option>
+              </b-select>
+            </b-field>
+          </b-field>
+        </div>
+        <div class="column level-right">
+          <b-button
+            type="is-dark"
+            class="mx-1"
+            size="is-small"
+            @click="applyFilters()"
+          >
+            Aplicar
+          </b-button>
+          <b-button @click="clearFilters()" size="is-small" type="is-default">
+            Limpiar
+          </b-button>
+        </div>
+      </div>
+
       <b-table
         striped
         hoverable
@@ -28,8 +98,11 @@
         :data="productEntries"
         id="my-table"
         :paginated="true"
+        backend-pagination
+        :total="totalPages"
         :per-page="perPage"
         :current-page.sync="currentPage"
+        @page-change="onPageChange"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
         aria-page-label="Page"
@@ -83,6 +156,8 @@
 </template>
 
 <script lang="ts">
+import { ProductEntryFilters } from "@/models/filters/productEntryFilters";
+import { dateTimeToLocal } from "@/utils/common-functions";
 import { Vue, Component } from "vue-property-decorator";
 import { ProductEntry } from "../../models/productEntry";
 import { NavigatorProductEntryService } from "../../services/product-entry-service";
@@ -95,12 +170,13 @@ export default class ProductEntryList extends Vue {
   public currentPage = 1;
   public perPage = 10;
   public isLoading = false;
+  public openFilters = false;
+  public totalPages = 0;
+  public filtersApplied = false;
+  public productEntryFilters: ProductEntryFilters = new ProductEntryFilters();
 
   dateTimeToLocal(date: Date) {
-    return new Date(date)
-      .toLocaleString()
-      .substr(0, 15)
-      .replace(" ", " - ");
+    return dateTimeToLocal(date);
   }
 
   deleteProductEntry(productEntry: ProductEntry) {
@@ -144,29 +220,76 @@ export default class ProductEntryList extends Vue {
     });
   }
 
-  created() {
+  public clearFilters() {
+    this.filtersApplied = false;
+    this.productEntryFilters = new ProductEntryFilters();
+    this.getProductEntries();
+  }
+
+  public applyFilters() {
     this.isLoading = true;
-    this.productEntryService
-      .getProductEntries()
-      .then(response => {
-        this.productEntries = response;
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.isLoading = false;
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
+    this.filtersApplied = true;
+    this.getProductEntries();
+  }
+
+  getProductEntries() {
+    this.isLoading = true;
+    let rta: Promise<void>;
+    if (this.filtersApplied) {
+      rta = this.productEntryService
+        .getTotalQtyByFilters(this.productEntryFilters)
+        .then(qty => {
+          this.totalPages = qty;
+          return this.productEntryService.getByFiltersPageAndQty(
+            this.productEntryFilters,
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.productEntries = response;
+          this.isLoading = false;
         });
-        console.log("error: ", e);
+    } else {
+      rta = this.productEntryService
+        .getTotalQty()
+        .then(qty => {
+          this.totalPages = qty;
+          return this.productEntryService.getByPageAndQty(
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.productEntries = response;
+          this.isLoading = false;
+        });
+    }
+
+    rta.catch(e => {
+      this.isLoading = false;
+      this.$buefy.dialog.alert({
+        title: "Error",
+        message:
+          "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+        type: "is-danger",
+        hasIcon: true,
+        icon: "times-circle",
+        iconPack: "fa",
+        ariaRole: "alertdialog",
+        ariaModal: true
       });
+      console.log("error: ", e);
+    });
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getProductEntries();
+  }
+
+  created() {
+    this.getProductEntries();
   }
 }
 </script>
@@ -225,5 +348,9 @@ input {
 
 .fieldWidth {
   width: 80px;
+}
+
+.actionButton {
+  margin-left: 5px;
 }
 </style>

@@ -1,6 +1,7 @@
 import { apiClient } from "./apiClient";
 import { User, UserForCreation } from "@/models/user";
 import { JwtResult } from "@/models/JwtResult";
+import { UserFilters } from "@/models/filters/userFilters";
 
 export interface UserService {
   getUsers(): Promise<User[]>;
@@ -8,9 +9,52 @@ export interface UserService {
   addUser(user: UserForCreation): Promise<User>;
   updateUser(user: User): Promise<void>;
   deleteUser(userId: string): Promise<void>;
+  getTotalQty(): Promise<number>;
+  getTotalQtyByFilters(userFilters: UserFilters): Promise<number>;
+  getByPageAndQty(skip: number, qty: number): Promise<User[]>;
+  getByFiltersPageAndQty(
+    userFilters: UserFilters,
+    skip: number,
+    qty: number
+  ): Promise<User[]>;
 }
 
 export class NavigatorUserService implements UserService {
+  public async getTotalQty(): Promise<number> {
+    return (await apiClient.get("/users/GetTotalQty")).data;
+  }
+
+  public async getTotalQtyByFilters(userFilters: UserFilters): Promise<number> {
+    return (
+      await apiClient.get(
+        "/users/GetTotalQtyByFilters?" + this.getQueryString(userFilters)
+      )
+    ).data;
+  }
+
+  public async getByPageAndQty(skip: number, qty: number): Promise<User[]> {
+    return (
+      await apiClient.get("/users/GetByPageAndQty?skip=" + skip + "&qty=" + qty)
+    ).data;
+  }
+
+  async getByFiltersPageAndQty(
+    userFilters: UserFilters,
+    skip: number,
+    qty: number
+  ): Promise<User[]> {
+    return (
+      await apiClient.get(
+        "/users/GetByFiltersPageAndQty?" +
+          this.getQueryString(userFilters) +
+          "&skip=" +
+          skip +
+          "&qty=" +
+          qty
+      )
+    ).data;
+  }
+
   public async getUsers(): Promise<User[]> {
     return await (await apiClient.get("/users")).data;
   }
@@ -51,5 +95,14 @@ export class NavigatorUserService implements UserService {
   public logout() {
     // remove user from local storage to log user out
     localStorage.removeItem("currentUser");
+  }
+
+  public getQueryString(userFilters: UserFilters): string {
+    const queryString = Object.keys(userFilters).map(key =>
+      userFilters[key as keyof UserFilters]
+        ? key + "=" + userFilters[key as keyof UserFilters]
+        : null
+    );
+    return queryString.filter(x => x !== null).join("&");
   }
 }

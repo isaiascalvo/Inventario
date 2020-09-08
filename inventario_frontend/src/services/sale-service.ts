@@ -80,6 +80,7 @@ export class NavigatorSaleService implements SaleService {
     saleFilters.dateTo = saleFilters.dateDateTo?.toISOString();
     const queryString = Object.keys(saleFilters).map(key =>
       saleFilters[key as keyof SaleFilters] !== undefined &&
+      saleFilters[key as keyof SaleFilters] !== null &&
       key !== "dateDateFrom" &&
       key !== "dateDateTo"
         ? key + "=" + saleFilters[key as keyof SaleFilters]

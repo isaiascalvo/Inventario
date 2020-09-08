@@ -16,10 +16,131 @@
             >
               Nuevo Usuario
             </b-button>
+            <b-button
+              @click="openFilters = !openFilters"
+              class="is-pulled-right"
+              type="is-primary"
+              size="is-small"
+              :icon-right="
+                openFilters ? 'filter-variant-minus' : 'filter-variant'
+              "
+            >
+              {{ openFilters ? "Ocultar Filtros" : "Mostrar Filtros" }}
+            </b-button>
           </div>
         </div>
       </div>
     </section>
+
+    <div class="columns filtersClass level" v-if="openFilters">
+      <div class="column is-10">
+        <b-field grouped group-multiline>
+          <b-field label-position="on-border" label="Nombre de usuario">
+            <b-input
+              v-model="userFilters.username"
+              placeholder="Nombre de usuario"
+              size="is-small"
+              icon-right="close-circle"
+              icon-right-clickable
+              @icon-right-click="userFilters.username = undefined"
+            ></b-input>
+          </b-field>
+
+          <b-field label-position="on-border" label="Nombre">
+            <b-input
+              v-model="userFilters.name"
+              placeholder="Nombre"
+              size="is-small"
+              icon-right="close-circle"
+              icon-right-clickable
+              @icon-right-click="userFilters.name = undefined"
+            ></b-input>
+          </b-field>
+
+          <b-field label-position="on-border" label="Apellido">
+            <b-input
+              v-model="userFilters.lastname"
+              placeholder="Apellido"
+              size="is-small"
+              icon-right="close-circle"
+              icon-right-clickable
+              @icon-right-click="userFilters.lastname = undefined"
+            ></b-input>
+          </b-field>
+
+          <b-field label-position="on-border" label="DNI">
+            <b-input
+              v-model="userFilters.dni"
+              placeholder="DNI"
+              size="is-small"
+              icon-right="close-circle"
+              icon-right-clickable
+              @icon-right-click="userFilters.dni = undefined"
+            ></b-input>
+          </b-field>
+
+          <b-field label-position="on-border" label="Mail">
+            <b-input
+              v-model="userFilters.mail"
+              placeholder="Mail"
+              size="is-small"
+              icon-right="close-circle"
+              icon-right-clickable
+              @icon-right-click="userFilters.mail = undefined"
+            ></b-input>
+          </b-field>
+
+          <b-field label-position="on-border" label="Teléfono">
+            <b-input
+              v-model="userFilters.phone"
+              placeholder="Teléfono"
+              size="is-small"
+              icon-right="close-circle"
+              icon-right-clickable
+              @icon-right-click="userFilters.phone = undefined"
+            ></b-input>
+          </b-field>
+
+          <b-field label-position="on-border" label="Tipo de Usuario">
+            <b-select
+              v-model="userFilters.isAdmin"
+              placeholder="Seleccione una opción"
+              size="is-small"
+            >
+              <option :value="null"></option>
+              <option :value="true">Administrador</option>
+              <option :value="false">Común</option>
+            </b-select>
+          </b-field>
+
+          <b-field label-position="on-border" label="Estado del cliente">
+            <b-select
+              v-model="userFilters.active"
+              placeholder="Seleccione una opción"
+              size="is-small"
+            >
+              <option :value="null"></option>
+              <option :value="true">Activo</option>
+              <option :value="false">No activo</option>
+            </b-select>
+          </b-field>
+        </b-field>
+      </div>
+
+      <div class="column level-right">
+        <b-button
+          type="is-dark"
+          class="mx-1"
+          size="is-small"
+          @click="applyFilters()"
+        >
+          Aplicar
+        </b-button>
+        <b-button @click="clearFilters()" size="is-small" type="is-default">
+          Limpiar
+        </b-button>
+      </div>
+    </div>
 
     <b-table
       striped
@@ -28,8 +149,11 @@
       :data="users"
       id="my-table"
       :paginated="true"
+      backend-pagination
+      :total="totalPages"
       :per-page="perPage"
       :current-page.sync="currentPage"
+      @page-change="onPageChange"
       aria-next-label="Next page"
       aria-previous-label="Previous page"
       aria-page-label="Page"
@@ -90,6 +214,7 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import { User } from "../../models/user";
+import { UserFilters } from "../../models/filters/userFilters";
 import { NavigatorUserService } from "../../services/user-service";
 
 @Component
@@ -99,9 +224,11 @@ export default class UserList extends Vue {
 
   public currentPage = 1;
   public perPage = 10;
-  public errorDialog = false;
-  public confirmDialog = false;
   public isLoading = false;
+  public openFilters = false;
+  public totalPages = 0;
+  public filtersApplied = false;
+  public userFilters: UserFilters = new UserFilters();
 
   deleteUser(user: User) {
     this.$buefy.dialog.confirm({
@@ -140,29 +267,76 @@ export default class UserList extends Vue {
     });
   }
 
-  created() {
+  public clearFilters() {
+    this.filtersApplied = false;
+    this.userFilters = new UserFilters();
+    this.getVendors();
+  }
+
+  public applyFilters() {
     this.isLoading = true;
-    this.userService
-      .getUsers()
-      .then(response => {
-        this.users = response as User[];
-        this.isLoading = false;
-      })
-      .catch(e => {
-        this.isLoading = false;
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
+    this.filtersApplied = true;
+    this.getVendors();
+  }
+
+  getVendors() {
+    this.isLoading = true;
+    let rta: Promise<void>;
+    if (this.filtersApplied) {
+      rta = this.userService
+        .getTotalQtyByFilters(this.userFilters)
+        .then(qty => {
+          this.totalPages = qty;
+          return this.userService.getByFiltersPageAndQty(
+            this.userFilters,
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.users = response;
+          this.isLoading = false;
         });
-        console.log("error: ", e);
+    } else {
+      rta = this.userService
+        .getTotalQty()
+        .then(qty => {
+          this.totalPages = qty;
+          return this.userService.getByPageAndQty(
+            (this.currentPage - 1) * this.perPage,
+            this.perPage
+          );
+        })
+        .then(response => {
+          this.users = response;
+          this.isLoading = false;
+        });
+    }
+
+    rta.catch(e => {
+      this.isLoading = false;
+      this.$buefy.dialog.alert({
+        title: "Error",
+        message:
+          "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+        type: "is-danger",
+        hasIcon: true,
+        icon: "times-circle",
+        iconPack: "fa",
+        ariaRole: "alertdialog",
+        ariaModal: true
       });
+      console.log("error: ", e);
+    });
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getVendors();
+  }
+
+  created() {
+    this.getVendors();
   }
 }
 </script>
@@ -225,5 +399,9 @@ input {
 
 .p-1 {
   padding: 1em;
+}
+
+.actionButton {
+  margin-left: 5px;
 }
 </style>

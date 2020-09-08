@@ -57,23 +57,36 @@ namespace Logic
 
         public async Task<IEnumerable<FeeRuleDto>> GetAll()
         {
-            List<FeeRule> feeRules = new List<FeeRule>();
-            var feeRulesGroups = (await _feeRuleRepositoryRepository.GetAll(x => x.Product)).GroupBy(x => x.ProductId);
-            foreach (var group in feeRulesGroups)
-            {
-                var subGroups = group.GroupBy(x => x.FeesAmountTo);
-                foreach (var subGroup in subGroups)
-                {
-                    var fee = subGroup.OrderByDescending(x => x.Date).FirstOrDefault();
-                    if (fee != null)
-                    {
-                        feeRules.Add(fee);
-                    }
-                }
-            }
+            
+            var feeRules = await GetActiveFeeRules();
 
             feeRules = feeRules.OrderBy(x => x.Product.Name).ThenBy(x => x.FeesAmountTo).ToList();
             return _mapper.Map<List<FeeRule>, List<FeeRuleDto>>(feeRules);
+        }
+
+        public async Task<int> GetTotalQty()
+        {
+            return (await GetActiveFeeRules()).Count();
+        }
+
+        public async Task<int> GetTotalQtyByFilters(FeeRuleFiltersDto filtersDto)
+        {
+            return (await GetActiveFeeRules()).AsQueryable().Where(filtersDto.GetExpresion()).Count();
+        }
+
+        public async Task<IEnumerable<FeeRuleDto>> GetByPageAndQty(int skip, int qty)
+        {
+            var users = (await GetActiveFeeRules())
+                .OrderByDescending(x => x.Product.Name).ThenBy(x => x.FeesAmountTo).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<FeeRule>, IEnumerable<FeeRuleDto>>(users);
+        }
+
+        public async Task<IEnumerable<FeeRuleDto>> GetFilteredByPageAndQty(FeeRuleFiltersDto filtersDto, int skip, int qty)
+        {
+            var users = (await GetActiveFeeRules())
+                .AsQueryable().Where(filtersDto.GetExpresion()).ToList()
+                .OrderByDescending(x => x.Product.Name).ThenBy(x => x.FeesAmountTo).Skip(skip).Take(qty);
+            return _mapper.Map<IEnumerable<FeeRule>, IEnumerable<FeeRuleDto>>(users);
         }
 
         public async Task<IEnumerable<FeeRuleDto>> GetByProduct(Guid productId)
@@ -147,6 +160,26 @@ namespace Logic
             }
             
             await _feeRuleRepositoryRepository.CommitAsync();
+        }
+
+        private async Task<List<FeeRule>> GetActiveFeeRules()
+        {
+            List<FeeRule> feeRules = new List<FeeRule>();
+            var feeRulesGroups = (await _feeRuleRepositoryRepository.GetAll(x => x.Product)).GroupBy(x => x.ProductId);
+            foreach (var group in feeRulesGroups)
+            {
+                var subGroups = group.GroupBy(x => x.FeesAmountTo);
+                foreach (var subGroup in subGroups)
+                {
+                    var fee = subGroup.OrderByDescending(x => x.Date).FirstOrDefault();
+                    if (fee != null)
+                    {
+                        feeRules.Add(fee);
+                    }
+                }
+            }
+
+            return feeRules;
         }
     }
 }

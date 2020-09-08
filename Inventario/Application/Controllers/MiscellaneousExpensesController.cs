@@ -38,6 +38,67 @@ namespace Application.Controllers
             return Ok(categories);
         }
 
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _miscellaneousExpensesUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<MiscellaneousExpensesDto> miscellaneousExpensesDto = await _miscellaneousExpensesUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<MiscellaneousExpensesViewModel> miscellaneousExpensesVM = _mapper.Map<IEnumerable<MiscellaneousExpensesDto>, IEnumerable<MiscellaneousExpensesViewModel>>(miscellaneousExpensesDto);
+                return Ok(miscellaneousExpensesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] MiscellaneousExpensesFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<MiscellaneousExpensesFiltersViewModel, MiscellaneousExpensesFiltersDto>(filtersVM);
+                int qty = await _miscellaneousExpensesUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] MiscellaneousExpensesFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<MiscellaneousExpensesFiltersViewModel, MiscellaneousExpensesFiltersDto>(filtersVM);
+                IEnumerable<MiscellaneousExpensesDto> miscellaneousExpensesDto = await _miscellaneousExpensesUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<MiscellaneousExpensesViewModel> miscellaneousExpensesVM = _mapper.Map<IEnumerable<MiscellaneousExpensesDto>, IEnumerable<MiscellaneousExpensesViewModel>>(miscellaneousExpensesDto);
+                return Ok(miscellaneousExpensesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         [HttpGet("{miscellaneousExpensesId}", Name = "GetMiscellaneousExpenses")]
         public async Task<IActionResult> GetOne(Guid miscellaneousExpensesId)
         {

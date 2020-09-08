@@ -115,9 +115,31 @@ namespace Application.Profiles
                     dest => dest.DateTo,
                     opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
                 );
+            
+            CreateMap<ProductEntryFiltersViewModel, ProductEntryFiltersDto>()
+                .ForMember(
+                    dest => dest.DateFrom,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateFrom))
+                )
+                .ForMember(
+                    dest => dest.DateTo,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
+                );
+            
+            CreateMap<MiscellaneousExpensesFiltersViewModel, MiscellaneousExpensesFiltersDto>()
+                .ForMember(
+                    dest => dest.DateFrom,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateFrom))
+                )
+                .ForMember(
+                    dest => dest.DateTo,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
+                );
 
             CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
             CreateMap<VendorFiltersViewModel, VendorFiltersDto>();
+            CreateMap<UserFiltersViewModel, UserFiltersDto>();
+            CreateMap<FeeRuleFiltersViewModel, FeeRuleFiltersDto>();
         }
     }
 }

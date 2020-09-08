@@ -104,9 +104,8 @@
                 placeholder="Seleccione un método de pago"
                 expanded
                 size="is-small"
-                required
-                validation-message="Seleccione un método de pago"
               >
+                <option :value="null"></option>
                 <option :value="0">Efectivo</option>
                 <option :value="1">Cuotas</option>
                 <option :value="2">Tarjeta de crédito</option>
@@ -249,8 +248,6 @@ export default class SaleList extends Vue {
   public openFilters = false;
   public currentPage = 1;
   public perPage = 10;
-  public errorDialog = false;
-  public confirmDialog = false;
   public isLoading = false;
   public filtersApplied = false;
   public totalPages = 0;
@@ -607,5 +604,9 @@ p-1 {
 .link {
   cursor: pointer;
   color: blue;
+}
+
+.actionButton {
+  margin-left: 5px;
 }
 </style>

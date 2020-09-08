@@ -45,6 +45,67 @@ namespace Application.Controllers
             }
         }
 
+        [HttpGet("GetTotalQty")]
+        public async Task<IActionResult> GetTotalQty()
+        {
+            try
+            {
+                int qty = await _feeRuleUseCases.GetTotalQty();
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByPageAndQty")]
+        public async Task<IActionResult> GetByPageAndQty(int skip, int qty)
+        {
+            try
+            {
+                IEnumerable<FeeRuleDto> feeRulesDto = await _feeRuleUseCases.GetByPageAndQty(skip, qty);
+                IEnumerable<FeeRuleViewModel> feeRulesVM = _mapper.Map<IEnumerable<FeeRuleDto>, IEnumerable<FeeRuleViewModel>>(feeRulesDto);
+                return Ok(feeRulesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+        [HttpGet("GetTotalQtyByFilters")]
+        public async Task<IActionResult> GetTotalQtyByFilters([FromQuery] FeeRuleFiltersViewModel filtersVM)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<FeeRuleFiltersViewModel, FeeRuleFiltersDto>(filtersVM);
+                int qty = await _feeRuleUseCases.GetTotalQtyByFilters(filtersDto);
+                return Ok(qty);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("GetByFiltersPageAndQty")]
+        public async Task<IActionResult> GetByFiltersPageAndQty([FromQuery] FeeRuleFiltersViewModel filtersVM, int skip, int qty)
+        {
+            try
+            {
+                var filtersDto = _mapper.Map<FeeRuleFiltersViewModel, FeeRuleFiltersDto>(filtersVM);
+                IEnumerable<FeeRuleDto> feeRulesDto = await _feeRuleUseCases.GetFilteredByPageAndQty(filtersDto, skip, qty);
+                IEnumerable<FeeRuleViewModel> feeRulesVM = _mapper.Map<IEnumerable<FeeRuleDto>, IEnumerable<FeeRuleViewModel>>(feeRulesDto);
+                return Ok(feeRulesVM);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         [HttpGet("ByProduct/{productId}")]
         public async Task<IActionResult> GetByProduct(Guid productId)
         {

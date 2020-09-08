@@ -40,6 +40,9 @@
                 v-model="vendorFilters.name"
                 placeholder="Nombre"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="vendorFilters.name = undefined"
               ></b-input>
             </b-field>
 
@@ -48,6 +51,9 @@
                 v-model="vendorFilters.cuil"
                 placeholder="CUIL"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="vendorFilters.cuil = undefined"
               ></b-input>
             </b-field>
 
@@ -56,6 +62,9 @@
                 v-model="vendorFilters.phone"
                 placeholder="Teléfono"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="vendorFilters.phone = undefined"
               ></b-input>
             </b-field>
 
@@ -64,6 +73,9 @@
                 v-model="vendorFilters.mail"
                 placeholder="Mail"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="vendorFilters.mail = undefined"
               ></b-input>
             </b-field>
 
@@ -72,6 +84,9 @@
                 v-model="vendorFilters.description"
                 placeholder="Descripción"
                 size="is-small"
+                icon-right="close-circle"
+                icon-right-clickable
+                @icon-right-click="vendorFilters.description = undefined"
               ></b-input>
             </b-field>
           </b-field>
@@ -343,5 +358,9 @@ input {
 
 .p-1 {
   padding: 1em;
+}
+
+.actionButton {
+  margin-left: 5px;
 }
 </style>
