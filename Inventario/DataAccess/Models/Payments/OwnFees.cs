@@ -13,6 +13,11 @@ namespace Data
         public FeeRule? FeeRule { get; set; }
         public List<Fee> FeeList { get; set; }
 
+        public OwnFees()
+        {
+
+        }
+
         public OwnFees(DateTime expirationDate, double amount, int quantity, Guid createdBy)
         {
             ExpirationDate = expirationDate.ToLocalTime();
@@ -36,7 +41,6 @@ namespace Data
                     OwnFeesId = this.Id,
                     ExpirationDate = expirationDate.AddMonths(i).ToLocalTime(),
                     Value = feeValue, 
-                    State = eFeeState.Pending,
                     CreatedBy = createdBy
                 };
 

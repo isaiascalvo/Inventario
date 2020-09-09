@@ -38,6 +38,7 @@
           <b-field grouped group-multiline>
             <b-field label-position="on-border" label="Producto">
               <b-autocomplete
+                class="autocompleteClass"
                 v-model="prodCodNameDesc"
                 :data="filteredProducts()"
                 placeholder="ej.: Producto X"
@@ -117,7 +118,21 @@
         </template>
         <template slot-scope="props">
           <b-table-column field="product" label="Producto">
-            {{ props.row.product.name }}
+            <b-tooltip
+              :label="getProductDescription(props.row.product)"
+              position="is-right"
+              size="is-large"
+              type="is-dark"
+              :active="getProductDescription(props.row.product).length > 100"
+              multilined
+            >
+              <span
+                class="link"
+                @click="openModalProductPreview(props.row.productId)"
+              >
+                {{ getShortProductDescription(props.row.product) }}
+              </span>
+            </b-tooltip>
           </b-table-column>
           <!-- <b-table-column field="date" label="Fecha">
           {{ props.row.date }}
@@ -153,6 +168,7 @@
 </template>
 
 <script lang="ts">
+import ModalProductPreview from "@/components/modals/ModalProductPreview.vue";
 import { FeeRuleFilters } from "@/models/filters/feeRuleFilters";
 import { Product } from "@/models/product";
 import { NavigatorProductService } from "@/services/product-service";
@@ -175,6 +191,35 @@ export default class FeeRuleList extends Vue {
   public openFilters = false;
   public filtersApplied = false;
   public totalPages = 0;
+
+  openModalProductPreview(productId: string) {
+    this.$buefy.modal.open({
+      parent: this,
+      component: ModalProductPreview,
+      hasModalCard: true,
+      customClass: "custom-class custom-class-2",
+      trapFocus: true,
+      props: {
+        productId: productId
+      }
+    });
+  }
+
+  getProductDescription(product: Product): string {
+    return (
+      product.name +
+      " - " +
+      product.description +
+      (product.code ? " - " + product.code : "")
+    );
+  }
+
+  getShortProductDescription(product: Product): string {
+    if (this.getProductDescription(product).length < 100) {
+      return this.getProductDescription(product);
+    }
+    return this.getProductDescription(product).substring(0, 100) + "...";
+  }
 
   deleteFeeRule(feeRule: FeeRule) {
     this.$buefy.dialog.confirm({
@@ -227,7 +272,7 @@ export default class FeeRuleList extends Vue {
 
     filtered.forEach(x => {
       if (x.name) {
-        codNameDescArray.push(x.code + " - " + x.name + " - " + x.description);
+        codNameDescArray.push(x.name + " - " + x.description + " - " + x.code);
       }
     });
     return codNameDescArray;
@@ -235,7 +280,7 @@ export default class FeeRuleList extends Vue {
 
   getProductId(option: string) {
     const prod = this.products.find(
-      x => x.code + " - " + x.name + " - " + x.description === option
+      x => x.name + " - " + x.description + " - " + x.code === option
     );
     this.feeRuleFilters.productId = prod ? prod.id : undefined;
   }
@@ -384,7 +429,16 @@ input {
   padding: 1em;
 }
 
+.link {
+  cursor: pointer;
+  color: blue;
+}
+
 .actionButton {
   margin-left: 5px;
+}
+
+.autocompleteClass input {
+  width: 500px !important;
 }
 </style>

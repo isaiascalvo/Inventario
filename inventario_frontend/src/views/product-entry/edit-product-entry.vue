@@ -260,7 +260,7 @@ export default class EditProductEntry extends Vue {
 
     filtered.forEach(x => {
       if (x.name) {
-        codNameDescArray.push(x.code + " - " + x.name + " - " + x.description);
+        codNameDescArray.push(x.name + " - " + x.description + " - " + x.code);
       }
     });
     return codNameDescArray;
@@ -268,7 +268,7 @@ export default class EditProductEntry extends Vue {
 
   getProductId(option: string) {
     const prod = this.products.find(
-      x => x.code + " - " + x.name + " - " + x.description === option
+      x => x.name + " - " + x.description + " - " + x.code === option
     );
     return prod ? prod.id : undefined;
   }
@@ -281,7 +281,7 @@ export default class EditProductEntry extends Vue {
   getProduct(productId: string) {
     const product = this.products.find(x => x.id === productId);
     return product
-      ? product.code + " - " + product.name + " - " + product.description
+      ? product.name + " - " + product.description + " - " + product.code
       : "";
   }
 
@@ -400,7 +400,7 @@ export default class EditProductEntry extends Vue {
                   new Product();
                 this.prodCodNameDesc.push({
                   text:
-                    prod.code + " - " + prod.name + " - " + prod.description,
+                    prod.name + " - " + prod.description + " - " + prod.code,
                   focus: true
                 });
               });

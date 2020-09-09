@@ -313,7 +313,9 @@ namespace Logic
                     saleDto.Cash = _mapper.Map<Cash, CashDto>((Cash)sale.Payment);
                     break;
                 case Util.Enums.ePaymentTypes.OwnFees:
-                    saleDto.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>((OwnFees)sale.Payment);
+                    OwnFees owF = (OwnFees)sale.Payment;
+                    owF.FeeList = (await _feeRepository.GetAll()).Where(x => x.OwnFeesId == owF.Id).OrderBy(x => x.ExpirationDate).ToList();
+                    saleDto.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>(owF);
                     break;
                 case Util.Enums.ePaymentTypes.CreditCard:
                     saleDto.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)sale.Payment);
@@ -397,7 +399,9 @@ namespace Logic
                         s.Cash = _mapper.Map<Cash, CashDto>((Cash)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
                         break;
                     case Util.Enums.ePaymentTypes.OwnFees:
-                        s.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>((OwnFees)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
+                        OwnFees owF = (OwnFees)sales.FirstOrDefault(x => x.Id == s.Id).Payment;
+                        owF.FeeList = (await _feeRepository.GetAll()).Where(x => x.OwnFeesId == owF.Id).OrderBy(x => x.ExpirationDate).ToList();
+                        s.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>(owF);
                         break;
                     case Util.Enums.ePaymentTypes.CreditCard:
                         s.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)sales.FirstOrDefault(x => x.Id == s.Id).Payment);
@@ -417,6 +421,25 @@ namespace Logic
                 }
             }
             return salesDto;
+        }
+
+        public async Task PayFee(Guid userId, Guid feeId, DateTime paymentDate)
+        {
+            var fee = await _feeRepository.GetById(feeId);
+            if (fee == null)
+                throw new KeyNotFoundException($"Fee with id: {feeId} not found.");
+            if (fee.PaymentDate != null)
+                throw new InvalidOperationException($"Fee with id: {feeId} has already been paid.");
+
+            var feeList = (await _feeRepository.GetAll()).Where(x => x.OwnFeesId == fee.OwnFeesId).OrderBy(x => x.ExpirationDate);
+
+            var previousFee = feeList.FirstOrDefault(x => x.ExpirationDate < fee.ExpirationDate);
+            if (previousFee != null && previousFee.PaymentDate == null)
+                throw new InvalidOperationException($"The previous fee must be paid.");
+
+            fee.PaymentDate = paymentDate;
+            await _feeRepository.Update(fee);
+            await _feeRepository.CommitAsync();
         }
     }
 }

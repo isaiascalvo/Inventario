@@ -75,6 +75,14 @@ export class NavigatorSaleService implements SaleService {
     return apiClient.delete("/sales/" + saleId);
   }
 
+  public async payFee(feeId: string, paymentDate: string): Promise<void> {
+    return (
+      await apiClient.get(
+        "/sales/PayFee?feeId=" + feeId + "&paymentDate=" + paymentDate
+      )
+    ).data;
+  }
+
   public getQueryString(saleFilters: SaleFilters): string {
     saleFilters.dateFrom = saleFilters.dateDateFrom?.toISOString();
     saleFilters.dateTo = saleFilters.dateDateTo?.toISOString();

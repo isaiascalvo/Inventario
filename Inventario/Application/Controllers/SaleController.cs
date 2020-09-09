@@ -169,5 +169,20 @@ namespace Application
         //        return NotFound();
         //    }
         //}
+
+        [HttpGet("PayFee")]
+        public async Task<IActionResult> PayFee(Guid feeId, string paymentDate)
+        {
+            try
+            {
+                var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+                await _saleUseCases.PayFee(userId, feeId, DateTime.Parse(paymentDate));
+                return Ok("Fee successfully paid.");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
     }
 }

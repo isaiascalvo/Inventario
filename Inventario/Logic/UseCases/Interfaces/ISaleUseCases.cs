@@ -18,5 +18,6 @@ namespace Logic.Interfaces
         Task<IEnumerable<SaleDto>> GetByPageAndQty(int skip, int qty);
         Task<int> GetTotalQtyByFilters(SaleFiltersDto filtersDto);
         Task<IEnumerable<SaleDto>> GetFilteredByPageAndQty(SaleFiltersDto filtersDto, int skip, int qty);
+        Task PayFee(Guid userId, Guid feeId, DateTime paymentDate);
     }
 }

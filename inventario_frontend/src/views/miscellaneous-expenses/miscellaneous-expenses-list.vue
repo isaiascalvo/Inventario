@@ -12,6 +12,7 @@
               size="is-small"
               tag="router-link"
               to="/miscellaneous-expenses/new"
+              class="mx-1"
             >
               Nuevo Gasto
             </b-button>
@@ -145,7 +146,7 @@
             {{ dateTimeToLocal(props.row.date) }}
           </b-table-column>
           <b-table-column field="value" label="Monto">
-            {{ props.row.value }}
+            ${{ props.row.value }}
           </b-table-column>
           <b-table-column field="destination" label="Destino">
             {{ props.row.destination }}

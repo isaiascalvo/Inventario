@@ -38,6 +38,7 @@
           <b-field grouped group-multiline>
             <b-field label-position="on-border" label="Cliente">
               <b-autocomplete
+                class="autocompleteClass"
                 v-model="saleFilters.clientName"
                 :data="filteredClients()"
                 placeholder="ej.: Cliente X"
@@ -56,6 +57,7 @@
 
             <b-field label-position="on-border" label="Producto">
               <b-autocomplete
+                class="autocompleteClass"
                 v-model="prodCodNameDesc"
                 :data="filteredProducts()"
                 placeholder="ej.: Producto X"
@@ -107,7 +109,7 @@
               >
                 <option :value="null"></option>
                 <option :value="0">Efectivo</option>
-                <option :value="1">Cuotas</option>
+                <option :value="1">Cuotas Propias</option>
                 <option :value="2">Tarjeta de crédito</option>
                 <option :value="3">Tarjeta de débito</option>
                 <option :value="4">Cheque</option>
@@ -191,7 +193,25 @@
             $ {{ getTotal(props.row) }}
           </b-table-column>
           <b-table-column field="paymentType" label="Forma de Pago">
-            {{ getPaymentType(props.row) }}
+            <template v-if="props.row.cheques || props.row.ownFees">
+              <span
+                v-if="props.row.cheques"
+                class="link"
+                @click="openModalChequesPreview(props.row.cheques)"
+              >
+                {{ getPaymentType(props.row) }}
+              </span>
+              <span
+                v-if="props.row.ownFees"
+                class="link"
+                @click="openModalOwnFeesPreview(props.row.ownFees)"
+              >
+                {{ getPaymentType(props.row) }}
+              </span>
+            </template>
+            <span v-else>
+              {{ getPaymentType(props.row) }}
+            </span>
           </b-table-column>
 
           <b-table-column field="action" label="Acciones" centered>
@@ -231,6 +251,8 @@ import { NavigatorClientService } from "@/services/client-service";
 import { NavigatorProductService } from "@/services/product-service";
 import ModalClientPreview from "@/components/modals/ModalClientPreview.vue";
 import ModalProductPreview from "@/components/modals/ModalProductPreview.vue";
+import ModalChequePreview from "@/components/modals/ModalChequePreview.vue";
+import ModalOwnFeesPreview from "@/components/modals/ModalOwnFeesPreview.vue";
 
 @Component({
   components: {
@@ -440,7 +462,7 @@ export default class SaleList extends Vue {
 
     filtered.forEach(x => {
       if (x.name) {
-        codNameDescArray.push(x.code + " - " + x.name + " - " + x.description);
+        codNameDescArray.push(x.name + " - " + x.description + " - " + x.code);
       }
     });
     return codNameDescArray;
@@ -448,7 +470,7 @@ export default class SaleList extends Vue {
 
   getProductId(option: string) {
     const prod = this.products.find(
-      x => x.code + " - " + x.name + " - " + x.description === option
+      x => x.name + " - " + x.description + " - " + x.code === option
     );
     this.saleFilters.productId = prod ? prod.id : undefined;
   }
@@ -502,6 +524,32 @@ export default class SaleList extends Vue {
       trapFocus: true,
       props: {
         productId: productId
+      }
+    });
+  }
+
+  openModalChequesPreview(cheques: ChequesPayment) {
+    this.$buefy.modal.open({
+      parent: this,
+      component: ModalChequePreview,
+      hasModalCard: true,
+      customClass: "custom-class custom-class-2",
+      trapFocus: true,
+      props: {
+        chequesPayment: cheques
+      }
+    });
+  }
+
+  openModalOwnFeesPreview(ownFees: OwnFees) {
+    this.$buefy.modal.open({
+      parent: this,
+      component: ModalOwnFeesPreview,
+      hasModalCard: true,
+      customClass: "custom-class custom-class-2",
+      trapFocus: true,
+      props: {
+        ownFees: ownFees
       }
     });
   }
@@ -608,5 +656,9 @@ p-1 {
 
 .actionButton {
   margin-left: 5px;
+}
+
+.autocompleteClass input {
+  width: 500px !important;
 }
 </style>

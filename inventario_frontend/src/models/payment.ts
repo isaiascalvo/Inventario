@@ -116,6 +116,5 @@ export class Fee {
   public ownFeesId!: string;
   public expirationDate!: Date;
   public paymentDate?: Date;
-  public state!: FeeStates;
   public value!: number;
 }
