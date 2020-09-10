@@ -161,6 +161,9 @@
                     validation-message="Debe seleccionar la cantidad de cuotas"
                     @input="option => getRule(option)"
                   >
+                    <option disabled v-if="feeRules.length === 0" :value="null">
+                      Este producto no se puede pagar en cuotas
+                    </option>
                     <option
                       v-for="feeRule in feeRules"
                       :value="feeRule.id"
@@ -797,6 +800,12 @@ export default class EditSale extends Vue {
       x => x.code + " - " + x.name + " - " + x.description === option
     );
     this.sale.productId = prod ? prod.id : undefined;
+    this.sale.paymentType = undefined;
+    this.sale.cash = undefined;
+    this.sale.ownFees = undefined;
+    this.sale.creditCard = undefined;
+    this.sale.debitCard = undefined;
+    this.sale.cheques = undefined;
     this.getPriceValue();
   }
 

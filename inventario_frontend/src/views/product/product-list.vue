@@ -7,14 +7,15 @@
             <h1 class="title is-6">Lista de Productos</h1>
           </div>
           <div>
-            <b-button
-              type="is-dark"
-              @click="genetarePdf()"
-              class="mx-1"
-              size="is-small"
-            >
-              Imprimir Listado
-            </b-button>
+            <b-tooltip label="Imprimir" type="is-dark">
+              <b-button
+                type="is-dark"
+                @click="genetarePdf()"
+                size="is-small"
+                icon-left="printer"
+              >
+              </b-button>
+            </b-tooltip>
             <b-button
               type="is-info"
               tag="router-link"
@@ -83,6 +84,7 @@
                 placeholder="Categoría"
                 size="is-small"
               >
+                <option :value="null"></option>
                 <option
                   v-for="category in categories"
                   :value="category.id"
@@ -99,6 +101,7 @@
                 placeholder="Proveedor"
                 size="is-small"
               >
+                <option :value="null"></option>
                 <option
                   v-for="vendor in vendors"
                   :value="vendor.id"
@@ -399,7 +402,7 @@ export default class ProductList extends Vue {
     //   //Open the URL on new Window
     //   window.open(fileURL);
     // });
-    this.productService.generatePdf().then(
+    this.productService.generatePdf(this.productFilters).then(
       data => {
         const downloadedFile = new Blob([data.data], {
           type: data.data.type

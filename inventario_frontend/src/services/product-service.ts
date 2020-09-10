@@ -23,7 +23,7 @@ export interface ProductService {
   updateProduct(product: Product): Promise<void>;
   deleteProduct(productId: string): Promise<void>;
   getPriceByDate(productId: string, date: string): Promise<number>;
-  generatePdf(): AxiosPromise<Blob>;
+  generatePdf(productFilters: ProductFilters): AxiosPromise<Blob>;
 }
 
 export class NavigatorProductService implements ProductService {
@@ -120,11 +120,15 @@ export class NavigatorProductService implements ProductService {
     ).data;
   }
 
-  public generatePdf(): AxiosPromise<Blob> {
-    return axios("https://localhost:44386/api/products/Pdf", {
-      method: "GET",
-      responseType: "blob"
-    });
+  public generatePdf(productFilters: ProductFilters): AxiosPromise<Blob> {
+    return axios(
+      "https://localhost:44386/api/products/Pdf?" +
+        this.getQueryString(productFilters),
+      {
+        method: "GET",
+        responseType: "blob"
+      }
+    );
   }
 
   public getQueryString(productFilters: ProductFilters): string {

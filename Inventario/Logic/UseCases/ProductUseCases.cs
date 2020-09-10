@@ -313,7 +313,7 @@ namespace Logic
             return price.Value;
         }
 
-        public async Task<MemoryStream> CreatePdf()
+        public async Task<MemoryStream> CreatePdf(ProductFiltersDto filtersDto)
         {
             string directory = _configuration["PdfRoute"];
             string finalDestination = directory + "/" + DateTime.Now.ToString().Replace("/", "_").Substring(0, 11) + ".pdf";
@@ -354,18 +354,18 @@ namespace Logic
                         "<td>Categoría</td>" +
                         "<td>Proveedor</td>" +
                         "<td>Marca</td>" +
-                        "<td>Stock</td>" +
-                        "<td>Unidad</td>" +
-                        "<td>Precio</td>" +
+                        "<td>Precio de compra</td>" +
+                        "<td>Precio de venta</td>" +
                     "</tr>" +
                     "<dinamic></dinamic>" +
                 "</table>");
 
-            var products = (await _productRepository.GetAll(x => x.Category, x => x.Vendor)).OrderBy(x => x.Name);
+            var products = (await _productRepository.GetAll(x => x.Category, x => x.Vendor)).AsQueryable().Where(filtersDto.GetExpresion()).OrderBy(x => x.Name);
             foreach (var prod in products)
             {
-                var price = (await _priceRepository.GetAll()).Where(p => p.ProductId == prod.Id).OrderByDescending(x => x.DateTime).FirstOrDefault();
-                htmlStr = AppendDynamicField(htmlStr, prod.Name, prod.Description, prod.Code, prod.Category.Name, prod.Vendor.Name, prod.Brand, prod.Stock, prod.UnitOfMeasurement, price.Value);
+                var purchasePrice = (await _priceRepository.GetAll()).Where(p => p.ProductId == prod.Id && p.PriceType == ePriceTypes.PurchasePrice).OrderByDescending(x => x.DateTime).FirstOrDefault();
+                var salePrice = (await _priceRepository.GetAll()).Where(p => p.ProductId == prod.Id && p.PriceType == ePriceTypes.SalePrice).OrderByDescending(x => x.DateTime).FirstOrDefault();
+                htmlStr = AppendDynamicField(htmlStr, prod.Name, prod.Description, prod.Code, prod.Category.Name, prod.Vendor.Name, prod.Brand, purchasePrice.Value, salePrice.Value);
             }
             htmlStr.Replace("<dinamic></dinamic>", "");
 
@@ -394,9 +394,9 @@ namespace Logic
             PdfBasicSchema.GenerateFooter(intermediateDestination, finalDestination);
         }
 
-        private string AppendDynamicField(string htmlStr, string name, string description, string code, string category, string vendor, string brand, double stock, string unitOfMeasurement, double price)
+        private string AppendDynamicField(string htmlStr, string name, string description, string code, string category, string vendor, string brand, double purchasePrice, double salePrice)
         {
-            string campoDinamico = "<tr class='font-size2 align-center {b}'> <td>{name}</td> <td>{description}</td> <td>{code}</td> <td>{category}</td> <td>{vendor}</td> <td>{brand}</td> <td>{stock}</td> <td>{unitOfMeasurement}</td> <td>$ {price}</td> </tr>";
+            string campoDinamico = "<tr class='font-size2 align-center {b}'> <td>{name}</td> <td>{description}</td> <td>{code}</td> <td>{category}</td> <td>{vendor}</td> <td>{brand}</td> <td>${purchasePrice}</td> <td>$ {salePrice}</td> </tr>";
 
             campoDinamico = campoDinamico.Replace("{name}", name);
             campoDinamico = campoDinamico.Replace("{description}", description);
@@ -404,9 +404,8 @@ namespace Logic
             campoDinamico = campoDinamico.Replace("{category}", category);
             campoDinamico = campoDinamico.Replace("{vendor}", vendor);
             campoDinamico = campoDinamico.Replace("{brand}", brand);
-            campoDinamico = campoDinamico.Replace("{stock}", stock.ToString());
-            campoDinamico = campoDinamico.Replace("{unitOfMeasurement}", unitOfMeasurement);
-            campoDinamico = campoDinamico.Replace("{price}", price.ToString());
+            campoDinamico = campoDinamico.Replace("{purchasePrice}", purchasePrice.ToString());
+            campoDinamico = campoDinamico.Replace("{salePrice}", salePrice.ToString());
             int index = htmlStr.IndexOf("<dinamic></dinamic>");
             if (index >= 0)
             {

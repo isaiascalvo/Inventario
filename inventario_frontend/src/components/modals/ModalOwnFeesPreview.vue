@@ -109,10 +109,12 @@ export default class ModalOwnFeesPreview extends Vue {
 
   payFee(index: number) {
     this.$buefy.dialog.prompt({
-      message: `Ingrese la fecha del pago de la cuota`,
+      message: `<strong>Ingrese la fecha del pago de la cuota</strong><br />(esta acción no podrá deshacerse):`,
       inputAttrs: {
         type: "date"
       },
+      confirmText: "Aceptar",
+      cancelText: "Cancelar",
       trapFocus: true,
       onConfirm: value => {
         this.$buefy.toast.open(`Pago registrado`);

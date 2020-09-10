@@ -1,4 +1,3 @@
-import { FeeStates } from "@/enums/paymentTypes";
 import { FeeRule } from "./feeRule";
 
 export abstract class Payment {

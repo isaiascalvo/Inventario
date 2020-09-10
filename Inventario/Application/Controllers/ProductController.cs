@@ -212,11 +212,12 @@ namespace Application
 
         [AllowAnonymous]
         [HttpGet("Pdf")]
-        public async Task<IActionResult> CreatePdf()
+        public async Task<IActionResult> CreatePdf([FromQuery] ProductFiltersViewModel filtersVM)
         {
             try
             {
-                MemoryStream stream = await _productUseCases.CreatePdf();
+                var filtersDto = _mapper.Map<ProductFiltersViewModel, ProductFiltersDto>(filtersVM);
+                MemoryStream stream = await _productUseCases.CreatePdf(filtersDto);
                 stream.Position = 0;
                 return File(stream, "application/pdf");
             }

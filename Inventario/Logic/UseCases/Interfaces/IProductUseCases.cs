@@ -22,6 +22,6 @@ namespace Logic.Interfaces
         Task<int> GetTotalQtyByFilters(ProductFiltersDto filters);
         Task<IEnumerable<ProductDto>> GetFilteredByPageAndQty(ProductFiltersDto filters, int skip, int qty);
         Task<double> GetPriceByDate(Guid productId, DateTime date);
-        Task<MemoryStream> CreatePdf();
+        Task<MemoryStream> CreatePdf(ProductFiltersDto filtersDto);
     }
 }
