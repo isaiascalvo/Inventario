@@ -9,6 +9,8 @@ namespace Logic.Dtos
     {
         public DateTime Date { get; set; }
         public bool IsEntry { get; set; }
+        public Guid? VendorId { get; set; }
+        public VendorDto? Vendor { get; set; }
         public List<ProductEntryLineDto> ProductEntryLines { get; set; }
     }
 }

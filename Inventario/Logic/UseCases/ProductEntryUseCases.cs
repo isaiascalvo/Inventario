@@ -16,13 +16,15 @@ namespace Logic
         private readonly IProductRepository _productRepository;
         private readonly IProductEntryRepository _productEntryRepository;
         private readonly IProductEntryLineRepository _productEntryLineRepository;
+        private readonly IVendorRepository _vendorRepository;
         private readonly IMapper _mapper;
 
-        public ProductEntryUseCases(IProductRepository productRepository, IProductEntryRepository productEntryRepository, IProductEntryLineRepository productEntryLineRepository, IMapper mapper)
+        public ProductEntryUseCases(IProductRepository productRepository, IProductEntryRepository productEntryRepository, IProductEntryLineRepository productEntryLineRepository, IVendorRepository vendorRepository, IMapper mapper)
         {
             _productRepository = productRepository;
             _productEntryRepository = productEntryRepository;
             _productEntryLineRepository = productEntryLineRepository;
+            _vendorRepository = vendorRepository;
             _mapper = mapper;
         }
 
@@ -30,10 +32,18 @@ namespace Logic
         {
             try
             {
+                if (productEntryForCreationDto.VendorId.HasValue)
+                {
+                    var vendor = await _vendorRepository.GetById(productEntryForCreationDto.VendorId.Value);
+                    if(vendor == null)
+                        throw new KeyNotFoundException($"Vendor with id: {productEntryForCreationDto.VendorId.Value} not found.");
+                }
+
                 ProductEntry productEntry = new ProductEntry()
                 {
                     Date = productEntryForCreationDto.Date.ToLocalTime(),
                     IsEntry = productEntryForCreationDto.IsEntry,
+                    VendorId = productEntryForCreationDto.VendorId,
                     CreatedBy = userId
                 };
 
@@ -105,7 +115,7 @@ namespace Logic
 
         public async Task<IEnumerable<ProductEntryDto>> GetAll()
         {
-            var productEntries = (await _productEntryRepository.GetAll()).OrderByDescending(x => x.Date);
+            var productEntries = (await _productEntryRepository.GetAll(x => x.Vendor)).OrderByDescending(x => x.Date);
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
 
@@ -121,13 +131,13 @@ namespace Logic
 
         public async Task<IEnumerable<ProductEntryDto>> GetByPageAndQty(int skip, int qty)
         {
-            var productEntries = (await _productEntryRepository.GetAll()).OrderByDescending(x => x.Date).Skip(skip).Take(qty);
+            var productEntries = (await _productEntryRepository.GetAll(x => x.Vendor)).OrderByDescending(x => x.Date).Skip(skip).Take(qty);
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
 
         public async Task<IEnumerable<ProductEntryDto>> GetFilteredByPageAndQty(ProductEntryFiltersDto filtersDto, int skip, int qty)
         {
-            var productEntries = (await _productEntryRepository.GetAll())
+            var productEntries = (await _productEntryRepository.GetAll(x => x.Vendor))
                 .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Date).Skip(skip).Take(qty);
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
@@ -146,6 +156,13 @@ namespace Logic
             var productEntry = await _productEntryRepository.GetById(productEntryDto.Id, x => x.ProductEntryLines);
             if (productEntry == null)
                 throw new KeyNotFoundException($"Product entry with id: {id} not found.");
+
+            if (productEntryDto.VendorId.HasValue)
+            {
+                var vendor = await _vendorRepository.GetById(productEntryDto.VendorId.Value);
+                if (vendor == null)
+                    throw new KeyNotFoundException($"Vendor with id: {productEntryDto.VendorId.Value} not found.");
+            }
 
             //Delete PEL Deleted
             var deleted = productEntry.ProductEntryLines.Where(

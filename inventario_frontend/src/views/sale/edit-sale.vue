@@ -153,7 +153,20 @@
 
               <template v-if="sale.paymentType === 1">
                 <b-field label="Cantidad de cuotas:">
-                  <b-select
+                  <b-numberinput
+                    v-model="sale.ownFees.quantity"
+                    placeholder="Ingrese la cantidad de cuotas"
+                    min="0"
+                    :max="maxFeesAmount"
+                    type="is-dark"
+                    required
+                    validation-message="Debe ingresar la cantidad de cuotas"
+                    @input="
+                      getRule();
+                      forceUpdate();
+                    "
+                  ></b-numberinput>
+                  <!-- <b-select
                     v-model="sale.ownFees.feeRuleId"
                     placeholder="Seleccione la cantidad de cuotas"
                     expanded
@@ -175,8 +188,20 @@
                           getFeeValue(feeRule.id)
                       }}
                     </option>
-                  </b-select>
+                  </b-select> -->
                 </b-field>
+
+                <div
+                  v-if="sale.ownFees.quantity"
+                  style="text-align: center; margin-bottom: 5px;"
+                >
+                  ({{
+                    sale.ownFees.quantity +
+                      " cuota" +
+                      (sale.ownFees.quantity === 1 ? "" : "s")
+                  }}
+                  de $ {{ feeValue }})
+                </div>
 
                 <b-field label="Fecha de vencimiento (primer cuota)">
                   <b-datepicker
@@ -226,6 +251,17 @@
                     @input="forceUpdate()"
                   ></b-numberinput>
                 </b-field>
+                <b-field label="Recargo (%):">
+                  <b-numberinput
+                    v-model="sale.creditCard.surcharge"
+                    placeholder="Ingrese el recargo"
+                    min="0"
+                    type="is-dark"
+                    required
+                    validation-message="Debe ingresar el recargo"
+                    @input="forceUpdate()"
+                  ></b-numberinput>
+                </b-field>
               </template>
 
               <template v-if="sale.paymentType === 3">
@@ -248,6 +284,17 @@
                     @input="forceUpdate()"
                   >
                   </b-input>
+                </b-field>
+                <b-field label="Descuento (%):">
+                  <b-numberinput
+                    v-model="sale.debitCard.discount"
+                    placeholder="Ingrese el descuento"
+                    min="0"
+                    type="is-dark"
+                    required
+                    validation-message="Debe ingresar el descuento"
+                    @input="forceUpdate()"
+                  ></b-numberinput>
                 </b-field>
                 <b-field label="Recargo (%):">
                   <b-numberinput
@@ -450,6 +497,8 @@ export default class EditSale extends Vue {
   public prodFocus = false;
   public dateFocus = false;
   public activeStep = 0;
+  public feeValue?: number = undefined;
+  public maxFeesAmount = 0;
 
   fieldState(field: unknown) {
     return fieldStateValidation(field);
@@ -487,6 +536,11 @@ export default class EditSale extends Vue {
     this.$forceUpdate();
   }
 
+  // setFeeRule() {
+  //   if (this.sale.ownFees?.quantity) {
+  //   }
+  // }
+
   pushCheque() {
     this.sale.cheques?.listOfCheques.push(new Cheque());
   }
@@ -498,19 +552,39 @@ export default class EditSale extends Vue {
     }
   }
 
-  getRule(key: string) {
-    const foundRule = this.feeRules.find(x => x.id === key);
+  getRule() {
+    console.log("Llamó");
+    const foundRule = this.feeRules.find(
+      x =>
+        x.feesAmountTo !== undefined &&
+        this.sale.ownFees?.quantity !== undefined &&
+        x.feesAmountTo >= this.sale.ownFees.quantity
+    );
     if (foundRule) {
-      (this.sale.ownFees as OwnFeesForCreation).quantity =
-        foundRule.feesAmountTo ?? 1;
+      // (this.sale.ownFees as OwnFeesForCreation).quantity =
+      //   foundRule.feesAmountTo ?? 1;
+      (this.sale.ownFees as OwnFeesForCreation).feeRuleId = foundRule.id;
       const percentage: number = foundRule.percentage ?? 0;
-      if (foundRule.feesAmountTo && this.priceValue && this.sale.quantity) {
-        this.sale.amount =
+      console.log(percentage);
+      if (
+        foundRule.feesAmountTo &&
+        this.priceValue &&
+        this.sale.quantity &&
+        this.sale.ownFees?.quantity
+      ) {
+        const v =
           this.priceValue *
           this.sale.quantity *
-          (1 + (percentage * foundRule.feesAmountTo) / 100);
+          (1 + (percentage * this.sale.ownFees.quantity) / 100);
+
+        this.sale.amount = Math.ceil(v * 100) / 100;
+        this.feeValue =
+          Math.ceil((this.sale.amount * 100) / this.sale.ownFees.quantity) /
+          100;
       }
     }
+    console.log(this.sale.amount);
+    this.forceUpdate();
   }
 
   public nextDisabled() {
@@ -532,7 +606,7 @@ export default class EditSale extends Vue {
   validatePayment() {
     switch (this.sale.paymentType) {
       case paymentTypes.cash: {
-        return this.sale.cash && this.sale.cash.discount;
+        return this.sale.cash && this.sale.cash.discount !== undefined;
       }
       case paymentTypes.ownFees: {
         return (
@@ -546,7 +620,8 @@ export default class EditSale extends Vue {
           this.sale.creditCard &&
           this.sale.creditCard.bank &&
           this.sale.creditCard.cardType &&
-          this.sale.creditCard.discount
+          this.fieldState(this.sale.creditCard.discount) &&
+          this.fieldState(this.sale.creditCard.surcharge)
         );
       }
       case paymentTypes.debitcard:
@@ -554,7 +629,8 @@ export default class EditSale extends Vue {
           this.sale.debitCard &&
           this.sale.debitCard.bank &&
           this.sale.debitCard.cardType &&
-          this.sale.debitCard.surcharge
+          this.fieldState(this.sale.debitCard.discount) &&
+          this.fieldState(this.sale.debitCard.surcharge)
         );
       case paymentTypes.cheque: {
         let band =
@@ -601,6 +677,7 @@ export default class EditSale extends Vue {
       case paymentTypes.creditcard:
         this.sale.creditCard = new CreditCard();
         this.sale.creditCard.discount = 0;
+        this.sale.creditCard.surcharge = 0;
         this.sale.cash = undefined;
         this.sale.ownFees = undefined;
         this.sale.debitCard = undefined;
@@ -608,6 +685,7 @@ export default class EditSale extends Vue {
         break;
       case paymentTypes.debitcard:
         this.sale.debitCard = new DebitCard();
+        this.sale.debitCard.discount = 0;
         this.sale.debitCard.surcharge = 0;
         this.sale.cash = undefined;
         this.sale.ownFees = undefined;
@@ -635,6 +713,8 @@ export default class EditSale extends Vue {
         .then(response => {
           this.isLoading = false;
           this.feeRules = response;
+          this.maxFeesAmount =
+            this.feeRules[this.feeRules.length - 1].feesAmountTo ?? 0;
         })
         .catch(error => {
           this.isLoading = true;

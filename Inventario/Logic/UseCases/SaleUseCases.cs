@@ -143,7 +143,7 @@ namespace Logic
                         break;
                     case Util.Enums.ePaymentTypes.CreditCard:
                         var creditCardDto = (CreditCardForCreationDto)saletForCreationDto.CreditCard;
-                        payment = new CreditCard(price.Value * saletForCreationDto.Quantity, creditCardDto.Discount)
+                        payment = new CreditCard(price.Value * saletForCreationDto.Quantity, creditCardDto.Discount, creditCardDto.Surcharge)
                         {
                             SaleId = sale.Id,
                             CardType = creditCardDto.CardType,
@@ -155,7 +155,7 @@ namespace Logic
                         break;
                     case Util.Enums.ePaymentTypes.DebitCard:
                         var debitCardDto = (DebitCardForCreationDto)saletForCreationDto.DebitCard;
-                        payment = new DebitCard(price.Value * saletForCreationDto.Quantity, debitCardDto.Surcharge)
+                        payment = new DebitCard(price.Value * saletForCreationDto.Quantity, debitCardDto.Discount, debitCardDto.Surcharge)
                         {
                             SaleId = sale.Id,
                             CardType = debitCardDto.CardType,

@@ -10,5 +10,6 @@ namespace Application.ViewModels
         public DateTime Date { get; set; }
         public double Value { get; set; }
         public string? Destination { get; set; }
+        public bool IsFixed { get; set; }
     }
 }

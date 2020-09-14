@@ -12,10 +12,11 @@ namespace Application.ViewModels
         public string? DateTo { get; set; }
         public double? Value { get; set; }
         public string? Destination { get; set; }
+        public bool? IsFixed { get; set; }
 
         public bool IsEmpty()
         {
-            return Description == null && DateFrom == null && DateTo == null && Value == null && Destination == null;
+            return Description == null && DateFrom == null && DateTo == null && Value == null && Destination == null && IsFixed == null;
         }
     }
 }

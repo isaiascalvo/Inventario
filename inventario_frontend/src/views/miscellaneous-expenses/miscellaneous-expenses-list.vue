@@ -145,6 +145,9 @@
           <b-table-column field="date" label="Fecha y hora">
             {{ dateTimeToLocal(props.row.date) }}
           </b-table-column>
+          <b-table-column field="isFixed" label="Tipo de gasto">
+            {{ props.row.isFixed ? "Fijo" : "Variable" }}
+          </b-table-column>
           <b-table-column field="value" label="Monto">
             ${{ props.row.value }}
           </b-table-column>

@@ -31,6 +31,7 @@ namespace Logic
                 Date = miscellaneousExpensesForCreationDto.Date.ToLocalTime(),
                 Value = miscellaneousExpensesForCreationDto.Value,
                 Destination = miscellaneousExpensesForCreationDto.Destination,
+                IsFixed = miscellaneousExpensesForCreationDto.IsFixed,
                 CreatedBy = userId
             };
 
@@ -93,6 +94,7 @@ namespace Logic
             miscellaneousExpense.Date = miscellaneousExpenseDto.Date.ToLocalTime();
             miscellaneousExpense.Value = miscellaneousExpenseDto.Value;
             miscellaneousExpense.Destination = miscellaneousExpenseDto.Destination;
+            miscellaneousExpense.IsFixed = miscellaneousExpenseDto.IsFixed;
             miscellaneousExpense.LastModificationBy = miscellaneousExpenseDto.LastModificationBy;
             await _miscellaneousExpensesRepository.Update(miscellaneousExpense);
             await _miscellaneousExpensesRepository.CommitAsync();

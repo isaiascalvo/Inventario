@@ -73,6 +73,9 @@ namespace Logic.Profiles
 
             CreateMap<FeeRuleDto, FeeRule>();
             CreateMap<FeeRule, FeeRuleDto>();
+            
+            CreateMap<CommissionDto, Commission>();
+            CreateMap<Commission, CommissionDto>();
         }
     }
 }

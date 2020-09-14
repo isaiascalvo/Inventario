@@ -48,6 +48,19 @@
               </b-datetimepicker>
             </b-field>
 
+            <b-field label="Tipo de gasto:">
+              <b-select
+                v-model="miscellaneousExpense.isFixed"
+                placeholder="Seleccione una opción"
+                expanded
+                required
+                validation-message="Seleccione una opción"
+              >
+                <option :value="true">Fijo</option>
+                <option :value="false">Variable</option>
+              </b-select>
+            </b-field>
+
             <b-field label="Monto:">
               <b-input
                 v-model="miscellaneousExpense.value"

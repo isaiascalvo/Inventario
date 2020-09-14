@@ -9,6 +9,7 @@ namespace Application.ViewModels
     {
         public DateTime Date { get; set; }
         public bool IsEntry { get; set; }
+        public Guid? VendorId { get; set; }
         public List<ProductEntryLineForCreationViewModel> ProductEntryLines { get; set; }
     }
 }

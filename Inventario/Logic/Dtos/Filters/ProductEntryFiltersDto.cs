@@ -11,10 +11,11 @@ namespace Logic.Dtos
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
         public bool? IsEntry { get; set; }
+        public Guid? VendorId { get; set; }
 
         public bool IsEmpty()
         {
-            return DateFrom == null && DateTo == null && IsEntry == null;
+            return DateFrom == null && DateTo == null && IsEntry == null && VendorId == null;
         }
 
         public Expression<Func<ProductEntry, bool>> GetExpresion()
@@ -22,7 +23,8 @@ namespace Logic.Dtos
             return x =>
                 (IsEntry == null || x.IsEntry == IsEntry) &&
                 (DateFrom == null || x.Date >= DateFrom) &&
-                (DateTo == null || x.Date <= DateTo);
+                (DateTo == null || x.Date <= DateTo) &&
+                (VendorId == null || x.VendorId != null && x.VendorId == VendorId);
         }
     }
 }

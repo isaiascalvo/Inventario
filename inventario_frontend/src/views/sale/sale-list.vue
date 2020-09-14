@@ -333,6 +333,8 @@ export default class SaleList extends Vue {
           sale.creditCard?.cardType +
           " - Descuento: " +
           sale.creditCard?.discount +
+          "% - Recargo: " +
+          sale.creditCard?.surcharge +
           "%)"
         );
       case paymentTypes.debitcard:
@@ -342,7 +344,9 @@ export default class SaleList extends Vue {
           sale.debitCard?.bank +
           " - " +
           sale.debitCard?.cardType +
-          " - Recargo: " +
+          " - Descuento: " +
+          sale.debitCard?.discount +
+          "% -  Recargo: " +
           sale.debitCard?.surcharge +
           "%)"
         );

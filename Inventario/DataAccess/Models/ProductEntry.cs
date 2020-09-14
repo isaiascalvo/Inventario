@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iText.Kernel.XMP.Properties;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,8 @@ namespace Data
     {
         public DateTime Date { get; set; }
         public bool IsEntry { get; set; }
+        public Guid? VendorId { get; set; }
+        public Vendor? Vendor { get; set; }
         public List<ProductEntryLine> ProductEntryLines { get; set; }
         public ProductEntry() : base()
         {

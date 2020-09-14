@@ -9,15 +9,17 @@ namespace Data
         public string CardType { get; set; }
         public string Bank { get; set; }
         public double Discount { get; set; }
+        public double Surcharge { get; set; }
 
         public CreditCard()
         {
 
         }
-        public CreditCard(double amount, double discount)
+        public CreditCard(double amount, double discount, double surcharge)
         {
-            Amount = amount * (1 - discount / 100);
             Discount = discount;
+            Surcharge = surcharge;
+            Amount = amount * (1 + (surcharge - discount) / 100);
         }
     }
 }

@@ -135,6 +135,20 @@ namespace Application.Profiles
                     dest => dest.DateTo,
                     opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
                 );
+            
+            CreateMap<CommissionFiltersViewModel, CommissionFiltersDto>()
+                .ForMember(
+                    dest => dest.DateFrom,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateFrom))
+                )
+                .ForMember(
+                    dest => dest.DateTo,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
+                );
+
+            CreateMap<CommissionViewModel, CommissionDto>();
+            CreateMap<CommissionDto, CommissionViewModel>();
+            CreateMap<CommissionForCreationViewModel, CommissionForCreationDto>();
 
             CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
             CreateMap<VendorFiltersViewModel, VendorFiltersDto>();
