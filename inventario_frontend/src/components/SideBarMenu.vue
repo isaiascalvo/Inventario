@@ -140,6 +140,11 @@ export default class SideBarMenu extends Vue {
       icon: "cash-multiple", //"script-text-outline",
       text: "Gastos Varios",
       url: "/miscellaneous-expenses-list"
+    },
+    {
+      icon: "script-text-outline",
+      text: "Comisiones",
+      url: "/commission-list"
     }
     //finance
   ];

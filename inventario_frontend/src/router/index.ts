@@ -255,6 +255,34 @@ const routes: Array<RouteConfig> = [
     props: true
   },
   {
+    path: "/commission-list",
+    name: "CommissionList",
+    component: () =>
+      import(
+        /* webpackChunkName: "commission" */
+        "../views/commission/commission-list.vue"
+      )
+  },
+  {
+    path: "/commission/new",
+    name: "NewCommission",
+    component: () =>
+      import(
+        /* webpackChunkName: "commission" */
+        "../views/commission/edit-commission.vue"
+      )
+  },
+  {
+    path: "/commission/modify/:id",
+    name: "ModifyCommission",
+    component: () =>
+      import(
+        /* webpackChunkName: "commission" */
+        "../views/commission/edit-commission.vue"
+      ),
+    props: true
+  },
+  {
     path: "/login",
     name: "Login",
     component: () =>

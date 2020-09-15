@@ -241,6 +241,8 @@ export default class EditMiscellaneousExpenses extends Vue {
             this.isLoading = false;
           }
         );
+    } else {
+      this.miscellaneousExpense.date = new Date();
     }
   }
 }

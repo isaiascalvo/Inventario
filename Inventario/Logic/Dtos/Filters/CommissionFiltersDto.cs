@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using Util.Enums;
 
 namespace Logic.Dtos
 {
@@ -14,7 +15,7 @@ namespace Logic.Dtos
         public string? ClientName { get; set; }
         public string? Product { get; set; }
         public double? Price { get; set; }
-        public string? PaymentType { get; set; }
+        public ePaymentTypes? PaymentType { get; set; }
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
         public double? Value { get; set; }
@@ -32,7 +33,7 @@ namespace Logic.Dtos
                 (ClientName == null || x.ClientName.ToLower().Contains(ClientName.ToLower())) &&
                 (Product == null || x.Product.ToLower().Contains(Product.ToLower())) &&
                 (Price == null || x.Price == Price) &&
-                (PaymentType == null || x.PaymentType.ToLower().Contains(PaymentType.ToLower())) &&
+                (PaymentType == null || x.PaymentType == PaymentType) &&
                 (DateFrom == null || x.Date >= DateFrom) &&
                 (DateTo == null || x.Date <= DateTo) &&
                 (Value == null || x.Value == Value);

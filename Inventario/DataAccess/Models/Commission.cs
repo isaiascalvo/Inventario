@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Util.Enums;
 
 namespace Data
 {
@@ -13,7 +14,7 @@ namespace Data
         public string ClientName { get; set; }
         public string  Product { get; set; }
         public double Price { get; set; }
-        public string PaymentType { get; set; }
+        public ePaymentTypes PaymentType { get; set; }
         public DateTime Date { get; set; }
         public double Value { get; set; }
     }
