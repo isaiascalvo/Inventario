@@ -9,14 +9,10 @@ namespace Application.ViewModels
     public class SaleViewModel
     {
         public Guid Id { get; set; }
-        public Guid ProductId { get; set; }
-        public ProductViewModel Product { get; set; }
         public Guid? ClientId { get; set; }
         public ClientViewModel Client { get; set; }
         public string ClientName { get; set; }
         public DateTime Date { get; set; }
-        public double Quantity { get; set; }
-        //public double Amount { get; set; }
         public ePaymentTypes PaymentType { get; set; }
         public Guid PaymentId { get; set; }
         public OwnFeesViewModel? OwnFees { get; set; }
@@ -24,7 +20,6 @@ namespace Application.ViewModels
         public CreditCardViewModel? CreditCard { get; set; }
         public DebitCardViewModel? DebitCard { get; set; }
         public ChequesPaymentViewModel? Cheques { get; set; }
-        public double GetTotal { get; }
-        public string GetPaymentType { get; }
+        public List<DetailViewModel> Details { get; set; }
     }
 }

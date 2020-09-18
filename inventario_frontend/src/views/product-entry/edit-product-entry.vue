@@ -227,6 +227,7 @@ export default class EditProductEntry extends Vue {
       });
       return false;
     }
+    console.log(result);
     return result === "productEntryLines;";
   }
 

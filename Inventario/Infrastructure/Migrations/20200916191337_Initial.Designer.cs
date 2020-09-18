@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(InventarioDbContext))]
-    [Migration("20200901173256_ChequesValues")]
-    partial class ChequesValues
+    [Migration("20200916191337_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -126,6 +126,111 @@ namespace Infrastructure.Migrations
                     b.ToTable("Clients");
                 });
 
+            modelBuilder.Entity("Data.Commission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ClientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ClientName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Product")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("VendorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("Commissions");
+                });
+
+            modelBuilder.Entity("Data.Detail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SaleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SaleId");
+
+                    b.ToTable("Details");
+                });
+
             modelBuilder.Entity("Data.Fee", b =>
                 {
                     b.Property<Guid>("Id")
@@ -161,9 +266,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("State")
-                        .HasColumnType("int");
 
                     b.Property<double>("Value")
                         .HasColumnType("float");
@@ -249,6 +351,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFixed")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastModificationAt")
@@ -507,7 +612,12 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("LastModificationBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("VendorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("ProductEntries");
                 });
@@ -599,19 +709,11 @@ namespace Infrastructure.Migrations
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
 
                     b.HasIndex("PaymentId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Sales");
                 });
@@ -701,7 +803,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CUIL")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -717,7 +818,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -742,7 +842,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CUIL")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CUIL] IS NOT NULL");
 
                     b.HasIndex("Mail")
                         .IsUnique()
@@ -775,6 +876,9 @@ namespace Infrastructure.Migrations
                         .HasColumnName("CreditCard_Discount")
                         .HasColumnType("float");
 
+                    b.Property<double>("Surcharge")
+                        .HasColumnType("float");
+
                     b.HasDiscriminator().HasValue("CreditCard");
                 });
 
@@ -790,7 +894,12 @@ namespace Infrastructure.Migrations
                         .HasColumnName("DebitCard_CardType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("Discount")
+                        .HasColumnName("DebitCard_Discount")
+                        .HasColumnType("float");
+
                     b.Property<double>("Surcharge")
+                        .HasColumnName("DebitCard_Surcharge")
                         .HasColumnType("float");
 
                     b.HasDiscriminator().HasValue("DebitCard");
@@ -810,15 +919,38 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("FeeRuleId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasIndex("FeeRuleId");
-
                     b.HasDiscriminator().HasValue("OwnFees");
+                });
+
+            modelBuilder.Entity("Data.Commission", b =>
+                {
+                    b.HasOne("Data.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId");
+
+                    b.HasOne("Data.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Data.Detail", b =>
+                {
+                    b.HasOne("Data.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Sale", "Sale")
+                        .WithMany("Details")
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Data.Fee", b =>
@@ -872,6 +1004,13 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Data.ProductEntry", b =>
+                {
+                    b.HasOne("Data.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId");
+                });
+
             modelBuilder.Entity("Data.ProductEntryLine", b =>
                 {
                     b.HasOne("Data.ProductEntry", "ProductEntry")
@@ -898,19 +1037,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Data.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Data.OwnFees", b =>
-                {
-                    b.HasOne("Data.FeeRule", "FeeRule")
-                        .WithMany()
-                        .HasForeignKey("FeeRuleId");
                 });
 #pragma warning restore 612, 618
         }

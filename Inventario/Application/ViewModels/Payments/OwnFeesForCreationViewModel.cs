@@ -8,7 +8,6 @@ namespace Application.ViewModels
     {
         public int Quantity { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public Guid? FeeRuleId { get; set; }
         //public List<FeeForCreationViewModel> FeeList;
 
         //public OwnFeeesDto()

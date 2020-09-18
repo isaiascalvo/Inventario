@@ -3,8 +3,10 @@
     <div
       class="card column"
       v-bind:class="{
-        'is-4 is-offset-4': activeStep !== 1 || sale.paymentType !== 4,
-        'is-6 is-offset-3': activeStep === 1 && sale.paymentType === 4
+        'is-4 is-offset-4':
+          activeStep !== 1 && (activeStep !== 2 || sale.paymentType !== 4),
+        'is-6 is-offset-3':
+          activeStep === 1 || (activeStep === 2 && sale.paymentType === 4)
       }"
     >
       <div class="card-content">
@@ -27,7 +29,7 @@
             label-position="bottom"
             mobile-mode="minimalist"
           >
-            <b-step-item step="1" label="Paso 1" clickable>
+            <b-step-item step="1" label="Paso 1">
               <!-- <h1 class="title has-text-centered">Account</h1> -->
               <b-field label="Cliente comprador:">
                 <b-autocomplete
@@ -64,60 +66,125 @@
                   trap-focus
                   horizontal-time-picker
                   editable
-                  @input="getPriceValue()"
                   @blur="dateFocus = true"
                 >
                 </b-datetimepicker>
               </b-field>
-
-              <b-field
-                label="Producto"
-                :type="
-                  prodFocus && !fieldState(sale.productId) ? 'is-danger' : ''
-                "
-                :message="
-                  prodFocus && !fieldState(sale.productId)
-                    ? 'Debe seleccionar un Producto'
-                    : ''
-                "
-              >
-                <b-autocomplete
-                  v-model="prodCodNameDesc"
-                  :data="filteredProducts()"
-                  placeholder="ej.: Producto X"
-                  icon="magnify"
-                  icon-right="close-circle"
-                  icon-right-clickable
-                  @icon-right-click="
-                    sale.productId = prodCodNameDesc = undefined
-                  "
-                  @select="option => getProductId(option)"
-                  @blur="prodFocus = true"
-                >
-                  <template slot="empty">No se encontraron resultados</template>
-                </b-autocomplete>
-              </b-field>
-
-              <b-field label="Cantidad:">
-                <b-numberinput
-                  controls-position="compact"
-                  controls-rounded
-                  v-model="sale.quantity"
-                  placeholder="Ingrese la cantidad"
-                  min="1"
-                  type="is-dark"
-                  required
-                  validation-message="Debe ingresar una cantidad"
-                ></b-numberinput>
-              </b-field>
-
-              <b-field>
-                <p class="pMargin"><strong>Precio Unitario: $</strong></p>
-                <b-input :value="getUnitPrice()" disabled></b-input>
-              </b-field>
             </b-step-item>
 
-            <b-step-item step="2" label="Paso 2" clickable>
+            <b-step-item step="2" label="Paso 2">
+              <b-table striped hoverable :data="sale.details">
+                <template slot-scope="props">
+                  <b-table-column field="productId" label="Producto">
+                    <b-field
+                      :type="
+                        prodCodNameDesc[getIndex(props.row)].focus &&
+                        !fieldState(props.row.productId)
+                          ? 'is-danger'
+                          : ''
+                      "
+                      :message="
+                        prodCodNameDesc[getIndex(props.row)].focus &&
+                        !fieldState(props.row.productId)
+                          ? 'Debe seleccionar un Producto'
+                          : ''
+                      "
+                    >
+                      <b-autocomplete
+                        v-model="prodCodNameDesc[getIndex(props.row)].text"
+                        :data="filteredProducts(props.row)"
+                        placeholder="Producto"
+                        icon-right="close-circle"
+                        size="is-small"
+                        icon-right-clickable
+                        @icon-right-click="
+                          props.row.productId = prodCodNameDesc[
+                            getIndex(props.row)
+                          ].text = ''
+                        "
+                        @select="
+                          option =>
+                            (props.row.productId = getProductIdByDetail(
+                              option,
+                              props.index
+                            ))
+                        "
+                        @blur="
+                          prodCodNameDesc[getIndex(props.row)].focus = true
+                        "
+                      >
+                        <template slot="empty"
+                          >No se encontraron resultados</template
+                        >
+                      </b-autocomplete>
+                    </b-field>
+                  </b-table-column>
+
+                  <b-table-column field="quantity" label="Cantidad">
+                    <b-field>
+                      <b-input
+                        v-model="props.row.quantity"
+                        placeholder="Cantidad"
+                        size="is-small"
+                        type="number"
+                        required
+                        validation-message="Debe ingresar la cantidad"
+                        @input="forceUpdate()"
+                      >
+                      </b-input>
+                    </b-field>
+                  </b-table-column>
+
+                  <b-table-column label="Precio unitario">
+                    <b-field>
+                      <b-input
+                        size="is-small"
+                        :value="
+                          '$' + prodCodNameDesc[getIndex(props.row)].unitPrice
+                        "
+                        disabled
+                      ></b-input>
+                    </b-field>
+                  </b-table-column>
+
+                  <b-table-column label="Subtotal">
+                    <b-field>
+                      <b-input
+                        size="is-small"
+                        :value="
+                          '$' +
+                            prodCodNameDesc[getIndex(props.row)].unitPrice *
+                              (props.row.quantity ? props.row.quantity : 0)
+                        "
+                        disabled
+                      ></b-input>
+                    </b-field>
+                  </b-table-column>
+
+                  <b-table-column field="action">
+                    <b-button
+                      @click="deleteDetail(props.row)"
+                      type="is-small"
+                      class="actionButton"
+                    >
+                      <b-icon icon="delete"></b-icon>
+                    </b-button>
+                  </b-table-column>
+                </template>
+
+                <template slot="footer">
+                  <b-button
+                    class="is-blue"
+                    size="is-small"
+                    @click="pushDetail()"
+                  >
+                    Agregar Producto
+                  </b-button>
+                </template>
+              </b-table>
+            </b-step-item>
+
+            <b-step-item step="3" label="Paso 3">
               <!-- <h1 class="title has-text-centered">Profile</h1> -->
 
               <b-field label="Método de pago:">
@@ -161,34 +228,8 @@
                     type="is-dark"
                     required
                     validation-message="Debe ingresar la cantidad de cuotas"
-                    @input="
-                      getRule();
-                      forceUpdate();
-                    "
+                    @input="getFeeValue()"
                   ></b-numberinput>
-                  <!-- <b-select
-                    v-model="sale.ownFees.feeRuleId"
-                    placeholder="Seleccione la cantidad de cuotas"
-                    expanded
-                    required
-                    validation-message="Debe seleccionar la cantidad de cuotas"
-                    @input="option => getRule(option)"
-                  >
-                    <option disabled v-if="feeRules.length === 0" :value="null">
-                      Este producto no se puede pagar en cuotas
-                    </option>
-                    <option
-                      v-for="feeRule in feeRules"
-                      :value="feeRule.id"
-                      :key="feeRule.id"
-                    >
-                      {{
-                        feeRule.feesAmountTo +
-                          " cuotas de $" +
-                          getFeeValue(feeRule.id)
-                      }}
-                    </option>
-                  </b-select> -->
                 </b-field>
 
                 <div
@@ -379,18 +420,18 @@
                   </b-table>
                 </div>
               </template>
+
+              <div style="text-align: center; margin-bottom: 5px;">
+                $ {{ saleAmount }}
+              </div>
             </b-step-item>
 
-            <b-step-item step="3" label="Paso Final" clickable>
+            <b-step-item step="4" label="Paso Final">
               <b-field>
                 <p class="pMargin">
                   <strong>Importe Total: $</strong>
                 </p>
-                <b-input
-                  v-model="sale.amount"
-                  :value="getImporte()"
-                  disabled
-                ></b-input>
+                <b-input v-model="saleAmount" disabled></b-input>
               </b-field>
             </b-step-item>
 
@@ -415,7 +456,7 @@
                 v-if="activeStep === 2"
                 native-type="submit"
                 class="is-success mr-1"
-                :disabled="!formValid()"
+                :disabled="nextDisabled()"
               >
                 Confirmar
               </b-button>
@@ -450,20 +491,20 @@ import { Client } from "../../models/client";
 import { NavigatorProductService } from "../../services/product-service";
 import { NavigatorClientService } from "../../services/client-service";
 import {
-  OwnFeesForCreation,
-  CashForCreation,
-  CreditCardForCreation,
-  DebitCardForCreation,
   Cash,
   OwnFees,
   CreditCard,
   DebitCard,
   Cheque,
-  ChequesPayment
+  ChequesPayment,
+  CashForCreation,
+  CreditCardForCreation,
+  DebitCardForCreation
 } from "@/models/payment";
 import { paymentTypes } from "@/enums/paymentTypes";
 import { FeeRule } from "@/models/feeRule";
 import { NavigatorFeeRuleService } from "@/services/fee-rule-service";
+import { Detail } from "@/models/detail";
 
 @Component
 export default class EditSale extends Vue {
@@ -478,27 +519,17 @@ export default class EditSale extends Vue {
   public feeRuleService: NavigatorFeeRuleService = new NavigatorFeeRuleService();
   public isLoading = false;
   public priceValue: number | undefined = undefined;
-  public monthNames = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diceimbre"
-  ];
-  public dayNames = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
-  public prodCodNameDesc = "";
+  public prodCodNameDesc: {
+    text: string;
+    focus: boolean;
+    unitPrice: number;
+  }[] = [];
   public prodFocus = false;
   public dateFocus = false;
   public activeStep = 0;
   public feeValue?: number = undefined;
   public maxFeesAmount = 0;
+  public saleAmount = 0;
 
   fieldState(field: unknown) {
     return fieldStateValidation(field);
@@ -525,14 +556,8 @@ export default class EditSale extends Vue {
     );
   }
 
-  parseDate(date: string) {
-    const dateSplited = date.split("/");
-    return new Date(
-      Date.parse(dateSplited[1] + "/" + dateSplited[0] + "/" + dateSplited[2])
-    );
-  }
-
   forceUpdate() {
+    this.getImporte();
     this.$forceUpdate();
   }
 
@@ -545,6 +570,15 @@ export default class EditSale extends Vue {
     this.sale.cheques?.listOfCheques.push(new Cheque());
   }
 
+  pushDetail() {
+    this.sale.details.push(new Detail());
+    this.prodCodNameDesc.push({
+      text: "",
+      focus: false,
+      unitPrice: 0
+    });
+  }
+
   deleteCheque(cheque: Cheque) {
     const index = this.sale.cheques?.listOfCheques.indexOf(cheque);
     if (index !== undefined) {
@@ -552,51 +586,69 @@ export default class EditSale extends Vue {
     }
   }
 
-  getRule() {
-    console.log("Llamó");
-    const foundRule = this.feeRules.find(
-      x =>
-        x.feesAmountTo !== undefined &&
-        this.sale.ownFees?.quantity !== undefined &&
-        x.feesAmountTo >= this.sale.ownFees.quantity
-    );
-    if (foundRule) {
-      // (this.sale.ownFees as OwnFeesForCreation).quantity =
-      //   foundRule.feesAmountTo ?? 1;
-      (this.sale.ownFees as OwnFeesForCreation).feeRuleId = foundRule.id;
-      const percentage: number = foundRule.percentage ?? 0;
-      console.log(percentage);
-      if (
-        foundRule.feesAmountTo &&
-        this.priceValue &&
-        this.sale.quantity &&
-        this.sale.ownFees?.quantity
-      ) {
-        const v =
-          this.priceValue *
-          this.sale.quantity *
-          (1 + (percentage * this.sale.ownFees.quantity) / 100);
+  deleteDetail(detail: Detail) {
+    const index = this.getIndex(detail);
+    this.sale.details.splice(index, 1);
+    this.prodCodNameDesc.splice(index, 1);
 
-        this.sale.amount = Math.ceil(v * 100) / 100;
-        this.feeValue =
-          Math.ceil((this.sale.amount * 100) / this.sale.ownFees.quantity) /
-          100;
+    this.prodCodNameDesc.forEach((elem, index) => {
+      this.sale.details[index].productId = this.getProductIdByText(elem.text);
+    });
+    // this.formValid();
+  }
+
+  getFeeValue() {
+    this.saleAmount = 0;
+    this.sale.details.forEach((detail, index) => {
+      const foundRule = this.feeRules.find(
+        x =>
+          x.feesAmountTo !== undefined &&
+          this.sale.ownFees?.quantity !== undefined &&
+          x.productId === detail.productId &&
+          x.feesAmountTo >= this.sale.ownFees.quantity
+      );
+      if (foundRule) {
+        const percentage: number = foundRule.percentage ?? 0;
+        if (
+          foundRule.feesAmountTo &&
+          detail.quantity &&
+          this.sale.ownFees?.quantity
+        ) {
+          const v =
+            this.prodCodNameDesc[index].unitPrice *
+            detail.quantity *
+            (1 + (percentage * this.sale.ownFees.quantity) / 100);
+
+          this.saleAmount += Math.ceil(v * 100) / 100;
+        }
       }
-    }
-    console.log(this.sale.amount);
-    this.forceUpdate();
+    });
+    this.feeValue =
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      Math.ceil((this.saleAmount * 100) / this.sale.ownFees?.quantity!) / 100;
+    this.$forceUpdate();
   }
 
   public nextDisabled() {
     switch (this.activeStep) {
       case 0:
         return !(
-          fieldStateValidation(this.sale.productId) &&
           fieldStateValidation(this.sale.date) &&
-          fieldStateValidation(this.sale.quantity) &&
           fieldStateValidation(this.sale.clientName)
         );
-      case 1:
+      case 1: {
+        let band = false;
+        this.sale.details.forEach(detail => {
+          if (
+            !this.fieldState(detail.productId) ||
+            !this.fieldState(detail.quantity)
+          ) {
+            band = true;
+          }
+        });
+        return band;
+      }
+      case 2:
         return !this.validatePayment();
       default:
         return false;
@@ -703,156 +755,148 @@ export default class EditSale extends Vue {
       default:
         break;
     }
+    this.getImporte();
   }
 
   public getFeeRules() {
+    const productsIds: string[] = [];
+    this.sale.details.forEach(element => {
+      if (element.productId) {
+        productsIds.push(element.productId);
+      }
+    });
     this.isLoading = true;
-    if (this.sale.productId) {
-      this.feeRuleService
-        .getFeeRulesByProduct(this.sale.productId)
-        .then(response => {
-          this.isLoading = false;
-          this.feeRules = response;
-          this.maxFeesAmount =
-            this.feeRules[this.feeRules.length - 1].feesAmountTo ?? 0;
-        })
-        .catch(error => {
-          this.isLoading = true;
-          console.log(error);
-        });
-    }
+    this.feeRuleService
+      .getFeeRulesByProducts(productsIds)
+      .then(response => {
+        this.isLoading = false;
+        this.feeRules = response;
+        this.getMaximumFeesAmount(productsIds);
+      })
+      .catch(error => {
+        this.isLoading = true;
+        console.log(error);
+      });
+  }
+
+  getMaximumFeesAmount(productsIds: string[]) {
+    const maxFees: number[] = [];
+    productsIds.forEach(productId => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const n = this.feeRules
+        .filter(x => x.productId === productId)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        .sort((a, b) => b.feesAmountTo! - a.feesAmountTo!)[0].feesAmountTo!;
+      maxFees.push(n);
+    });
+    this.maxFeesAmount = maxFees.sort((a, b) => a - b)[0];
+    console.log(maxFees, this.maxFeesAmount);
   }
 
   getImporte() {
-    if (this.priceValue && this.sale.quantity) {
+    if (this.sale.details.length !== 0) {
+      this.getSaleAmount();
       switch (this.sale.paymentType) {
         case paymentTypes.cash:
           {
             const payCash = this.sale.cash as CashForCreation;
-            if (payCash.discount) {
-              this.sale.amount =
-                this.priceValue *
-                this.sale.quantity *
-                (1 - payCash.discount / 100);
+            if (payCash.discount !== undefined) {
+              this.saleAmount *= 1 - payCash.discount / 100;
             } else {
-              this.sale.amount = undefined;
+              this.saleAmount = 0;
             }
           }
           break;
         case paymentTypes.ownFees:
-          {
-            // const payOwnFee = this.sale.payment as OwnFeesForCreation;
-            // if (payOwnFee.quantity && this.priceValue && this.sale.quantity) {
-            //   this.sale.amount = this.priceValue * this.sale.quantity;
-            //   //(1 + (3 * payOwnFee.quantity) / 100)
-            //   const rule = this.feeRules.find(x => x.feesAmountTo);
-            //   console.log(rule);
-            // } else {
-            //   this.sale.amount = undefined;
-            // }
-          }
           break;
         case paymentTypes.creditcard:
           {
             const payCredit = this.sale.creditCard as CreditCardForCreation;
-            if (payCredit.discount) {
-              this.sale.amount =
-                this.priceValue *
-                this.sale.quantity *
-                (1 - payCredit.discount / 100);
+            if (
+              payCredit.discount !== undefined &&
+              payCredit.surcharge != undefined
+            ) {
+              this.saleAmount *=
+                1 + (payCredit.surcharge - payCredit.discount) / 100;
             } else {
-              this.sale.amount = undefined;
+              this.saleAmount = 0;
             }
           }
           break;
         case paymentTypes.debitcard:
           {
             const payDebit = this.sale.debitCard as DebitCardForCreation;
-            if (payDebit.surcharge) {
-              this.sale.amount =
-                this.priceValue *
-                this.sale.quantity *
-                (1 - payDebit.surcharge / 100);
+            if (
+              payDebit.surcharge !== undefined &&
+              payDebit.discount !== undefined
+            ) {
+              this.saleAmount *=
+                1 + (payDebit.surcharge - payDebit.discount) / 100;
             } else {
-              this.sale.amount = undefined;
+              this.saleAmount = 0;
             }
           }
           break;
         case paymentTypes.cheque:
-          this.sale.amount = this.priceValue * this.sale.quantity;
           break;
         default:
           break;
       }
     }
-    return this.sale.amount;
   }
 
-  getFeeValue(feeRuleId: string) {
-    if (this.sale.quantity && this.priceValue) {
-      let value = this.sale.quantity * this.priceValue;
-      const rule = this.feeRules.find(x => x.id === feeRuleId);
-      const percentage: number = rule && rule.percentage ? rule.percentage : 0;
-      if (rule && rule.feesAmountTo) {
-        value *= 1 + (percentage * rule.feesAmountTo) / 100;
-        return Math.ceil((value * 100) / rule.feesAmountTo) / 100;
-      }
-    }
+  getSaleAmount() {
+    this.saleAmount = 0;
+    this.sale.details.forEach((detail, index) => {
+      this.saleAmount +=
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        detail.quantity! * this.prodCodNameDesc[index].unitPrice;
+    });
   }
 
   getUnitPrice() {
     return this.priceValue !== undefined ? this.priceValue : "";
   }
 
-  getPriceValue() {
-    if (this.sale.productId && this.sale.date) {
-      const date = this.sale.date
-        ? this.sale.date.toISOString()
-        : new Date().toISOString();
-      this.isLoading = true;
-      this.productService
-        .getPriceByDate(this.sale.productId, date)
-        .then(response => {
-          this.priceValue = response as number;
-          this.isLoading = false;
-          this.$forceUpdate();
-        })
-        .catch(e => {
-          this.$buefy.dialog.alert({
-            title: "Error",
-            message:
-              "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-            type: "is-danger",
-            hasIcon: true,
-            icon: "times-circle",
-            iconPack: "fa",
-            ariaRole: "alertdialog",
-            ariaModal: true
-          });
-          this.isLoading = false;
-          console.log("error: ", e);
-        });
-    }
+  getPriceValue(productId: string): Promise<number> {
+    const date = this.sale.date
+      ? this.sale.date.toISOString()
+      : new Date().toISOString();
+    return this.productService.getPriceByDate(productId, date);
   }
 
-  filteredProducts() {
+  filteredProducts(row: Detail) {
     const filtered = this.products.filter(option => {
-      return option.name
-        ? option.name
-            .toString()
-            .toLowerCase()
-            .indexOf((this.prodCodNameDesc ?? "").toLowerCase()) >= 0
-        : false;
+      return (
+        (option.name
+          ? option.name
+              .toString()
+              .toLowerCase()
+              .indexOf(
+                (
+                  this.prodCodNameDesc[this.getIndex(row)].text ?? ""
+                ).toLowerCase()
+              ) >= 0
+          : false) &&
+        !this.sale.details.some(
+          pl => pl.productId === option.id && pl.productId !== row.id
+        )
+      );
     });
 
     const codNameDescArray: string[] = [];
 
     filtered.forEach(x => {
       if (x.name) {
-        codNameDescArray.push(x.code + " - " + x.name + " - " + x.description);
+        codNameDescArray.push(x.name + " - " + x.description + " - " + x.code);
       }
     });
     return codNameDescArray;
+  }
+
+  getIndex(row: Detail) {
+    const index = this.sale.details.indexOf(row);
+    return index;
   }
 
   filteredClients() {
@@ -875,18 +919,43 @@ export default class EditSale extends Vue {
     return dniNameArray;
   }
 
-  getProductId(option: string) {
+  getProductIdByText(text: string) {
     const prod = this.products.find(
-      x => x.code + " - " + x.name + " - " + x.description === option
+      x => x.name + " - " + x.description + " - " + x.code === text
     );
-    this.sale.productId = prod ? prod.id : undefined;
-    this.sale.paymentType = undefined;
-    this.sale.cash = undefined;
-    this.sale.ownFees = undefined;
-    this.sale.creditCard = undefined;
-    this.sale.debitCard = undefined;
-    this.sale.cheques = undefined;
-    this.getPriceValue();
+    return prod ? prod.id : undefined;
+  }
+
+  getProductIdByDetail(option: string, index: number) {
+    console.log(index);
+    const prod = this.products.find(
+      x => x.name + " - " + x.description + " - " + x.code === option
+    );
+    // this.sale.productId = prod ? prod.id : undefined;
+    if (prod) {
+      this.isLoading = true;
+      this.getPriceValue(prod.id)
+        .then(response => {
+          this.isLoading = false;
+          this.prodCodNameDesc[index].unitPrice = response as number;
+        })
+        .catch(e => {
+          this.$buefy.dialog.alert({
+            title: "Error",
+            message:
+              "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+            type: "is-danger",
+            hasIcon: true,
+            icon: "times-circle",
+            iconPack: "fa",
+            ariaRole: "alertdialog",
+            ariaModal: true
+          });
+          this.isLoading = false;
+          console.log("error: ", e);
+        });
+    }
+    return prod ? prod.id : undefined;
   }
 
   getClientId(option: string) {
@@ -968,41 +1037,41 @@ export default class EditSale extends Vue {
       })
       .then(response => {
         this.clients = response;
-        if (this.sale.id) {
-          this.isLoading = true;
-          this.saleService.getSale(this.sale.id).then(
-            data => {
-              this.sale = data as Sale;
-              this.sale.date = new Date(this.sale.date ?? "");
-              const pp =
-                this.products.find(x => x.id === this.sale.productId) ??
-                new Product();
-              this.prodCodNameDesc =
-                pp.code + " - " + pp.name + " - " + pp.description;
-              this.isLoading = false;
-              this.getPriceValue();
-            },
-            error => {
-              this.$buefy.dialog.alert({
-                title: "Error",
-                message:
-                  "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-                type: "is-danger",
-                hasIcon: true,
-                icon: "times-circle",
-                iconPack: "fa",
-                ariaRole: "alertdialog",
-                ariaModal: true
-              });
-              console.log(error);
-              this.isLoading = true;
-            }
-          );
-        } else {
-          this.sale.date = new Date();
-          this.sale.quantity = 1;
-          this.isLoading = false;
-        }
+        // if (this.sale.id) {
+        //   this.isLoading = true;
+        //   this.saleService.getSale(this.sale.id).then(
+        //     data => {
+        //       this.sale = data as Sale;
+        //       this.sale.date = new Date(this.sale.date ?? "");
+        //       // const pp =
+        //       //   this.products.find(x => x.id === this.sale.productId) ??
+        //       //   new Product();
+        //       // this.prodCodNameDesc =
+        //       //   pp.code + " - " + pp.name + " - " + pp.description;
+        //       this.isLoading = false;
+        //       this.getPriceValue();
+        //     },
+        //     error => {
+        //       this.$buefy.dialog.alert({
+        //         title: "Error",
+        //         message:
+        //           "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+        //         type: "is-danger",
+        //         hasIcon: true,
+        //         icon: "times-circle",
+        //         iconPack: "fa",
+        //         ariaRole: "alertdialog",
+        //         ariaModal: true
+        //       });
+        //       console.log(error);
+        //       this.isLoading = true;
+        //     }
+        //   );
+        // } else {
+        this.sale.date = new Date();
+        this.pushDetail();
+        this.isLoading = false;
+        // }
       })
       .catch(e => {
         this.isLoading = false;

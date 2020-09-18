@@ -106,12 +106,12 @@ namespace Application.Controllers
             }
         }
 
-        [HttpGet("ByProduct/{productId}")]
-        public async Task<IActionResult> GetByProduct(Guid productId)
+        [HttpPost("ByProducts")]
+        public async Task<IActionResult> GetByProducts(List<Guid> productsIds)
         {
             try
             {
-                IEnumerable<FeeRuleDto> feeRuleDto = await _feeRuleUseCases.GetByProduct(productId);
+                IEnumerable<FeeRuleDto> feeRuleDto = await _feeRuleUseCases.GetByProducts(productsIds);
                 IEnumerable<FeeRuleViewModel> feeRuleVM = _mapper.Map<IEnumerable<FeeRuleDto>, IEnumerable<FeeRuleViewModel>>(feeRuleDto);
                 return Ok(feeRuleVM);
             }

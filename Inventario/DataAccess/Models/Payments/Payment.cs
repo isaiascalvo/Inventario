@@ -8,9 +8,5 @@ namespace Data
     {
         public Guid SaleId { get; set; }
         public double Amount { get; set; }
-        public virtual double GetTotal() 
-        {
-            return Amount;
-        }
     }
 }

@@ -79,8 +79,6 @@ export class CreditCard extends CreditCardForCreation {
 export class OwnFeesForCreation extends Payment {
   public quantity: number | undefined = undefined;
   public expirationDate: Date | undefined = undefined;
-  public feeRuleId?: string;
-  public feeRule?: FeeRule;
 
   /**
    *

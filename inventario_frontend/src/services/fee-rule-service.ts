@@ -10,7 +10,7 @@ export interface FeeRuleService {
   updateFeeRule(feeRule: FeeRule): Promise<void>;
   deleteFeeRule(feeRuleId: string): Promise<void>;
   addFeeRuleByCategory(feeRuleByCategory: FeeRuleByCategory): Promise<void>;
-  getFeeRulesByProduct(productId: string): Promise<FeeRule[]>;
+  getFeeRulesByProducts(productsIds: string[]): Promise<FeeRule[]>;
   getTotalQty(): Promise<number>;
   getTotalQtyByFilters(feeRuleFilters: FeeRuleFilters): Promise<number>;
   getByPageAndQty(skip: number, qty: number): Promise<FeeRule[]>;
@@ -88,8 +88,10 @@ export class NavigatorFeeRuleService implements FeeRuleService {
     return apiClient.post("/fee-rules/ByCategory", feeRuleByCategory);
   }
 
-  public async getFeeRulesByProduct(productId: string): Promise<FeeRule[]> {
-    return await (await apiClient.get("/fee-rules/ByProduct/" + productId))
+  public async getFeeRulesByProducts(
+    productsIds: string[]
+  ): Promise<FeeRule[]> {
+    return await (await apiClient.post("/fee-rules/ByProducts", productsIds))
       .data;
   }
 

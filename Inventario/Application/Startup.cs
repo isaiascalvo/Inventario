@@ -115,6 +115,7 @@ namespace Application
             services.AddScoped<IProductEntryRepository, ProductEntryRepository>();
             services.AddScoped<IProductEntryLineRepository, ProductEntryLineRepository>();
             services.AddScoped<ISaleRepository, SaleRepository>();
+            services.AddScoped<IDetailRepository, DetailRepository>();
             services.AddScoped<ICashRepository, CashRepository>();
             services.AddScoped<ICreditCardRepository, CreditCardRepository>();
             services.AddScoped<IDebitCardRepository, DebitCardRepository>();

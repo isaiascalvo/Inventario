@@ -154,7 +154,7 @@
           No hay ventas registradas
         </template>
         <template slot-scope="props">
-          <b-table-column field="productId" label="Producto">
+          <!-- <b-table-column field="productId" label="Producto">
             <b-tooltip
               :label="getProductDescription(props.row.product)"
               position="is-right"
@@ -173,7 +173,7 @@
           </b-table-column>
           <b-table-column field="quantity" label="Cantidad" centered>
             {{ props.row.quantity }}
-          </b-table-column>
+          </b-table-column> -->
           <b-table-column field="clientName" label="Cliente" centered>
             <span
               v-if="props.row.clientId"

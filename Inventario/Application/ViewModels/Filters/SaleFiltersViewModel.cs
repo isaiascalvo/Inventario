@@ -9,14 +9,13 @@ namespace Application.ViewModels
     {
         public string? ClientName { get; set; }
         public Guid? ClientId { get; set; }
-        public Guid? ProductId { get; set; }
         public string? DateFrom { get; set; }
         public string? DateTo { get; set; }
         public ePaymentTypes? PaymentType { get; set; }
 
         public bool IsEmpty()
         {
-            return ClientName == null && ClientId == null && ProductId == null && DateFrom == null && DateTo == null && PaymentType == null;
+            return ClientName == null && ClientId == null && DateFrom == null && DateTo == null && PaymentType == null;
         }
     }
 }

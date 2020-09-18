@@ -11,7 +11,7 @@ namespace Infrastructure.EFCore
     public interface IGenericRepository<T> where T : class, IEntity
     {
         Task<List<T>> GetAll(params Expression<Func<T, object>>[] includeProperties);
-        Task<List<T>> Find(Expression<Func<T, bool>> predicate);
+        Task<List<T>> Find(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includeProperties);
         Task<T> GetById(Guid id, params Expression<Func<T, object>>[] includeProperties);
         Task<T> Add(T entity);
         Task<T> Update(T entity);

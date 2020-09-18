@@ -76,9 +76,14 @@ namespace Infrastructure.EFCore
             return entity;
         }
 
-        public async Task<List<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
+        public async Task<List<TEntity>> Find(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
         {
-            return await _context.Set<TEntity>().Where(predicate).Where(e => !e.IsDeleted).ToListAsync();
+            IQueryable<TEntity> query = _context.Set<TEntity>();
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+            return await query.Where(predicate).Where(e => !e.IsDeleted).ToListAsync();
         }
 
         public IQueryable<TEntity> AllIncluding(params Expression<Func<TEntity, object>>[] includeProperties)

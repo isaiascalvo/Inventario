@@ -10,7 +10,7 @@ namespace Logic.Interfaces
     {
         Task<FeeRuleDto> GetOne(Guid id);
         Task<IEnumerable<FeeRuleDto>> GetAll();
-        Task<IEnumerable<FeeRuleDto>> GetByProduct(Guid productId);
+        Task<IEnumerable<FeeRuleDto>> GetByProducts(List<Guid> productsIds);
         Task Delete(Guid userId, Guid id);
         Task<FeeRuleDto> Create(Guid userId, FeeRuleForCreationDto feeRuleForCreationDto);
         Task Update(Guid id, FeeRuleDto feeRuleDto);

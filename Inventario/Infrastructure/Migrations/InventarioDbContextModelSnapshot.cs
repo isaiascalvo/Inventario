@@ -184,6 +184,51 @@ namespace Infrastructure.Migrations
                     b.ToTable("Commissions");
                 });
 
+            modelBuilder.Entity("Data.Detail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SaleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SaleId");
+
+                    b.ToTable("Details");
+                });
+
             modelBuilder.Entity("Data.Fee", b =>
                 {
                     b.Property<Guid>("Id")
@@ -662,19 +707,11 @@ namespace Infrastructure.Migrations
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
 
                     b.HasIndex("PaymentId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Sales");
                 });
@@ -880,13 +917,8 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("FeeRuleId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.HasIndex("FeeRuleId");
 
                     b.HasDiscriminator().HasValue("OwnFees");
                 });
@@ -900,6 +932,21 @@ namespace Infrastructure.Migrations
                     b.HasOne("Data.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Data.Detail", b =>
+                {
+                    b.HasOne("Data.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Sale", "Sale")
+                        .WithMany("Details")
+                        .HasForeignKey("SaleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -988,19 +1035,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Data.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Data.OwnFees", b =>
-                {
-                    b.HasOne("Data.FeeRule", "FeeRule")
-                        .WithMany()
-                        .HasForeignKey("FeeRuleId");
                 });
 #pragma warning restore 612, 618
         }

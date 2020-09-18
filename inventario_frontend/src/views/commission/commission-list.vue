@@ -154,7 +154,7 @@
           No hay comisiones registradas
         </template>
         <template slot-scope="props">
-          <b-table-column field="vendorId" label="Vendor">
+          <b-table-column field="vendorId" label="Proveedor">
             <span
               class="link"
               @click="openModalVendorPreview(props.row.vendorId)"

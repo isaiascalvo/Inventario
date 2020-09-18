@@ -89,22 +89,24 @@ namespace Logic
             return _mapper.Map<IEnumerable<FeeRule>, IEnumerable<FeeRuleDto>>(users);
         }
 
-        public async Task<IEnumerable<FeeRuleDto>> GetByProduct(Guid productId)
+        public async Task<IEnumerable<FeeRuleDto>> GetByProducts(List<Guid> productsIds)
         {
             List<FeeRule> feeRules = new List<FeeRule>();
-            var productFeeRules = await _feeRuleRepositoryRepository.Find(x => x.ProductId == productId);
-
-            var groups = productFeeRules.GroupBy(x => x.FeesAmountTo);
-            foreach (var group in groups)
+            foreach (var productId in productsIds)
             {
-                var fee = group.OrderByDescending(x => x.Date).FirstOrDefault();
-                if (fee != null)
+                List<FeeRule> productFeeRules = await _feeRuleRepositoryRepository.Find(x => x.ProductId == productId);
+                var groups = productFeeRules.GroupBy(x => x.FeesAmountTo);
+                foreach (var group in groups)
                 {
-                    feeRules.Add(fee);
+                    var fee = group.OrderByDescending(x => x.Date).FirstOrDefault();
+                    if (fee != null)
+                    {
+                        feeRules.Add(fee);
+                    }
                 }
             }
             
-            feeRules = feeRules.OrderBy(x => x.FeesAmountTo).ToList();
+            feeRules = feeRules.OrderBy(x => x.ProductId).ThenBy(x => x.FeesAmountTo).ToList();
             return _mapper.Map<List<FeeRule>, List<FeeRuleDto>>(feeRules);
         }
 

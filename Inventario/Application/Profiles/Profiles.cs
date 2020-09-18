@@ -61,6 +61,10 @@ namespace Application.Profiles
             CreateMap<SaleViewModel, SaleDto>();
             CreateMap<SaleDto, SaleViewModel>();
             CreateMap<SaleForCreationViewModel, SaleForCreationDto>();
+            
+            CreateMap<DetailViewModel, DetailDto>();
+            CreateMap<DetailDto, DetailViewModel>();
+            CreateMap<DetailForCreationViewModel, DetailForCreationDto>();
 
             CreateMap<CashViewModel, CashDto>();
             CreateMap<CashDto, CashViewModel>();

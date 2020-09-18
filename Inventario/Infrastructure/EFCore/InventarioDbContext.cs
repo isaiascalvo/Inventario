@@ -23,6 +23,7 @@ namespace Infrastructure.EFCore
         public DbSet<ProductEntry> ProductEntries { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Sale> Sales { get; set; }
+        public DbSet<Detail> Details { get; set; }
         public DbSet<MiscellaneousExpenses> MiscellaneousExpenses { get; set; }
         public DbSet<Cash> CashPayments { get; set; }
         public DbSet<CreditCard> CreditCardPayments { get; set; }
@@ -51,10 +52,6 @@ namespace Infrastructure.EFCore
                 .HasForeignKey(p => p.VendorId);
             modelBuilder.Entity<Product>()
                  .HasIndex(p => p.Code).IsUnique();
-            //modelBuilder.Entity<Product>()
-            //    .HasOne(a => a.Brand)
-            //    .WithMany()
-            //    .HasForeignKey(a => a.BrandId);
 
             //Vendor
             modelBuilder.Entity<Vendor>()
@@ -76,9 +73,6 @@ namespace Infrastructure.EFCore
                 .HasIndex(c => c.Dni).IsUnique();
             modelBuilder.Entity<Client>()
                 .HasIndex(c => c.Mail).IsUnique();
-            //.hasone(p => p.city)
-            //.withmany()
-            //.hasforeignkey(p => p.cityid);
 
             //ProductEntryLine
             modelBuilder.Entity<ProductEntryLine>()
@@ -113,13 +107,23 @@ namespace Infrastructure.EFCore
 
             //Sale
             modelBuilder.Entity<Sale>()
-                .HasOne(p => p.Product)
+                .HasOne(p => p.Client)
                 .WithMany()
-                .HasForeignKey(p => p.ProductId);
+                .HasForeignKey(p => p.ClientId);
             modelBuilder.Entity<Sale>()
                 .HasOne(p => p.Payment)
                 .WithMany()
                 .HasForeignKey(p => p.PaymentId);
+
+            //Detail
+            modelBuilder.Entity<Detail>()
+                .HasOne(d => d.Sale)
+                .WithMany(s => s.Details)
+                .HasForeignKey(d => d.SaleId);
+            modelBuilder.Entity<Detail>()
+                .HasOne(p => p.Product)
+                .WithMany()
+                .HasForeignKey(p => p.ProductId);
 
             //Fee
             modelBuilder.Entity<Fee>()

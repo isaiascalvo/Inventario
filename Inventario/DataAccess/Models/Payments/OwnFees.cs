@@ -9,8 +9,8 @@ namespace Data
     {
         public int Quantity { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public Guid? FeeRuleId { get; set; }
-        public FeeRule? FeeRule { get; set; }
+        //public Guid? FeeRuleId { get; set; }
+        //public FeeRule? FeeRule { get; set; }
         public List<Fee> FeeList { get; set; }
 
         public OwnFees()
@@ -34,7 +34,6 @@ namespace Data
                 {
                     var acum = feeValue * 100 * (Quantity - 1);
                     feeValue = (Amount * 100 - acum) / 100;
-
                 }
                 var fee = new Fee
                 {

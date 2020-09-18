@@ -251,6 +251,9 @@ export default class EditProduct extends Vue {
       vendorId: this.product.vendorId,
       purchasePrice: new PriceForCreation(),
       salePrice: new PriceForCreation(),
+      minimumStock: this.product.minimumStock
+        ? +this.product.minimumStock
+        : undefined,
       stock: +this.product.stock,
       unitOfMeasurement: this.product.unitOfMeasurement
     };
