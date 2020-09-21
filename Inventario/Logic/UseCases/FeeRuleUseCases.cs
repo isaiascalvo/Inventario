@@ -3,6 +3,7 @@ using Data;
 using Infrastructure.Repositories;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -167,7 +168,7 @@ namespace Logic
         private async Task<List<FeeRule>> GetActiveFeeRules()
         {
             List<FeeRule> feeRules = new List<FeeRule>();
-            var feeRulesGroups = (await _feeRuleRepositoryRepository.GetAll(x => x.Product)).GroupBy(x => x.ProductId);
+            var feeRulesGroups = (await _feeRuleRepositoryRepository.GetAll(x => x.Include(f => f.Product))).GroupBy(x => x.ProductId);
             foreach (var group in feeRulesGroups)
             {
                 var subGroups = group.GroupBy(x => x.FeesAmountTo);

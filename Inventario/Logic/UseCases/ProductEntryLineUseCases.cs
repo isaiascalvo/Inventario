@@ -3,6 +3,7 @@ using Data;
 using Infrastructure.Repositories;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +57,7 @@ namespace Logic
 
         public async Task Delete(Guid userId, Guid id)
         {
-            var productEntryLine = await _productEntryLineRepository.GetById(id, x => x.ProductEntry);
+            var productEntryLine = await _productEntryLineRepository.GetById(id, x => x.Include(pel => pel.ProductEntry));
             if (productEntryLine == null)
                 throw new KeyNotFoundException($"Product entry line with id: {id} not found.");
 

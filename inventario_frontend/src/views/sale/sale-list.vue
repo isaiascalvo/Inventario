@@ -216,6 +216,13 @@
 
           <b-table-column field="action" label="Acciones" centered>
             <b-button
+              @click="openModalSaleDetails(props.row.details)"
+              type="is-small"
+              class="actionButton"
+            >
+              <b-icon icon="format-list-bulleted"></b-icon>
+            </b-button>
+            <b-button
               @click="deleteSale(props.row)"
               type="is-small"
               class="actionButton"
@@ -250,15 +257,12 @@ import { Product } from "@/models/product";
 import { NavigatorClientService } from "@/services/client-service";
 import { NavigatorProductService } from "@/services/product-service";
 import ModalClientPreview from "@/components/modals/ModalClientPreview.vue";
-import ModalProductPreview from "@/components/modals/ModalProductPreview.vue";
 import ModalChequePreview from "@/components/modals/ModalChequePreview.vue";
 import ModalOwnFeesPreview from "@/components/modals/ModalOwnFeesPreview.vue";
+import { Detail } from "@/models/detail";
+import ModalSaleDetails from "@/components/modals/ModalSaleDetails.vue";
 
-@Component({
-  components: {
-    ModalClientPreview
-  }
-})
+@Component
 export default class SaleList extends Vue {
   public sales: Sale[] = [];
   public clients: Client[] = [];
@@ -519,19 +523,6 @@ export default class SaleList extends Vue {
     });
   }
 
-  openModalProductPreview(productId: string) {
-    this.$buefy.modal.open({
-      parent: this,
-      component: ModalProductPreview,
-      hasModalCard: true,
-      customClass: "custom-class custom-class-2",
-      trapFocus: true,
-      props: {
-        productId: productId
-      }
-    });
-  }
-
   openModalChequesPreview(cheques: ChequesPayment) {
     this.$buefy.modal.open({
       parent: this,
@@ -554,6 +545,19 @@ export default class SaleList extends Vue {
       trapFocus: true,
       props: {
         ownFees: ownFees
+      }
+    });
+  }
+
+  openModalSaleDetails(details: Detail[]) {
+    this.$buefy.modal.open({
+      parent: this,
+      component: ModalSaleDetails,
+      hasModalCard: true,
+      customClass: "custom-class custom-class-2",
+      trapFocus: true,
+      props: {
+        details: details
       }
     });
   }

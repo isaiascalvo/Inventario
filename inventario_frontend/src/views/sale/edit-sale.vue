@@ -5,8 +5,8 @@
       v-bind:class="{
         'is-4 is-offset-4':
           activeStep !== 1 && (activeStep !== 2 || sale.paymentType !== 4),
-        'is-6 is-offset-3':
-          activeStep === 1 || (activeStep === 2 && sale.paymentType === 4)
+        'is-6 is-offset-3': activeStep === 2 && sale.paymentType === 4,
+        'is-8 is-offset-2': activeStep === 1
       }"
     >
       <div class="card-content">
@@ -75,7 +75,11 @@
             <b-step-item step="2" label="Paso 2">
               <b-table striped hoverable :data="sale.details">
                 <template slot-scope="props">
-                  <b-table-column field="productId" label="Producto">
+                  <b-table-column
+                    field="productId"
+                    label="Producto"
+                    width="60%"
+                  >
                     <b-field
                       :type="
                         prodCodNameDesc[getIndex(props.row)].focus &&
@@ -96,6 +100,8 @@
                         placeholder="Producto"
                         icon-right="close-circle"
                         size="is-small"
+                        expanded
+                        append-to-body
                         icon-right-clickable
                         @icon-right-click="
                           props.row.productId = prodCodNameDesc[
@@ -219,45 +225,59 @@
               </template>
 
               <template v-if="sale.paymentType === 1">
-                <b-field label="Cantidad de cuotas:">
-                  <b-numberinput
-                    v-model="sale.ownFees.quantity"
-                    placeholder="Ingrese la cantidad de cuotas"
-                    min="0"
-                    :max="maxFeesAmount"
-                    type="is-dark"
-                    required
-                    validation-message="Debe ingresar la cantidad de cuotas"
-                    @input="getFeeValue()"
-                  ></b-numberinput>
-                </b-field>
-
-                <div
-                  v-if="sale.ownFees.quantity"
-                  style="text-align: center; margin-bottom: 5px;"
-                >
-                  ({{
-                    sale.ownFees.quantity +
-                      " cuota" +
-                      (sale.ownFees.quantity === 1 ? "" : "s")
-                  }}
-                  de $ {{ feeValue }})
+                <div v-if="impossibleFee">
+                  <strong>
+                    Elija otro método de pago. Los siguientes productos no se
+                    pueden pagar en cuotas:
+                  </strong>
+                  <ul>
+                    <li v-for="ipf in impossibleFeeProducts" :key="ipf.id">
+                      {{ getProductDescription(ipf) }}
+                    </li>
+                  </ul>
                 </div>
+                <template v-else>
+                  <b-field label="Cantidad de cuotas:">
+                    <b-numberinput
+                      v-model="sale.ownFees.quantity"
+                      placeholder="Ingrese la cantidad de cuotas"
+                      min="0"
+                      :max="maxFeesAmount"
+                      type="is-dark"
+                      required
+                      validation-message="Debe ingresar la cantidad de cuotas"
+                      @input="getFeeValue()"
+                      :disabled="impossibleFee"
+                    ></b-numberinput>
+                  </b-field>
 
-                <b-field label="Fecha de vencimiento (primer cuota)">
-                  <b-datepicker
-                    v-model="sale.ownFees.expirationDate"
-                    placeholder="Seleccione una fecha"
-                    icon="calendar-today"
-                    trap-focus
-                    position="is-top-right"
-                    editable
-                    required
-                    validation-message="Debe ingresar una fecha"
-                    @input="forceUpdate()"
+                  <div
+                    v-if="sale.ownFees.quantity"
+                    style="text-align: center; margin-bottom: 5px;"
                   >
-                  </b-datepicker>
-                </b-field>
+                    ({{
+                      sale.ownFees.quantity +
+                        " cuota" +
+                        (sale.ownFees.quantity === 1 ? "" : "s")
+                    }}
+                    de $ {{ feeValue }})
+                  </div>
+
+                  <b-field label="Fecha de vencimiento (primer cuota)">
+                    <b-datepicker
+                      v-model="sale.ownFees.expirationDate"
+                      placeholder="Seleccione una fecha"
+                      icon="calendar-today"
+                      trap-focus
+                      position="is-top-right"
+                      editable
+                      required
+                      validation-message="Debe ingresar una fecha"
+                      @input="forceUpdate()"
+                    >
+                    </b-datepicker>
+                  </b-field>
+                </template>
               </template>
 
               <template v-if="sale.paymentType === 2">
@@ -421,7 +441,10 @@
                 </div>
               </template>
 
-              <div style="text-align: center; margin-bottom: 5px;">
+              <div
+                v-if="!impossibleFee"
+                style="text-align: center; margin-bottom: 5px;"
+              >
                 $ {{ saleAmount }}
               </div>
             </b-step-item>
@@ -445,7 +468,7 @@
                 Atrás
               </b-button>
               <b-button
-                v-if="activeStep !== 2"
+                v-if="activeStep !== 3"
                 outlined
                 :disabled="next.disabled || nextDisabled()"
                 @click.prevent="next.action"
@@ -453,7 +476,7 @@
                 Siguiente
               </b-button>
               <b-button
-                v-if="activeStep === 2"
+                v-if="activeStep === 3"
                 native-type="submit"
                 class="is-success mr-1"
                 :disabled="nextDisabled()"
@@ -530,6 +553,8 @@ export default class EditSale extends Vue {
   public feeValue?: number = undefined;
   public maxFeesAmount = 0;
   public saleAmount = 0;
+  public impossibleFee = false;
+  public impossibleFeeProducts: string[] = [];
 
   fieldState(field: unknown) {
     return fieldStateValidation(field);
@@ -560,11 +585,6 @@ export default class EditSale extends Vue {
     this.getImporte();
     this.$forceUpdate();
   }
-
-  // setFeeRule() {
-  //   if (this.sale.ownFees?.quantity) {
-  //   }
-  // }
 
   pushCheque() {
     this.sale.cheques?.listOfCheques.push(new Cheque());
@@ -706,6 +726,8 @@ export default class EditSale extends Vue {
   }
 
   public setPayment() {
+    this.impossibleFee = false;
+    this.impossibleFeeProducts = [];
     switch (this.sale.paymentType) {
       case paymentTypes.cash:
         this.sale.cash = new Cash();
@@ -781,16 +803,21 @@ export default class EditSale extends Vue {
 
   getMaximumFeesAmount(productsIds: string[]) {
     const maxFees: number[] = [];
+    this.impossibleFee = false;
+    this.impossibleFeeProducts = [];
     productsIds.forEach(productId => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const n = this.feeRules
-        .filter(x => x.productId === productId)
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        .sort((a, b) => b.feesAmountTo! - a.feesAmountTo!)[0].feesAmountTo!;
-      maxFees.push(n);
+      const pfr = this.feeRules.filter(x => x.productId === productId);
+      if (pfr.length > 0) {
+        maxFees.push(
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          pfr.sort((a, b) => b.feesAmountTo! - a.feesAmountTo!)[0].feesAmountTo!
+        );
+      } else {
+        this.impossibleFeeProducts.push(productId);
+        this.impossibleFee = true;
+      }
     });
     this.maxFeesAmount = maxFees.sort((a, b) => a - b)[0];
-    console.log(maxFees, this.maxFeesAmount);
   }
 
   getImporte() {
@@ -927,11 +954,10 @@ export default class EditSale extends Vue {
   }
 
   getProductIdByDetail(option: string, index: number) {
-    console.log(index);
     const prod = this.products.find(
       x => x.name + " - " + x.description + " - " + x.code === option
     );
-    // this.sale.productId = prod ? prod.id : undefined;
+    this.sale.paymentType = undefined;
     if (prod) {
       this.isLoading = true;
       this.getPriceValue(prod.id)
@@ -958,20 +984,19 @@ export default class EditSale extends Vue {
     return prod ? prod.id : undefined;
   }
 
+  getProductDescription(productId: string) {
+    const prod = this.products.find(x => x.id === productId);
+    if (prod && prod.name !== undefined) {
+      return prod.name + (prod.description ? " - " + prod.description : "");
+    }
+  }
+
   getClientId(option: string) {
     const client = this.clients.find(
       x => x.name + " - " + x.lastname + " - " + x.dni === option
     );
     this.sale.clientId = client ? client.id : undefined;
   }
-
-  // public submit() {
-  //   if (!this.sale.id) {
-  //     this.newSale();
-  //   } else {
-  //     this.updateSale();
-  //   }
-  // }
 
   public submit() {
     this.isLoading = true;
@@ -998,33 +1023,6 @@ export default class EditSale extends Vue {
         this.$router.push({ name: "SaleList" });
       });
   }
-
-  // public updateSale() {
-  //   this.isLoading = true;
-  //   // this.sale.quantity = +(this.sale.quantity ?? 0);
-  //   this.saleService
-  //     .updateSale(this.sale)
-  //     .then(() => {
-  //       this.isLoading = false;
-  //       this.$router.push({ name: "SaleList" });
-  //     })
-  //     .catch(e => {
-  //       this.isLoading = false;
-  //       this.$buefy.dialog.alert({
-  //         title: "Error",
-  //         message:
-  //           "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-  //         type: "is-danger",
-  //         hasIcon: true,
-  //         icon: "times-circle",
-  //         iconPack: "fa",
-  //         ariaRole: "alertdialog",
-  //         ariaModal: true
-  //       });
-  //       console.log("error: ", e);
-  //       this.$router.push({ name: "SaleList" });
-  //     });
-  // }
 
   created() {
     this.isLoading = true;

@@ -1,5 +1,6 @@
 ﻿using Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,24 +42,25 @@ namespace Infrastructure.EFCore
             return entity;
         }
 
-        public async Task<TEntity> GetById(Guid id, params Expression<Func<TEntity, object>>[] includeProperties)
+        public async Task<TEntity> GetById(Guid id, params Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>[] includeProperties)
         {
             IQueryable<TEntity> query = _context.Set<TEntity>();
             foreach (var includeProperty in includeProperties)
             {
-                query = query.Include(includeProperty);
+                query = includeProperty(query);
             }
             return await query.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
         }
 
-        public async Task<List<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] includeProperties)
+        public async Task<List<TEntity>> GetAll(params Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>[] includeProperties)
         {
             try
             {
                 IQueryable<TEntity> query = _context.Set<TEntity>();
                 foreach (var includeProperty in includeProperties)
                 {
-                    query = query.Include(includeProperty);
+                    //query = query.Include(includeProperty);
+                    query = includeProperty(query);
                 }
                 return await query.Where(e => !e.IsDeleted).ToListAsync();
             }
@@ -76,12 +78,14 @@ namespace Infrastructure.EFCore
             return entity;
         }
 
-        public async Task<List<TEntity>> Find(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+        public async Task<List<TEntity>> Find(Expression<Func<TEntity, bool>> predicate, params Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>[] includeProperties)
         {
             IQueryable<TEntity> query = _context.Set<TEntity>();
             foreach (var includeProperty in includeProperties)
             {
-                query = query.Include(includeProperty);
+                //query = query.Include(includeProperty);
+                //query = includeProperty.
+                query = includeProperty(query);
             }
             return await query.Where(predicate).Where(e => !e.IsDeleted).ToListAsync();
         }

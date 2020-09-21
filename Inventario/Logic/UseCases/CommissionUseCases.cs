@@ -3,6 +3,7 @@ using Data;
 using Infrastructure.Repositories;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +70,7 @@ namespace Logic
 
         public async Task<IEnumerable<CommissionDto>> GetAll()
         {
-            var commission = (await _commissionRepository.GetAll(x => x.Vendor)).OrderByDescending(x => x.Date).ThenBy(x => x.Vendor.Name);
+            var commission = (await _commissionRepository.GetAll(x => x.Include( c => c.Vendor))).OrderByDescending(x => x.Date).ThenBy(x => x.Vendor.Name);
             return _mapper.Map<IEnumerable<Commission>, IEnumerable<CommissionDto>>(commission);
         }
 
@@ -86,13 +87,13 @@ namespace Logic
 
         public async Task<IEnumerable<CommissionDto>> GetByPageAndQty(int skip, int qty)
         {
-            var commissions = (await _commissionRepository.GetAll(x => x.Vendor)).OrderByDescending(x => x.Date).ThenBy(x => x.Vendor.Name).Skip(skip).Take(qty);
+            var commissions = (await _commissionRepository.GetAll(x => x.Include(c => c.Vendor))).OrderByDescending(x => x.Date).ThenBy(x => x.Vendor.Name).Skip(skip).Take(qty);
             return _mapper.Map<IEnumerable<Commission>, IEnumerable<CommissionDto>>(commissions);
         }
 
         public async Task<IEnumerable<CommissionDto>> GetFilteredByPageAndQty(CommissionFiltersDto filtersDto, int skip, int qty)
         {
-            var commissions = (await _commissionRepository.GetAll(x => x.Vendor))
+            var commissions = (await _commissionRepository.GetAll(x => x.Include(c => c.Vendor)))
                 .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Date).ThenBy(x => x.Vendor.Name).Skip(skip).Take(qty);
             return _mapper.Map<IEnumerable<Commission>, IEnumerable<CommissionDto>>(commissions);
         }
@@ -101,7 +102,7 @@ namespace Logic
 
         public async Task<CommissionDto> GetOne(Guid id)
         {
-            var commission = await _commissionRepository.GetById(id, x => x.Vendor);
+            var commission = await _commissionRepository.GetById(id, x => x.Include(c => c.Vendor));
             if (commission == null)
                 throw new KeyNotFoundException($"Commission with id: {id} not found.");
 

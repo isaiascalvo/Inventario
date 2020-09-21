@@ -7,6 +7,7 @@ using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -216,7 +217,7 @@ namespace Logic
 
         public async Task<ProductDto> GetOne(Guid id)
         {
-            var product = await _productRepository.GetById(id, p => p.Category, p => p.Vendor);
+            var product = await _productRepository.GetById(id, x => x.Include(p => p.Category).Include(p => p.Vendor));
             if (product == null)
                 throw new KeyNotFoundException($"Product with id: {id} not found.");
 
@@ -360,7 +361,8 @@ namespace Logic
                     "<dinamic></dinamic>" +
                 "</table>");
 
-            var products = (await _productRepository.GetAll(x => x.Category, x => x.Vendor)).AsQueryable().Where(filtersDto.GetExpresion()).OrderBy(x => x.Name);
+            var products = (await _productRepository.GetAll(x => x.Include(p => p.Category).Include(p => p.Vendor)))
+                .AsQueryable().Where(filtersDto.GetExpresion()).OrderBy(x => x.Name);
             foreach (var prod in products)
             {
                 var purchasePrice = (await _priceRepository.GetAll()).Where(p => p.ProductId == prod.Id && p.PriceType == ePriceTypes.PurchasePrice).OrderByDescending(x => x.DateTime).FirstOrDefault();

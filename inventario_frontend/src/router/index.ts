@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Home from "../views/Home.vue";
+// import Home from "../views/Home.vue";
 import { JwtResult } from "@/models/JwtResult";
 import { getCurrentUser } from "@/utils/common-functions";
 
@@ -9,8 +9,9 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "Home",
-    component: Home
+    name: "Login",
+    component: () =>
+      import(/* webpackChunkName: "login" */ "../views/login.vue")
   },
   {
     path: "/product-list",
@@ -281,12 +282,12 @@ const routes: Array<RouteConfig> = [
         "../views/commission/edit-commission.vue"
       ),
     props: true
-  },
-  {
-    path: "/login",
-    name: "Login",
-    component: () =>
-      import(/* webpackChunkName: "login" */ "../views/login.vue")
+    // },
+    // {
+    //   path: "/login",
+    //   name: "Login",
+    //   component: () =>
+    //     import(/* webpackChunkName: "login" */ "../views/login.vue")
     // beforeEnter: (to, from, next) => {
     //   if (sessionStorage.getItem("currentUser") !== null) {
     //     next({ name: "Home" });
@@ -304,7 +305,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.path !== "/login" && sessionStorage.getItem("currentUser") === null) {
+  if (to.path !== "/" && sessionStorage.getItem("currentUser") === null) {
     next({ name: "Login" });
     alert("Debe iniciar sesión para continuar.");
   } else {

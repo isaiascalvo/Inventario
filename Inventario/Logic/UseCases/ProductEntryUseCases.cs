@@ -3,6 +3,7 @@ using Data;
 using Infrastructure.Repositories;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,7 +116,7 @@ namespace Logic
 
         public async Task<IEnumerable<ProductEntryDto>> GetAll()
         {
-            var productEntries = (await _productEntryRepository.GetAll(x => x.Vendor)).OrderByDescending(x => x.Date);
+            var productEntries = (await _productEntryRepository.GetAll(x => x.Include(pe => pe.Vendor))).OrderByDescending(x => x.Date);
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
 
@@ -131,20 +132,20 @@ namespace Logic
 
         public async Task<IEnumerable<ProductEntryDto>> GetByPageAndQty(int skip, int qty)
         {
-            var productEntries = (await _productEntryRepository.GetAll(x => x.Vendor)).OrderByDescending(x => x.Date).Skip(skip).Take(qty);
+            var productEntries = (await _productEntryRepository.GetAll(x => x.Include(pe => pe.Vendor))).OrderByDescending(x => x.Date).Skip(skip).Take(qty);
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
 
         public async Task<IEnumerable<ProductEntryDto>> GetFilteredByPageAndQty(ProductEntryFiltersDto filtersDto, int skip, int qty)
         {
-            var productEntries = (await _productEntryRepository.GetAll(x => x.Vendor))
+            var productEntries = (await _productEntryRepository.GetAll(x => x.Include(pe => pe.Vendor)))
                 .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Date).Skip(skip).Take(qty);
             return _mapper.Map<IEnumerable<ProductEntry>, IEnumerable<ProductEntryDto>>(productEntries);
         }
 
         public async Task<ProductEntryDto> GetOne(Guid id)
         {
-            var productEntry = await _productEntryRepository.GetById(id, x => x.ProductEntryLines);
+            var productEntry = await _productEntryRepository.GetById(id, x => x.Include(pe => pe.ProductEntryLines));
             if (productEntry == null)
                 throw new KeyNotFoundException($"Product entry with id: {id} not found.");
             productEntry.ProductEntryLines.RemoveAll(x => x.IsDeleted);
@@ -153,7 +154,7 @@ namespace Logic
 
         public async Task Update(Guid id, ProductEntryDto productEntryDto)
         {
-            var productEntry = await _productEntryRepository.GetById(productEntryDto.Id, x => x.ProductEntryLines);
+            var productEntry = await _productEntryRepository.GetById(productEntryDto.Id, x => x.Include(pe => pe.ProductEntryLines));
             if (productEntry == null)
                 throw new KeyNotFoundException($"Product entry with id: {id} not found.");
 

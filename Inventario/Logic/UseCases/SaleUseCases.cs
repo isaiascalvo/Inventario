@@ -4,6 +4,7 @@ using Data.Models;
 using Infrastructure.Repositories;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -222,7 +223,7 @@ namespace Logic
 
         public async Task Delete(Guid userId, Guid id)
         {
-            var sale = await _saleRepository.GetById(id, x => x.Details);
+            var sale = await _saleRepository.GetById(id, x => x.Include(s => s.Details));
             if (sale == null)
                 throw new KeyNotFoundException($"Sale with id: {id} not found.");
 
@@ -283,10 +284,11 @@ namespace Logic
         {
             try
             {
-                var sales = (await _saleRepository.GetAll(x => x.Client, x => x.Payment)).OrderByDescending(x => x.Date);
+                var sales = (await _saleRepository.GetAll(x => x.Include(s => s.Client).Include(s => s.Payment).Include(s => s.Details).ThenInclude(d => d.Product)))
+                    .OrderByDescending(x => x.Date);
                 foreach (var sale in sales)
                 {
-                    sale.Details = await _detailRepository.Find(x => x.SaleId == sale.Id, x => x.Product);
+                    sale.Details = sale.Details.Where(x => !x.IsDeleted).ToList();
                 }
                 var salesDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
                 return await SetSalePayments(sales, salesDto);
@@ -304,15 +306,16 @@ namespace Logic
 
         public async Task<int> GetTotalQtyByFilters(SaleFiltersDto filtersDto)
         {
-            return (await _saleRepository.GetAll()).AsQueryable().Where(filtersDto.GetExpresion()).Count();
+            return (await _saleRepository.GetAll(x => x.Include(s => s.Details).ThenInclude(d => d.Product))).AsQueryable().Where(filtersDto.GetExpresion()).Count();
         }
 
         public async Task<IEnumerable<SaleDto>> GetByPageAndQty(int skip, int qty)
         {
-            var sales = (await _saleRepository.GetAll(x => x.Client, x => x.Payment)).OrderByDescending(x => x.Date).Skip(skip).Take(qty);
+            var sales = (await _saleRepository.GetAll(x => x.Include(s => s.Client).Include(s => s.Payment).Include(s => s.Details).ThenInclude(d => d.Product)))
+                .OrderByDescending(x => x.Date).Skip(skip).Take(qty);
             foreach (var sale in sales)
             {
-                sale.Details = await _detailRepository.Find(x => x.SaleId == sale.Id, x => x.Product);
+                sale.Details = sale.Details.Where(x => !x.IsDeleted).ToList();
             }
             var salesDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
             return await SetSalePayments(sales, salesDto);
@@ -320,11 +323,11 @@ namespace Logic
 
         public async Task<IEnumerable<SaleDto>> GetFilteredByPageAndQty(SaleFiltersDto filtersDto, int skip, int qty)
         {
-            var sales = (await _saleRepository.GetAll(x => x.Client, x => x.Payment))
+            var sales = (await _saleRepository.GetAll(x => x.Include(s => s.Client).Include(s => s.Payment).Include(s => s.Details).ThenInclude(d => d.Product)))
                 .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Date).Skip(skip).Take(qty);
             foreach (var sale in sales)
             {
-                sale.Details = await _detailRepository.Find(x => x.SaleId == sale.Id, x => x.Product);
+                sale.Details = sale.Details.Where(x => !x.IsDeleted).ToList();
             }
             var salesDto = _mapper.Map<IEnumerable<Sale>, IEnumerable<SaleDto>>(sales);
             return await SetSalePayments(sales, salesDto);
@@ -332,11 +335,11 @@ namespace Logic
 
         public async Task<SaleDto> GetOne(Guid id)
         {
-            var sale = await _saleRepository.GetById(id, x => x.Client, x => x.Payment);
+            var sale = await _saleRepository.GetById(id, x => x.Include(s => s.Client).Include(s => s.Payment).Include(s => s.Details).ThenInclude(d => d.Product));
             if (sale == null)
                 throw new KeyNotFoundException($"Sale with id: {id} not found.");
 
-            sale.Details = await _detailRepository.Find(x => x.SaleId == sale.Id, x => x.Product);
+            sale.Details = sale.Details.Where(x => !x.IsDeleted).ToList();
 
             var saleDto = _mapper.Map<Sale, SaleDto>(sale);
 

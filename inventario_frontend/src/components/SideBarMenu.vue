@@ -170,7 +170,7 @@ export default class SideBarMenu extends Vue {
   public logOut() {
     sessionStorage.removeItem("currentUser");
     this.$forceUpdate();
-    this.$router.push("/login");
+    this.$router.push("/");
   }
 
   public getTitle(): string {
