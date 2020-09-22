@@ -11,6 +11,6 @@ namespace Data
         public OwnFees OwnFees { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime? PaymentDate { get; set; }
-        public double Value { get; set; }
+        public decimal Value { get; set; }
     }
 }

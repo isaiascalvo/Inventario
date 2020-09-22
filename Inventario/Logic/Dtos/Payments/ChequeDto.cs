@@ -11,6 +11,6 @@ namespace Logic.Dtos
         public ChequesPaymentDto ChequesPayment { get; set; }
         public string Nro { get; set; }
         public string Bank { get; set; }
-        public double Value { get; set; }
+        public decimal Value { get; set; }
     }
 }

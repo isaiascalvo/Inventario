@@ -10,6 +10,7 @@ namespace Application.ViewModels
         public Guid Id { get; set; }
         public Guid ProductId { get; set; }
         public ProductViewModel Product { get; set; }
-        public double Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
     }
 }

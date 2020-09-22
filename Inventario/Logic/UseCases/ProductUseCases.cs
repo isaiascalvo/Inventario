@@ -299,7 +299,7 @@ namespace Logic
             await _priceRepository.CommitAsync();
         }
 
-        public async Task<double> GetPriceByDate(Guid productId, DateTime date)
+        public async Task<decimal> GetPriceByDate(Guid productId, DateTime date)
         {
             var product = await _productRepository.GetById(productId);
             if (product == null)
@@ -396,7 +396,7 @@ namespace Logic
             PdfBasicSchema.GenerateFooter(intermediateDestination, finalDestination);
         }
 
-        private string AppendDynamicField(string htmlStr, string name, string description, string code, string category, string vendor, string brand, double purchasePrice, double salePrice)
+        private string AppendDynamicField(string htmlStr, string name, string description, string code, string category, string vendor, string brand, decimal purchasePrice, decimal salePrice)
         {
             string campoDinamico = "<tr class='font-size2 align-center {b}'> <td>{name}</td> <td>{description}</td> <td>{code}</td> <td>{category}</td> <td>{vendor}</td> <td>{brand}</td> <td>${purchasePrice}</td> <td>$ {salePrice}</td> </tr>";
 

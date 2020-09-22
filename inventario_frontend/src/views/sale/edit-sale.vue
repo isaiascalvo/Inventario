@@ -4,8 +4,11 @@
       class="card column"
       v-bind:class="{
         'is-4 is-offset-4':
-          activeStep !== 1 && (activeStep !== 2 || sale.paymentType !== 4),
-        'is-6 is-offset-3': activeStep === 2 && sale.paymentType === 4,
+          activeStep !== 1 &&
+          (activeStep !== 2 || sale.paymentType !== 4) &&
+          activeStep !== 3,
+        'is-6 is-offset-3':
+          (activeStep === 2 && sale.paymentType === 4) || activeStep === 3,
         'is-8 is-offset-2': activeStep === 1
       }"
     >
@@ -146,7 +149,10 @@
                       <b-input
                         size="is-small"
                         :value="
-                          '$' + prodCodNameDesc[getIndex(props.row)].unitPrice
+                          '$' +
+                            formattedAmount(
+                              prodCodNameDesc[getIndex(props.row)].unitPrice
+                            )
                         "
                         disabled
                       ></b-input>
@@ -159,8 +165,10 @@
                         size="is-small"
                         :value="
                           '$' +
-                            prodCodNameDesc[getIndex(props.row)].unitPrice *
-                              (props.row.quantity ? props.row.quantity : 0)
+                            formattedAmount(
+                              prodCodNameDesc[getIndex(props.row)].unitPrice *
+                                (props.row.quantity ? props.row.quantity : 0)
+                            )
                         "
                         disabled
                       ></b-input>
@@ -260,7 +268,7 @@
                         " cuota" +
                         (sale.ownFees.quantity === 1 ? "" : "s")
                     }}
-                    de $ {{ feeValue }})
+                    de $ {{ formattedAmount(feeValue) }})
                   </div>
 
                   <b-field label="Fecha de vencimiento (primer cuota)">
@@ -445,16 +453,66 @@
                 v-if="!impossibleFee"
                 style="text-align: center; margin-bottom: 5px;"
               >
-                $ {{ saleAmount }}
+                $ {{ formattedAmount(saleAmount) }}
               </div>
             </b-step-item>
 
             <b-step-item step="4" label="Paso Final">
               <b-field>
                 <p class="pMargin">
-                  <strong>Importe Total: $</strong>
+                  <strong>Cliente:</strong>
+                  {{ saleConfirmation.clientName }}
                 </p>
-                <b-input v-model="saleAmount" disabled></b-input>
+              </b-field>
+
+              <b-field>
+                <p class="pMargin">
+                  <strong>Fecha y hora de venta:</strong>
+                  {{ dateTimeToLocal(saleConfirmation.date) }}
+                </p>
+              </b-field>
+
+              <b-table
+                striped
+                hoverable
+                scrollable
+                :data="saleConfirmation.details"
+                id="my-table"
+              >
+                <template slot="empty">
+                  No hay Productos en la compra
+                </template>
+                <template slot-scope="props">
+                  <b-table-column field="product" label="Producto">
+                    {{ props.row.product.name }}
+                  </b-table-column>
+                  <b-table-column field="quantity" label="Cantidad">
+                    {{ props.row.quantity }}
+                  </b-table-column>
+                  <b-table-column field="unitPrice" label="Precio Unitario">
+                    $ {{ formattedAmount(props.row.unitPrice) }}
+                  </b-table-column>
+                  <b-table-column field="subTotal" label="Subtotal">
+                    $
+                    {{
+                      formattedAmount(props.row.quantity * props.row.unitPrice)
+                    }}
+                  </b-table-column>
+                </template>
+              </b-table>
+
+              <b-field style="margin-top: 10px;">
+                <p class="pMargin">
+                  <strong>Método de pago:</strong>
+                  {{ getPaymentType(saleConfirmation) }}
+                </p>
+              </b-field>
+
+              <b-field>
+                <p class="pMargin">
+                  <strong>Importe Total:</strong>
+                  $ {{ getTotal(saleConfirmation) }}
+                </p>
               </b-field>
             </b-step-item>
 
@@ -471,7 +529,7 @@
                 v-if="activeStep !== 3"
                 outlined
                 :disabled="next.disabled || nextDisabled()"
-                @click.prevent="next.action"
+                @click.prevent="nextTwo()"
               >
                 Siguiente
               </b-button>
@@ -506,7 +564,9 @@ import { Vue, Component } from "vue-property-decorator";
 import { NavigatorSaleService } from "../../services/sale-service";
 import { Sale } from "../../models/sale";
 import {
+  dateTimeToLocal,
   fieldStateValidation,
+  formattedAmount,
   formValidation
 } from "../../utils/common-functions";
 import { Product } from "../../models/product";
@@ -555,6 +615,11 @@ export default class EditSale extends Vue {
   public saleAmount = 0;
   public impossibleFee = false;
   public impossibleFeeProducts: string[] = [];
+  public saleConfirmation: Sale = new Sale();
+
+  dateTimeToLocal(date: Date) {
+    return dateTimeToLocal(date);
+  }
 
   fieldState(field: unknown) {
     return fieldStateValidation(field);
@@ -998,30 +1063,142 @@ export default class EditSale extends Vue {
     this.sale.clientId = client ? client.id : undefined;
   }
 
-  public submit() {
-    this.isLoading = true;
-    this.saleService
-      .addSale(this.sale)
-      .then(() => {
-        this.isLoading = false;
-        this.$router.push({ name: "SaleList" });
-      })
-      .catch(e => {
-        this.$buefy.dialog.alert({
-          title: "Error",
-          message:
-            "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "times-circle",
-          iconPack: "fa",
-          ariaRole: "alertdialog",
-          ariaModal: true
+  public getTotal(sale: Sale) {
+    let amount = 0;
+    switch (sale.paymentType) {
+      case paymentTypes.cash:
+        amount = sale.cash?.amount ?? 0;
+        break;
+      case paymentTypes.ownFees:
+        amount = sale.ownFees?.amount ?? 0;
+        break;
+      case paymentTypes.creditcard:
+        amount = sale.creditCard?.amount ?? 0;
+        break;
+      case paymentTypes.debitcard:
+        amount = sale.debitCard?.amount ?? 0;
+        break;
+      case paymentTypes.cheque:
+        amount = sale.cheques?.amount ?? 0;
+        break;
+      default:
+        break;
+    }
+    return this.formattedAmount(amount);
+  }
+
+  formattedAmount(amount: number) {
+    return formattedAmount(amount);
+  }
+
+  getPaymentType(sale: Sale) {
+    switch (sale.paymentType) {
+      case paymentTypes.cash:
+        return (
+          Cash.GetPaymentType() + " (Descuento: " + sale.cash?.discount + "%)"
+        );
+      case paymentTypes.ownFees:
+        return (
+          OwnFees.GetPaymentType() +
+          " (" +
+          sale.ownFees?.quantity +
+          " de $ " +
+          formattedAmount(sale.ownFees?.feeList[0]?.value ?? 0) +
+          ")"
+        );
+      case paymentTypes.creditcard:
+        return (
+          CreditCard.GetPaymentType() +
+          " (" +
+          sale.creditCard?.bank +
+          " - " +
+          sale.creditCard?.cardType +
+          " - Descuento: " +
+          sale.creditCard?.discount +
+          "% - Recargo: " +
+          sale.creditCard?.surcharge +
+          "%)"
+        );
+      case paymentTypes.debitcard:
+        return (
+          DebitCard.GetPaymentType() +
+          " (" +
+          sale.debitCard?.bank +
+          " - " +
+          sale.debitCard?.cardType +
+          " - Descuento: " +
+          sale.debitCard?.discount +
+          "% -  Recargo: " +
+          sale.debitCard?.surcharge +
+          "%)"
+        );
+      case paymentTypes.cheque:
+        return (
+          ChequesPayment.GetPaymentType() +
+          " (" +
+          sale.cheques?.listOfCheques.length +
+          ")"
+        );
+      default:
+        break;
+    }
+  }
+
+  public nextTwo() {
+    if (this.activeStep === 2) {
+      this.isLoading = true;
+      this.saleService
+        .preCreation(this.sale)
+        .then(response => {
+          this.saleConfirmation = response as Sale;
+          console.log(JSON.parse(JSON.stringify(this.saleConfirmation)));
+          this.isLoading = false;
+        })
+        .catch(error => {
+          this.isLoading = false;
+          console.log(error);
+          this.$buefy.dialog.alert({
+            title: "Error",
+            message:
+              "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+            type: "is-danger",
+            hasIcon: true,
+            icon: "times-circle",
+            iconPack: "fa",
+            ariaRole: "alertdialog",
+            ariaModal: true
+          });
         });
-        this.isLoading = false;
-        console.log("error: ", e);
-        this.$router.push({ name: "SaleList" });
-      });
+    }
+    this.activeStep += 1;
+  }
+
+  public submit() {
+    if (this.saleConfirmation) {
+      this.isLoading = true;
+      this.saleService
+        .addSale(this.saleConfirmation)
+        .then(() => {
+          this.isLoading = false;
+          this.$router.push({ name: "SaleList" });
+        })
+        .catch(e => {
+          this.isLoading = false;
+          this.$buefy.dialog.alert({
+            title: "Error",
+            message:
+              "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
+            type: "is-danger",
+            hasIcon: true,
+            icon: "times-circle",
+            iconPack: "fa",
+            ariaRole: "alertdialog",
+            ariaModal: true
+          });
+          console.log("error: ", e);
+          this.$router.push({ name: "SaleList" });
+        });
+    }
   }
 
   created() {

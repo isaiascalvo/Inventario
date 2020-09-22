@@ -8,6 +8,6 @@ namespace Application.ViewModels
     {
         public string Nro { get; set; }
         public string Bank { get; set; }
-        public double Value { get; set; }
+        public decimal Value { get; set; }
     }
 }

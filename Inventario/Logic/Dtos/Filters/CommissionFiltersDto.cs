@@ -14,11 +14,11 @@ namespace Logic.Dtos
         public Guid? ClientId { get; set; }
         public string? ClientName { get; set; }
         public string? Product { get; set; }
-        public double? Price { get; set; }
+        public decimal? Price { get; set; }
         public ePaymentTypes? PaymentType { get; set; }
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
-        public double? Value { get; set; }
+        public decimal? Value { get; set; }
 
         public bool IsEmpty()
         {

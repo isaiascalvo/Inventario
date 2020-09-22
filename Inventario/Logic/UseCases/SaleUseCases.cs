@@ -63,6 +63,175 @@ namespace Logic
             _mapper = mapper;
         }
 
+        public async Task<SaleDto> PreCreation(Guid userId, SaleForCreationDto saletForCreationDto)
+        {
+            try
+            {
+                Client client = null;
+                if (saletForCreationDto.ClientId.HasValue)
+                {
+                    client = await _clientRepository.GetById(saletForCreationDto.ClientId.Value);
+                    if (client == null)
+                        throw new KeyNotFoundException($"Client with id: {saletForCreationDto.ClientId} not found.");
+                }
+
+                var sale = new Sale()
+                {
+                    ClientId = saletForCreationDto.ClientId,
+                    Client = client,
+                    ClientName = client != null ? client.Name + " " + client.Lastname : saletForCreationDto.ClientName,
+                    Date = saletForCreationDto.Date.ToLocalTime(),
+                    PaymentType = saletForCreationDto.PaymentType,
+                    CreatedBy = userId
+                };
+
+                decimal total = 0;
+                foreach (var detailFC in saletForCreationDto.Details)
+                {
+                    var product = await _productRepository.GetById(detailFC.ProductId);
+                    if (product == null)
+                        throw new KeyNotFoundException($"Product with id: {detailFC.ProductId} not found.");
+
+                    var price = (await _priceRepository.GetAll())
+                        .OrderByDescending(x => x.DateTime)
+                        .FirstOrDefault(
+                            x => x.ProductId == detailFC.ProductId &&
+                            x.DateTime.ToLocalTime() <= saletForCreationDto.Date.ToLocalTime() &&
+                            x.PriceType == ePriceTypes.SalePrice &&
+                            !x.IsDeleted
+                        );
+
+                    var detail = new Detail()
+                    {
+                        SaleId = sale.Id,
+                        ProductId = detailFC.ProductId,
+                        Product = product,
+                        Quantity = detailFC.Quantity,
+                        UnitPrice = price.Value,
+                        CreatedBy = userId
+                    };
+
+                    if (sale.PaymentType == ePaymentTypes.OwnFees)
+                    {
+                        FeeRule feeRule = (await _feeRuleRepository.Find(x => x.ProductId == detailFC.ProductId))
+                            .OrderByDescending(x => x.Date).ThenBy(x => x.FeesAmountTo)
+                            .FirstOrDefault(x => x.Date <= sale.Date && x.FeesAmountTo >= saletForCreationDto.OwnFees.Quantity);
+                        if (feeRule == null)
+                            throw new KeyNotFoundException($"Fee Rule not found.");
+
+                        decimal percentage = feeRule.Percentage * saletForCreationDto.OwnFees.Quantity / 100;
+                        total += price.Value * detailFC.Quantity * (1 + percentage);
+                    }
+                    else
+                        total += price.Value * detailFC.Quantity;
+
+                    sale.Details.Add(detail);
+                }
+
+                Payment payment = null;
+                switch (saletForCreationDto.PaymentType)
+                {
+                    case Util.Enums.ePaymentTypes.Cash:
+                        var cashDto = (CashForCreationDto)saletForCreationDto.Cash;
+                        payment = new Cash(total, cashDto.Discount)
+                        {
+                            SaleId = sale.Id,
+                            CreatedBy = userId
+                        };
+                        break;
+                    case Util.Enums.ePaymentTypes.OwnFees:
+                        var ownFeesDto = (OwnFeesForCreationDto)saletForCreationDto.OwnFees;
+                        payment = new OwnFees(ownFeesDto.ExpirationDate, total, ownFeesDto.Quantity, userId)
+                        {
+                            SaleId = sale.Id,
+                        };
+                        break;
+                    case Util.Enums.ePaymentTypes.CreditCard:
+                        var creditCardDto = (CreditCardForCreationDto)saletForCreationDto.CreditCard;
+                        payment = new CreditCard(total, creditCardDto.Discount, creditCardDto.Surcharge)
+                        {
+                            SaleId = sale.Id,
+                            CardType = creditCardDto.CardType,
+                            Bank = creditCardDto.Bank,
+                            CreatedBy = userId
+                        };
+                        break;
+                    case Util.Enums.ePaymentTypes.DebitCard:
+                        var debitCardDto = (DebitCardForCreationDto)saletForCreationDto.DebitCard;
+                        payment = new DebitCard(total, debitCardDto.Discount, debitCardDto.Surcharge)
+                        {
+                            SaleId = sale.Id,
+                            CardType = debitCardDto.CardType,
+                            Bank = debitCardDto.Bank,
+                            CreatedBy = userId
+                        };
+                        break;
+                    case Util.Enums.ePaymentTypes.Cheques:
+                        var chequesDto = (ChequesPaymentForCreationDto)saletForCreationDto.Cheques;
+
+                        if (chequesDto.ListOfCheques.Sum(x => x.Value) != total)
+                            throw new InvalidOperationException("The sum of cheques list is different of amount.");
+
+                        payment = new ChequesPayment()
+                        {
+                            SaleId = sale.Id,
+                            Amount = Math.Ceiling(total * 100) / 100,
+                            CreatedBy = userId
+                        };
+
+                        foreach (var c in chequesDto.ListOfCheques)
+                        {
+                            var cheque = new Cheque()
+                            {
+                                ChequesPaymentId = payment.Id,
+                                Bank = c.Bank,
+                                Nro = c.Nro,
+                                Value = c.Value,
+                                CreatedBy = userId
+                            };
+
+                            ((ChequesPayment)payment).ListOfCheques.Add(cheque);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                sale.PaymentId = payment.Id;
+                sale.Payment = payment;
+
+                var saleDto = _mapper.Map<Sale, SaleDto>(sale);
+
+                switch (saleDto.PaymentType)
+                {
+                    case Util.Enums.ePaymentTypes.Cash:
+                        saleDto.Cash = _mapper.Map<Cash, CashDto>((Cash)payment);
+                        break;
+                    case Util.Enums.ePaymentTypes.OwnFees:
+                        OwnFees owF = (OwnFees)payment;
+                        saleDto.OwnFees = _mapper.Map<OwnFees, OwnFeesDto>(owF);
+                        break;
+                    case Util.Enums.ePaymentTypes.CreditCard:
+                        saleDto.CreditCard = _mapper.Map<CreditCard, CreditCardDto>((CreditCard)payment);
+                        break;
+                    case Util.Enums.ePaymentTypes.DebitCard:
+                        saleDto.DebitCard = _mapper.Map<DebitCard, DebitCardDto>((DebitCard)payment);
+                        break;
+                    case Util.Enums.ePaymentTypes.Cheques:
+                        saleDto.Cheques = _mapper.Map<ChequesPayment, ChequesPaymentDto>((ChequesPayment)payment);
+                        break;
+                    default:
+                        break;
+                }
+
+                return saleDto;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         public async Task<SaleDto> Create(Guid userId, SaleForCreationDto saletForCreationDto)
         {
             try
@@ -84,7 +253,7 @@ namespace Logic
                     CreatedBy = userId
                 };
 
-                double total = 0;
+                decimal total = 0;
                 foreach (var detailFC in saletForCreationDto.Details)
                 {
                     var product = await _productRepository.GetById(detailFC.ProductId);
@@ -96,6 +265,7 @@ namespace Logic
                         .FirstOrDefault(
                             x => x.ProductId == detailFC.ProductId &&
                             x.DateTime.ToLocalTime() <= saletForCreationDto.Date.ToLocalTime() &&
+                            x.PriceType == ePriceTypes.SalePrice &&
                             !x.IsDeleted
                         );
 
@@ -104,6 +274,7 @@ namespace Logic
                         SaleId = sale.Id,
                         ProductId = detailFC.ProductId,
                         Quantity = detailFC.Quantity,
+                        UnitPrice = price.Value,
                         CreatedBy = userId
                     };
                     product.Stock -= detailFC.Quantity;
@@ -116,7 +287,7 @@ namespace Logic
                         if (feeRule == null)
                             throw new KeyNotFoundException($"Fee Rule not found.");
 
-                        double percentage = feeRule.Percentage * saletForCreationDto.OwnFees.Quantity / 100;
+                        decimal percentage = feeRule.Percentage * saletForCreationDto.OwnFees.Quantity / 100;
                         total += price.Value * detailFC.Quantity * (1 + percentage);
                     }
                     else
@@ -185,7 +356,7 @@ namespace Logic
                         payment = new ChequesPayment()
                         {
                             SaleId = sale.Id,
-                            Amount = total,
+                            Amount = Math.Ceiling(total * 100) / 100,
                             CreatedBy = userId
                         };
 

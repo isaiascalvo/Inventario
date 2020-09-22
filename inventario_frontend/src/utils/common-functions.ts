@@ -55,3 +55,7 @@ export function dateTimeToLocal(date: Date): string {
   };
   return new Date(date).toLocaleString("es-ES", options).replace(" ", " - ");
 }
+
+export function formattedAmount(amount: number): string {
+  return amount.toFixed(2);
+}

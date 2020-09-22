@@ -11,7 +11,7 @@ namespace Logic.Dtos
         public string? Description { get; set; }
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
-        public double? Value { get; set; }
+        public decimal? Value { get; set; }
         public string? Destination { get; set; }
         public bool? IsFixed { get; set; }
 

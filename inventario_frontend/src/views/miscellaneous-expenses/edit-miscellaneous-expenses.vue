@@ -61,7 +61,7 @@
               </b-select>
             </b-field>
 
-            <b-field label="Monto:">
+            <b-field label="Monto ($):">
               <b-input
                 v-model="miscellaneousExpense.value"
                 placeholder="Ingrese el monto"

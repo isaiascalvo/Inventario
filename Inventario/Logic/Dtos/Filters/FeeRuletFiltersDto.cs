@@ -10,7 +10,7 @@ namespace Logic.Dtos
     {
         public Guid? ProductId { get; set; }
         public int? FeesAmountTo { get; set; }
-        public double? Percentage { get; set; }
+        public decimal? Percentage { get; set; }
 
         public bool IsEmpty()
         {

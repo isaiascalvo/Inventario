@@ -128,7 +128,7 @@ namespace Application
         {
             try
             {
-                double price = await _productUseCases.GetPriceByDate(Guid.Parse(productId), DateTime.Parse(date));
+                decimal price = await _productUseCases.GetPriceByDate(Guid.Parse(productId), DateTime.Parse(date));
                 return Ok(price);
             }
             catch (Exception e)

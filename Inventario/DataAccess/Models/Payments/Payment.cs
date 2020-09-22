@@ -7,6 +7,6 @@ namespace Data
     public abstract class Payment: Entity
     {
         public Guid SaleId { get; set; }
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

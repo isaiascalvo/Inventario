@@ -21,8 +21,8 @@ namespace Logic.Dtos
         public Guid VendorId { get; set; }
         public VendorDto Vendor { get; set; }
         public string Brand { get; set; }
-        public double? MinimumStock { get; set; }
-        public double Stock { get; set; }
+        public decimal? MinimumStock { get; set; }
+        public decimal Stock { get; set; }
         public string UnitOfMeasurement { get; set; }
         public PriceDto PurchasePrice { get; set; }
         public PriceDto SalePrice { get; set; }

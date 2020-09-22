@@ -6,15 +6,15 @@ namespace Data
 {
     public class Cash: Payment
     {
-        public double Discount { get; set; }
+        public decimal Discount { get; set; }
         public Cash()
         {
                 
         }
-        public Cash(double amount, double discount)
+        public Cash(decimal amount, decimal discount)
         {
             Discount = discount;
-            Amount = amount * (1 - Discount / 100);
+            Amount = Math.Ceiling(amount * 100 * (1 - Discount) / 100) / 100;
         }
     }
 }

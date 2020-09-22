@@ -250,7 +250,7 @@ import {
   DebitCard,
   ChequesPayment
 } from "@/models/payment";
-import { dateTimeToLocal } from "@/utils/common-functions";
+import { dateTimeToLocal, formattedAmount } from "@/utils/common-functions";
 import { SaleFilters } from "../../models/filters/saleFilters";
 import { Client } from "@/models/client";
 import { Product } from "@/models/product";
@@ -297,20 +297,31 @@ export default class SaleList extends Vue {
   }
 
   public getTotal(sale: Sale) {
+    let amount = 0;
     switch (sale.paymentType) {
       case paymentTypes.cash:
-        return sale.cash?.amount;
+        amount = sale.cash?.amount ?? 0;
+        break;
       case paymentTypes.ownFees:
-        return sale.ownFees?.amount;
+        amount = sale.ownFees?.amount ?? 0;
+        break;
       case paymentTypes.creditcard:
-        return sale.creditCard?.amount;
+        amount = sale.creditCard?.amount ?? 0;
+        break;
       case paymentTypes.debitcard:
-        return sale.debitCard?.amount;
+        amount = sale.debitCard?.amount ?? 0;
+        break;
       case paymentTypes.cheque:
-        return sale.cheques?.amount;
+        amount = sale.cheques?.amount ?? 0;
+        break;
       default:
         break;
     }
+    return this.formattedAmount(amount);
+  }
+
+  formattedAmount(amount: number) {
+    return formattedAmount(amount);
   }
 
   getPaymentType(sale: Sale) {
@@ -324,8 +335,8 @@ export default class SaleList extends Vue {
           OwnFees.GetPaymentType() +
           " (" +
           sale.ownFees?.quantity +
-          " de $" +
-          sale.ownFees?.feeList[0]?.value +
+          " de $ " +
+          formattedAmount(sale.ownFees?.feeList[0]?.value ?? 0) +
           ")"
         );
       case paymentTypes.creditcard:

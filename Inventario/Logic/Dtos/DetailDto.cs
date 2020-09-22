@@ -11,6 +11,7 @@ namespace Logic.Dtos
         public SaleDto Sale { get; set; }
         public Guid ProductId { get; set; }
         public ProductDto Product { get; set; }
-        public double Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
     }
 }

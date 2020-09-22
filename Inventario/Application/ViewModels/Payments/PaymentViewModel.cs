@@ -9,6 +9,6 @@ namespace Application.ViewModels
     {
         public Guid Id { get; set; }
         public Guid SaleId { get; set; }
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

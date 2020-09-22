@@ -21,8 +21,8 @@ namespace Data
         public Guid VendorId { get; set; }
         public Vendor Vendor { get; set; }
         public string Brand { get; set; }
-        public double? MinimumStock { get; set; }
-        public double Stock { get; set; }
+        public decimal? MinimumStock { get; set; }
+        public decimal Stock { get; set; }
         public string UnitOfMeasurement { get; set; }
     }
 }

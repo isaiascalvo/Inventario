@@ -6,6 +6,6 @@ namespace Application.ViewModels
 {
     public class CashViewModel: PaymentViewModel
     {
-        public double Discount { get; set; }
+        public decimal Discount { get; set; }
     }
 }

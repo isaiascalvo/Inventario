@@ -27,7 +27,7 @@
                 {{ dateToLocal(props.row.paymentDate) }}
               </b-table-column>
               <b-table-column field="value" label="Monto">
-                ${{ props.row.value }}
+                $ {{ formattedAmount(props.row.value) }}
               </b-table-column>
               <b-table-column field="state" label="Estado">
                 <div v-html="getState(props.row)"></div>
@@ -61,7 +61,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Fee, OwnFees } from "@/models/payment";
 import { NavigatorSaleService } from "@/services/sale-service";
-import { dateTimeToLocal } from "@/utils/common-functions";
+import { dateTimeToLocal, formattedAmount } from "@/utils/common-functions";
 
 @Component
 export default class ModalOwnFeesPreview extends Vue {
@@ -105,6 +105,10 @@ export default class ModalOwnFeesPreview extends Vue {
       }
     }
     return `<span style="color: ${color};">${text}</span>`;
+  }
+
+  formattedAmount(amount: number) {
+    return formattedAmount(amount);
   }
 
   payFee(index: number) {

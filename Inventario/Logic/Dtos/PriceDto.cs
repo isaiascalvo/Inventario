@@ -12,7 +12,7 @@ namespace Logic.Dtos
         //public DateTime? LastModificationAt { get; set; }
         //public bool IsDeleted { get; set; }
         //public DateTime? DeletedAt { get; set; }
-        public double Value { get; set; }
+        public decimal Value { get; set; }
         public Guid ProductId { get; set; }
         public DateTime DateTime { get; set; }
     }

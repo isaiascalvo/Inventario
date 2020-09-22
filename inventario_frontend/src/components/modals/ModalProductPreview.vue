@@ -55,11 +55,11 @@
           </div>
           <div>
             <label>Precio de compra: </label>
-            <span>${{ product.purchasePrice.value }}</span>
+            <span>${{ formattedAmount(product.purchasePrice.value) }}</span>
           </div>
           <div>
             <label>Precio de venta: </label>
-            <span>${{ product.salePrice.value }}</span>
+            <span>${{ formattedAmount(product.salePrice.value) }}</span>
           </div>
         </section>
         <footer class="modal-card-foot">
@@ -77,7 +77,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { dateTimeToLocal } from "@/utils/common-functions";
+import { dateTimeToLocal, formattedAmount } from "@/utils/common-functions";
 import { Product } from "@/models/product";
 import { NavigatorProductService } from "@/services/product-service";
 
@@ -92,6 +92,10 @@ export default class ModalProductPreview extends Vue {
 
   dateToLocal(date: Date) {
     return dateTimeToLocal(date).substring(0, 10);
+  }
+
+  formattedAmount(amount: number) {
+    return formattedAmount(amount);
   }
 
   created() {

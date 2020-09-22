@@ -9,4 +9,5 @@ export class Detail extends DetailForCreation {
   public id!: string;
   public saleId!: string;
   public product: Product | undefined = undefined;
+  public unitPrice!: number;
 }

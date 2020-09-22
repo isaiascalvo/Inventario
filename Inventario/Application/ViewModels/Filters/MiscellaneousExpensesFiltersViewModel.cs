@@ -10,7 +10,7 @@ namespace Application.ViewModels
         public string? Description { get; set; }
         public string? DateFrom { get; set; }
         public string? DateTo { get; set; }
-        public double? Value { get; set; }
+        public decimal? Value { get; set; }
         public string? Destination { get; set; }
         public bool? IsFixed { get; set; }
 

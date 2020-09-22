@@ -4,14 +4,16 @@ using Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(InventarioDbContext))]
-    partial class InventarioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200922151853_SaleDetailUnitPrice")]
+    partial class SaleDetailUnitPrice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,14 +165,14 @@ namespace Infrastructure.Migrations
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<string>("Product")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Value")
+                        .HasColumnType("float");
 
                     b.Property<Guid>("VendorId")
                         .HasColumnType("uniqueidentifier");
@@ -220,8 +222,8 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("SaleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("UnitPrice")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -268,8 +270,8 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Value")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -311,8 +313,8 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("LastModificationBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Percentage")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Percentage")
+                        .HasColumnType("float");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -363,8 +365,8 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("LastModificationBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Value")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -407,8 +409,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Nro")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Value")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -427,8 +429,8 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -501,8 +503,8 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Value")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -551,15 +553,15 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("LastModificationBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal?>("MinimumStock")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double?>("MinimumStock")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Stock")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Stock")
+                        .HasColumnType("float");
 
                     b.Property<string>("UnitOfMeasurement")
                         .HasColumnType("nvarchar(max)");
@@ -656,8 +658,8 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -857,8 +859,8 @@ namespace Infrastructure.Migrations
                 {
                     b.HasBaseType("Data.Payment");
 
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Discount")
+                        .HasColumnType("float");
 
                     b.HasDiscriminator().HasValue("Cash");
                 });
@@ -873,12 +875,12 @@ namespace Infrastructure.Migrations
                     b.Property<string>("CardType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Discount")
+                    b.Property<double>("Discount")
                         .HasColumnName("CreditCard_Discount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("float");
 
-                    b.Property<decimal>("Surcharge")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Surcharge")
+                        .HasColumnType("float");
 
                     b.HasDiscriminator().HasValue("CreditCard");
                 });
@@ -895,13 +897,13 @@ namespace Infrastructure.Migrations
                         .HasColumnName("DebitCard_CardType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Discount")
+                    b.Property<double>("Discount")
                         .HasColumnName("DebitCard_Discount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("float");
 
-                    b.Property<decimal>("Surcharge")
+                    b.Property<double>("Surcharge")
                         .HasColumnName("DebitCard_Surcharge")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("float");
 
                     b.HasDiscriminator().HasValue("DebitCard");
                 });

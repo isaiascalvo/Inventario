@@ -8,6 +8,6 @@ namespace Application.ViewModels
     public class DetailForCreationViewModel
     {
         public Guid ProductId { get; set; }
-        public double Quantity { get; set; }
+        public int Quantity { get; set; }
     }
 }

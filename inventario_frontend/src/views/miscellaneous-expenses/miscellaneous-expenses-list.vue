@@ -149,7 +149,7 @@
             {{ props.row.isFixed ? "Fijo" : "Variable" }}
           </b-table-column>
           <b-table-column field="value" label="Monto">
-            ${{ props.row.value }}
+            $ {{ formattedAmount(props.row.value) }}
           </b-table-column>
           <b-table-column field="destination" label="Destino">
             {{ props.row.destination }}
@@ -193,7 +193,7 @@
 
 <script lang="ts">
 import { MiscellaneousExpensesFilters } from "@/models/filters/miscellaneousExpensesFilters";
-import { dateTimeToLocal } from "@/utils/common-functions";
+import { dateTimeToLocal, formattedAmount } from "@/utils/common-functions";
 import { Vue, Component } from "vue-property-decorator";
 import { MiscellaneousExpenses } from "../../models/miscellaneousExpenses";
 import { NavigatorMiscellaneousExpensesService } from "../../services/miscellaneous-expenses-service";
@@ -213,6 +213,10 @@ export default class MiscellaneousExpensesList extends Vue {
 
   dateTimeToLocal(date: Date) {
     return dateTimeToLocal(date);
+  }
+
+  formattedAmount(amount: number) {
+    return formattedAmount(amount);
   }
 
   deleteMiscellaneousExpenses(miscellaneousExpense: MiscellaneousExpenses) {

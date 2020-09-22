@@ -23,8 +23,8 @@ namespace Application.ViewModels
         public Guid? VendorId { get; set; }
         public VendorViewModel Vendor { get; set; }
         public string Brand { get; set; }
-        public double? MinimumStock { get; set; }
-        public double Stock { get; set; }
+        public decimal? MinimumStock { get; set; }
+        public decimal Stock { get; set; }
         public string UnitOfMeasurement { get; set; }
         public PriceViewModel PurchasePrice { get; set; }
         public PriceViewModel SalePrice { get; set; }

@@ -178,7 +178,7 @@
             {{ props.row.product }}
           </b-table-column>
           <b-table-column field="price" label="Precio" centered>
-            $ {{ props.row.price }}
+            $ {{ formattedAmount(props.row.price) }}
           </b-table-column>
           <b-table-column field="paymentType" label="Forma de Pago">
             {{ getPaymentType(props.row.paymentType) }}
@@ -187,7 +187,7 @@
             {{ dateTimeToLocal(props.row.date) }}
           </b-table-column>
           <b-table-column field="value" label="Comisión" centered>
-            $ {{ props.row.value }}
+            $ {{ formattedAmount(props.row.value) }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones" centered>
@@ -218,7 +218,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import { Commission } from "../../models/commission";
 import { NavigatorCommissionService } from "../../services/commission-service";
-import { dateTimeToLocal } from "@/utils/common-functions";
+import { dateTimeToLocal, formattedAmount } from "@/utils/common-functions";
 import { CommissionFilters } from "../../models/filters/commissionFilters";
 import { Client } from "@/models/client";
 import { NavigatorClientService } from "@/services/client-service";
@@ -258,6 +258,10 @@ export default class CommissionList extends Vue {
 
   dateTimeToLocal(date: Date) {
     return dateTimeToLocal(date);
+  }
+
+  formattedAmount(amount: number) {
+    return formattedAmount(amount);
   }
 
   getPaymentType(paymentType: paymentTypes) {

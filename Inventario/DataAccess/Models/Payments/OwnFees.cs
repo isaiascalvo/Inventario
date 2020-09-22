@@ -18,7 +18,7 @@ namespace Data
 
         }
 
-        public OwnFees(DateTime expirationDate, double amount, int quantity, Guid createdBy)
+        public OwnFees(DateTime expirationDate, decimal amount, int quantity, Guid createdBy)
         {
             ExpirationDate = expirationDate.ToLocalTime();
             Amount = amount;
@@ -26,7 +26,7 @@ namespace Data
             FeeList = new List<Fee>();
             CreatedBy = createdBy;
 
-            double feeValue = Math.Ceiling(Amount * 100 / Quantity) / 100;
+            decimal feeValue = Math.Ceiling(Amount * 100 / Quantity) / 100;
 
             for (int i = 0; i < Quantity; i++)
             {

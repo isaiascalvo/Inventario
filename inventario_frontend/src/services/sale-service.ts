@@ -5,6 +5,7 @@ import { SaleFilters } from "@/models/filters/saleFilters";
 export interface SaleService {
   getSales(): Promise<Sale[]>;
   getSale(id: string): Promise<Sale>;
+  preCreation(sale: SaleForCreation): Promise<Sale>;
   addSale(sale: SaleForCreation): Promise<Sale>;
   // updateSale(sale: Sale): Promise<void>;
   deleteSale(saleId: string): Promise<void>;
@@ -62,8 +63,11 @@ export class NavigatorSaleService implements SaleService {
     return (await apiClient.get("/sales/" + id)).data;
   }
 
+  public async preCreation(sale: SaleForCreation): Promise<Sale> {
+    return (await apiClient.post("/sales/PreCreation", sale)).data;
+  }
+
   public addSale(sale: SaleForCreation): Promise<Sale> {
-    console.log(JSON.parse(JSON.stringify(sale)));
     return apiClient.post("/sales", sale);
   }
 

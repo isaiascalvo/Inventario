@@ -121,6 +121,17 @@ namespace Application
             }
         }
 
+        [HttpPost("PreCreation")]
+        public async Task<IActionResult> PreCreation(SaleForCreationViewModel saleForCreationVM)
+        {
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("NameId"));
+            var saleAndPaymentForCreationDto = _mapper.Map<SaleForCreationViewModel, SaleForCreationDto>(saleForCreationVM);
+            var sale = await _saleUseCases.PreCreation(userId, saleAndPaymentForCreationDto);
+            var saleVM = _mapper.Map<SaleDto, SaleViewModel>(sale);
+
+            return Ok(saleVM);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Add(SaleForCreationViewModel saleForCreationVM)
         {

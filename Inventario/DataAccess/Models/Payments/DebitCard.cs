@@ -8,18 +8,18 @@ namespace Data
     {
         public string CardType { get; set; }
         public string Bank { get; set; }
-        public double Discount { get; set; }
-        public double Surcharge { get; set; }
+        public decimal Discount { get; set; }
+        public decimal Surcharge { get; set; }
 
         public DebitCard()
         {
 
         }
-        public DebitCard(double amount, double discount, double surcharge)
+        public DebitCard(decimal amount, decimal discount, decimal surcharge)
         {
             Discount = discount;
             Surcharge = surcharge;
-            Amount = amount * (1 + (surcharge - discount) / 100);
+            Amount = Math.Ceiling(amount * 100 * (1 + (surcharge - discount) / 100)) / 100;
         }
     }
 }

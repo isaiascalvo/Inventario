@@ -9,7 +9,7 @@ namespace Data
     public class Price: Entity
     {
         [Required]
-        public double Value { get; set; }
+        public decimal Value { get; set; }
         [Required]
         public Guid ProductId { get; set; }
         public Product Product { get; set; }

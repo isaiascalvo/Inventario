@@ -8,7 +8,7 @@ namespace Logic.Dtos
     {
         public string CardType { get; set; }
         public string Bank { get; set; }
-        public double Discount { get; set; }
-        public double Surcharge { get; set; }
+        public decimal Discount { get; set; }
+        public decimal Surcharge { get; set; }
     }
 }
