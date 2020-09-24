@@ -4,14 +4,16 @@ using Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(InventarioDbContext))]
-    partial class InventarioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200924162218_ProductEntryCostObs")]
+    partial class ProductEntryCostObs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,9 +204,6 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FeeRuleId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -227,8 +226,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FeeRuleId");
 
                     b.HasIndex("ProductId");
 
@@ -955,10 +952,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Data.Detail", b =>
                 {
-                    b.HasOne("Data.FeeRule", "FeeRule")
-                        .WithMany()
-                        .HasForeignKey("FeeRuleId");
-
                     b.HasOne("Data.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")

@@ -105,6 +105,7 @@ namespace Application
             services.AddScoped<IMiscellaneousExpensesUseCases, MiscellaneousExpensesUseCases>();
             services.AddScoped<IFeeRuleUseCases, FeeRuleUseCases>();
             services.AddScoped<ICommissionUseCases, CommissionUseCases>();
+            services.AddScoped<IPeriodicReportUseCases, PeriodicReportUseCases>();
 
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IPriceRepository, PriceRepository>();

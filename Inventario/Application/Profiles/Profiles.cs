@@ -153,6 +153,9 @@ namespace Application.Profiles
             CreateMap<CommissionViewModel, CommissionDto>();
             CreateMap<CommissionDto, CommissionViewModel>();
             CreateMap<CommissionForCreationViewModel, CommissionForCreationDto>();
+            
+            CreateMap<PeriodicReportViewModel, PeriodicReportDto>();
+            CreateMap<PeriodicReportDto, PeriodicReportViewModel>();
 
             CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
             CreateMap<VendorFiltersViewModel, VendorFiltersDto>();

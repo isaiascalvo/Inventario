@@ -52,6 +52,12 @@ namespace Infrastructure.EFCore
                 .HasForeignKey(p => p.VendorId);
             modelBuilder.Entity<Product>()
                  .HasIndex(p => p.Code).IsUnique();
+            modelBuilder.Entity<Product>()
+                .Property(p => p.MinimumStock)
+                .HasColumnType("decimal(18,4)");
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Stock)
+                .HasColumnType("decimal(18,4)");
 
             //Vendor
             modelBuilder.Entity<Vendor>()
@@ -67,6 +73,9 @@ namespace Infrastructure.EFCore
                 .HasOne(p => p.Product)
                 .WithMany()
                 .HasForeignKey(p => p.ProductId);
+            modelBuilder.Entity<Price>()
+                .Property(p => p.Value)
+                .HasColumnType("decimal(18,4)");
 
             //Client
             modelBuilder.Entity<Client>()
@@ -83,12 +92,18 @@ namespace Infrastructure.EFCore
                 .HasOne(pel => pel.ProductEntry)
                 .WithMany(pe => pe.ProductEntryLines)
                 .HasForeignKey(pel => pel.ProductEntryId);
+            modelBuilder.Entity<ProductEntryLine>()
+                .Property(pel => pel.Quantity)
+                .HasColumnType("decimal(18,4)");
 
             //ProductEntry
             modelBuilder.Entity<ProductEntry>()
                 .HasMany(pe => pe.ProductEntryLines)
                 .WithOne(pel => pel.ProductEntry)
                 .HasForeignKey(pel => pel.ProductEntryId);
+            modelBuilder.Entity<ProductEntry>()
+                .Property(pe => pe.Cost)
+                .HasColumnType("decimal(18,4)");
 
             modelBuilder.Entity<ProductEntry>()
                 .HasOne(pe => pe.Vendor)
@@ -124,18 +139,36 @@ namespace Infrastructure.EFCore
                 .HasOne(p => p.Product)
                 .WithMany()
                 .HasForeignKey(p => p.ProductId);
+            modelBuilder.Entity<Detail>()
+                .HasOne(d => d.FeeRule)
+                .WithMany()
+                .HasForeignKey(d => d.FeeRuleId);
+            modelBuilder.Entity<Detail>()
+                .Property(d => d.UnitPrice)
+                .HasColumnType("decimal(18,4)");
+
+            //Fee
+            modelBuilder.Entity<Payment>()
+                .Property(o => o.Amount)
+                .HasColumnType("decimal(18,4)");
 
             //Fee
             modelBuilder.Entity<Fee>()
                 .HasOne(f => f.OwnFees)
                 .WithMany(x => x.FeeList)
                 .HasForeignKey(f => f.OwnFeesId);
+            modelBuilder.Entity<Fee>()
+                .Property(o => o.Value)
+                .HasColumnType("decimal(18,4)");
 
             //FeeRule
             modelBuilder.Entity<FeeRule>()
                 .HasOne(fr => fr.Product)
                 .WithMany()
                 .HasForeignKey(fr => fr.ProductId);
+            modelBuilder.Entity<FeeRule>()
+                .Property(fr => fr.Percentage)
+                .HasColumnType("decimal(18,4)");
 
             //Cheque
             modelBuilder.Entity<Cheque>()
@@ -144,6 +177,30 @@ namespace Infrastructure.EFCore
                 .HasForeignKey(ch => ch.ChequesPaymentId);
             modelBuilder.Entity<Cheque>()
                 .HasIndex(ch => ch.Nro).IsUnique();
+            modelBuilder.Entity<Cheque>()
+                .Property(ch => ch.Value)
+                .HasColumnType("decimal(18,4)");
+
+            //Cash
+            modelBuilder.Entity<Cash>()
+                .Property(c => c.Discount)
+                .HasColumnType("decimal(18,4)");
+
+            //CreditCard
+            modelBuilder.Entity<CreditCard>()
+                .Property(c => c.Discount)
+                .HasColumnType("decimal(18,4)");
+            modelBuilder.Entity<CreditCard>()
+                .Property(c => c.Surcharge)
+                .HasColumnType("decimal(18,4)");
+
+            //DebitCard
+            modelBuilder.Entity<DebitCard>()
+                .Property(c => c.Discount)
+                .HasColumnType("decimal(18,4)");
+            modelBuilder.Entity<DebitCard>()
+                .Property(c => c.Surcharge)
+                .HasColumnType("decimal(18,4)");
 
             //Commission
             modelBuilder.Entity<Commission>()
@@ -154,6 +211,17 @@ namespace Infrastructure.EFCore
                 .HasOne(c => c.Client)
                 .WithMany()
                 .HasForeignKey(c => c.ClientId);
+            modelBuilder.Entity<Commission>()
+                .Property(c => c.Price)
+                .HasColumnType("decimal(18,4)");
+            modelBuilder.Entity<Commission>()
+                .Property(c => c.Value)
+                .HasColumnType("decimal(18,4)");
+
+            //MiscellaneousExpenses
+            modelBuilder.Entity<MiscellaneousExpenses>()
+                .Property(me => me.Value)
+                .HasColumnType("decimal(18,4)");
         }
         #endregion
 

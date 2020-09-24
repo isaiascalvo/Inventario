@@ -295,6 +295,15 @@ const routes: Array<RouteConfig> = [
     //     next();
     //   }
     // },
+  },
+  {
+    path: "/periodic-report",
+    name: "PeriodicReport",
+    component: () =>
+      import(
+        /* webpackChunkName: "periodic-report" */
+        "../views/periodic-report/periodic-report-list.vue"
+      )
   }
 ];
 

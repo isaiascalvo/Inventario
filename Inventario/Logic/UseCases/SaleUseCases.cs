@@ -101,19 +101,10 @@ namespace Logic
                             !x.IsDeleted
                         );
 
-                    var detail = new Detail()
-                    {
-                        SaleId = sale.Id,
-                        ProductId = detailFC.ProductId,
-                        Product = product,
-                        Quantity = detailFC.Quantity,
-                        UnitPrice = price.Value,
-                        CreatedBy = userId
-                    };
-
+                    FeeRule feeRule = null;
                     if (sale.PaymentType == ePaymentTypes.OwnFees)
                     {
-                        FeeRule feeRule = (await _feeRuleRepository.Find(x => x.ProductId == detailFC.ProductId))
+                        feeRule = (await _feeRuleRepository.Find(x => x.ProductId == detailFC.ProductId))
                             .OrderByDescending(x => x.Date).ThenBy(x => x.FeesAmountTo)
                             .FirstOrDefault(x => x.Date <= sale.Date && x.FeesAmountTo >= saletForCreationDto.OwnFees.Quantity);
                         if (feeRule == null)
@@ -124,6 +115,17 @@ namespace Logic
                     }
                     else
                         total += price.Value * detailFC.Quantity;
+
+                    var detail = new Detail()
+                    {
+                        SaleId = sale.Id,
+                        ProductId = detailFC.ProductId,
+                        Product = product,
+                        Quantity = detailFC.Quantity,
+                        UnitPrice = price.Value,
+                        FeeRuleId = feeRule?.Id,
+                        CreatedBy = userId
+                    };
 
                     sale.Details.Add(detail);
                 }
@@ -269,19 +271,10 @@ namespace Logic
                             !x.IsDeleted
                         );
 
-                    var detail = new Detail()
-                    {
-                        SaleId = sale.Id,
-                        ProductId = detailFC.ProductId,
-                        Quantity = detailFC.Quantity,
-                        UnitPrice = price.Value,
-                        CreatedBy = userId
-                    };
-                    product.Stock -= detailFC.Quantity;
-
+                    FeeRule feeRule = null;
                     if (sale.PaymentType == ePaymentTypes.OwnFees)
                     {
-                        FeeRule feeRule = (await _feeRuleRepository.Find(x => x.ProductId == detailFC.ProductId))
+                        feeRule = (await _feeRuleRepository.Find(x => x.ProductId == detailFC.ProductId))
                             .OrderByDescending(x => x.Date).ThenBy(x => x.FeesAmountTo)
                             .FirstOrDefault(x => x.Date <= sale.Date && x.FeesAmountTo >= saletForCreationDto.OwnFees.Quantity);
                         if (feeRule == null)
@@ -292,6 +285,17 @@ namespace Logic
                     }
                     else
                         total += price.Value * detailFC.Quantity;
+
+                    var detail = new Detail()
+                    {
+                        SaleId = sale.Id,
+                        ProductId = detailFC.ProductId,
+                        Quantity = detailFC.Quantity,
+                        UnitPrice = price.Value,
+                        FeeRuleId = feeRule?.Id,
+                        CreatedBy = userId
+                    };
+                    product.Stock -= detailFC.Quantity;
 
                     detail = await _detailRepository.Add(detail);
                     await _productRepository.Update(product);

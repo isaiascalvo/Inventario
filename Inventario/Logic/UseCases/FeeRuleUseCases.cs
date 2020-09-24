@@ -53,6 +53,16 @@ namespace Logic
             if (feeRule == null)
                 throw new KeyNotFoundException($"Fee Rule with id: {id} not found.");
 
+            var lastFeeRules = await _feeRuleRepositoryRepository
+                .Find(x => x.ProductId == feeRule.ProductId && x.FeesAmountTo == feeRule.FeesAmountTo && !x.IsDeleted);
+
+            foreach (var rule in lastFeeRules)
+            {
+                var r = await _feeRuleRepositoryRepository.Delete(userId, rule.Id);
+                if (r == null)
+                    throw new KeyNotFoundException($"Fee Rule with id: {r.Id} not found.");
+            }
+
             await _feeRuleRepositoryRepository.CommitAsync();
         }
 

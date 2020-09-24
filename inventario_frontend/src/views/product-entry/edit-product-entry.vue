@@ -23,10 +23,7 @@
                     placeholder="Seleccione una fecha"
                     icon="calendar-today"
                     trap-focus
-                    :day-names="dayNames"
-                    :month-names="monthNames"
                     editable
-                    :date-parser="parseDate"
                     size="is-small"
                     required
                     validation-message="Debe ingresar una fecha"
@@ -43,9 +40,68 @@
                     size="is-small"
                     required
                     validation-message="Seleccione un Tipo"
+                    @input="
+                      () =>
+                        (productEntry.vendorId = productEntry.cost = undefined)
+                    "
                   >
-                    <option value="true">Entrada</option>
-                    <option value="false">Salida</option>
+                    <option :value="true">Entrada</option>
+                    <option :value="false">Salida</option>
+                  </b-select>
+                </b-field>
+              </div>
+            </div>
+
+            <div v-if="productEntry.isEntry" class="columns">
+              <div class="column">
+                <b-field label="Proveedor">
+                  <b-select
+                    v-model="productEntry.vendorId"
+                    placeholder="Seleccione un Proveedor"
+                    expanded
+                    required
+                    size="is-small"
+                    validation-message="Seleccione un Proveedor"
+                  >
+                    <option
+                      v-for="vendor in vendors"
+                      :key="vendor.id"
+                      :value="vendor.id"
+                    >
+                      {{ vendor.name }}
+                    </option>
+                  </b-select>
+                </b-field>
+              </div>
+
+              <div class="column">
+                <b-field label="Costo ($)">
+                  <b-input
+                    v-model="productEntry.cost"
+                    type="number"
+                    placeholder="Ingrese el costo de la compra"
+                    size="is-small"
+                    required
+                    validation-message="Debe ingresar el costo de la compra"
+                  ></b-input>
+                </b-field>
+              </div>
+
+              <div class="column">
+                <b-field label="Método de pago:">
+                  <b-select
+                    v-model="productEntry.paymentType"
+                    placeholder="Seleccione un método de pago"
+                    expanded
+                    size="is-small"
+                    required
+                    validation-message="Seleccione un método de pago"
+                  >
+                    <option :value="0">Efectivo</option>
+                    <option :value="1">Cuotas</option>
+                    <option :value="2">Tarjeta de crédito</option>
+                    <option :value="3">Tarjeta de débito</option>
+                    <option :value="4">Cheque</option>
                   </b-select>
                 </b-field>
               </div>
@@ -140,6 +196,19 @@
               </b-table>
             </div>
 
+            <div style="margin-top: 10px;">
+              <b-field label="Observaciones">
+                <b-input
+                  v-model="productEntry.observations"
+                  placeholder="Observaciones"
+                  expanded
+                  type="textarea"
+                  size="is-small"
+                >
+                </b-input>
+              </b-field>
+            </div>
+
             <div class="buttons">
               <b-button
                 native-type="submit"
@@ -179,43 +248,27 @@ import {
 import { ProductEntryLine } from "../../models/productEntryLine";
 import { Product } from "../../models/product";
 import { NavigatorProductService } from "../../services/product-service";
+import { NavigatorVendorService } from "@/services/vendor-service";
+import { Vendor } from "@/models/vendor";
 
-@Component({
-  components: {
-    // ErrorDialog
-  }
-})
+@Component
 export default class EditProductEntry extends Vue {
   public errorDialog = false;
   public productEntry: ProductEntry = new ProductEntry();
   public products: Product[] = [];
   public isLoading = false;
-  public monthNames = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diceimbre"
-  ];
-  public dayNames = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+  public vendors: Vendor[] = [];
   public prodCodNameDesc: { text: string; focus: boolean }[] = [];
 
   public productEntryService: NavigatorProductEntryService = new NavigatorProductEntryService();
   public productService: NavigatorProductService = new NavigatorProductService();
+  public vendorService: NavigatorVendorService = new NavigatorVendorService();
 
   fieldState(field: unknown) {
     return fieldStateValidation(field);
   }
 
   formValid() {
-    const result = formValidation(this.productEntry as never);
     const productsInvalid = this.productEntry.productEntryLines.filter(
       x => x.quantity === undefined || x.productId === undefined
     );
@@ -227,15 +280,17 @@ export default class EditProductEntry extends Vue {
       });
       return false;
     }
-    console.log(result);
-    return result === "productEntryLines;";
-  }
 
-  parseDate(date: string) {
-    const dateSplited = date.split("/");
-    return new Date(
-      Date.parse(dateSplited[1] + "/" + dateSplited[0] + "/" + dateSplited[2])
-    );
+    //Falta
+    // if (this.productEntry) {
+    //   this.fieldState(this.productEntry.vendorId);
+    // }
+
+    const result = formValidation(this.productEntry as never);
+    const nulleableProps = ["", "productEntryLines"];
+    const splitedResult = result.split(";");
+    console.log(result);
+    return splitedResult.every(x => nulleableProps.some(y => y === x));
   }
 
   filteredNamesProducts(row: ProductEntryLine) {
@@ -379,9 +434,14 @@ export default class EditProductEntry extends Vue {
   created() {
     this.productEntry.id = this.$route.params.id;
     this.isLoading = true;
-    this.productService.getProducts().then(
-      data => {
+    this.productService
+      .getProducts()
+      .then(data => {
         this.products = data;
+        return this.vendorService.getVendors();
+      })
+      .then(response => {
+        this.vendors = response;
         if (this.productEntry.id) {
           this.productEntryService.getProductEntry(this.productEntry.id).then(
             response => {
@@ -428,8 +488,8 @@ export default class EditProductEntry extends Vue {
           this.productEntry.productEntryLines.push(new ProductEntryLine());
           this.prodCodNameDesc.push({ text: "", focus: false });
         }
-      },
-      error => {
+      })
+      .catch(error => {
         this.isLoading = false;
         this.$buefy.dialog.alert({
           title: "Error",
@@ -444,8 +504,7 @@ export default class EditProductEntry extends Vue {
         });
         console.log(error);
         this.$router.push({ name: "ProductEntryList" });
-      }
-    );
+      });
   }
 }
 </script>

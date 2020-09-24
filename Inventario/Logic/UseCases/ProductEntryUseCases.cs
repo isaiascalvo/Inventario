@@ -33,7 +33,7 @@ namespace Logic
         {
             try
             {
-                if (productEntryForCreationDto.VendorId.HasValue)
+                if (productEntryForCreationDto.IsEntry)
                 {
                     var vendor = await _vendorRepository.GetById(productEntryForCreationDto.VendorId.Value);
                     if(vendor == null)
@@ -45,6 +45,9 @@ namespace Logic
                     Date = productEntryForCreationDto.Date.ToLocalTime(),
                     IsEntry = productEntryForCreationDto.IsEntry,
                     VendorId = productEntryForCreationDto.VendorId,
+                    Cost = productEntryForCreationDto.Cost,
+                    PaymentType = productEntryForCreationDto.PaymentType,
+                    Observations = productEntryForCreationDto.Observations,
                     CreatedBy = userId
                 };
 
@@ -158,13 +161,6 @@ namespace Logic
             if (productEntry == null)
                 throw new KeyNotFoundException($"Product entry with id: {id} not found.");
 
-            if (productEntryDto.VendorId.HasValue)
-            {
-                var vendor = await _vendorRepository.GetById(productEntryDto.VendorId.Value);
-                if (vendor == null)
-                    throw new KeyNotFoundException($"Vendor with id: {productEntryDto.VendorId.Value} not found.");
-            }
-
             //Delete PEL Deleted
             var deleted = productEntry.ProductEntryLines.Where(
                 pel => !pel.IsDeleted && !productEntryDto.ProductEntryLines.Any(pelDto => pelDto.Id == pel.Id)
@@ -225,8 +221,20 @@ namespace Logic
                 }
             }
 
+            Vendor vendor = null;
+            if (productEntryDto.IsEntry)
+            {
+                vendor = await _vendorRepository.GetById(productEntryDto.VendorId.Value);
+                if (vendor == null)
+                    throw new KeyNotFoundException($"Vendor with id: {productEntryDto.VendorId.Value} not found.");
+            }
+
             productEntry.Date = productEntryDto.Date.ToLocalTime();
             productEntry.IsEntry = productEntryDto.IsEntry;
+            productEntry.VendorId = productEntryDto.IsEntry ? productEntryDto.VendorId : null;
+            productEntry.Cost = productEntryDto.IsEntry ? productEntryDto.Cost : null;
+            productEntry.PaymentType = productEntryDto.IsEntry ? productEntryDto.PaymentType : null;
+            productEntry.Observations = productEntryDto.Observations;
             productEntry.LastModificationBy = productEntryDto.LastModificationBy;
             
             await _productEntryRepository.Update(productEntry);

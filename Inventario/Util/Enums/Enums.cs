@@ -24,6 +24,21 @@ namespace Util.Enums
         PurchasePrice,
         SalePrice
     }
+    public enum eMonths
+    {
+        Enero,
+        Febrero,
+        Marzo,
+        Abril,
+        Mayo,
+        Junio,
+        Julio,
+        Agosto,
+        Septiembre,
+        Octubre,
+        Noviembre,
+        Diciembre
+    }
 
     public static class eRoutes
     {
