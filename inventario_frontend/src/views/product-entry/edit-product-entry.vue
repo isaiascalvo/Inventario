@@ -17,18 +17,31 @@
           <form @submit.prevent="submit()" class="flex-text-left">
             <div class="columns">
               <div class="column">
-                <b-field label="Fecha">
-                  <b-datepicker
+                <b-field
+                  label="Fecha y hora"
+                  :type="
+                    dateFocus && !fieldState(productEntry.date)
+                      ? 'is-danger'
+                      : ''
+                  "
+                  :message="
+                    dateFocus && !fieldState(productEntry.date)
+                      ? 'Debe seleccionar fecha y hora'
+                      : ''
+                  "
+                >
+                  <b-datetimepicker
                     v-model="productEntry.date"
-                    placeholder="Seleccione una fecha"
+                    rounded
+                    placeholder="Seleccione fecha y hora"
                     icon="calendar-today"
                     trap-focus
+                    horizontal-time-picker
                     editable
                     size="is-small"
-                    required
-                    validation-message="Debe ingresar una fecha"
+                    @blur="dateFocus = true"
                   >
-                  </b-datepicker>
+                  </b-datetimepicker>
                 </b-field>
               </div>
               <div class="column">
@@ -52,62 +65,7 @@
               </div>
             </div>
 
-            <div v-if="productEntry.isEntry" class="columns">
-              <div class="column">
-                <b-field label="Proveedor">
-                  <b-select
-                    v-model="productEntry.vendorId"
-                    placeholder="Seleccione un Proveedor"
-                    expanded
-                    required
-                    size="is-small"
-                    validation-message="Seleccione un Proveedor"
-                  >
-                    <option
-                      v-for="vendor in vendors"
-                      :key="vendor.id"
-                      :value="vendor.id"
-                    >
-                      {{ vendor.name }}
-                    </option>
-                  </b-select>
-                </b-field>
-              </div>
-
-              <div class="column">
-                <b-field label="Costo ($)">
-                  <b-input
-                    v-model="productEntry.cost"
-                    type="number"
-                    placeholder="Ingrese el costo de la compra"
-                    size="is-small"
-                    required
-                    validation-message="Debe ingresar el costo de la compra"
-                  ></b-input>
-                </b-field>
-              </div>
-
-              <div class="column">
-                <b-field label="Método de pago:">
-                  <b-select
-                    v-model="productEntry.paymentType"
-                    placeholder="Seleccione un método de pago"
-                    expanded
-                    size="is-small"
-                    required
-                    validation-message="Seleccione un método de pago"
-                  >
-                    <option :value="0">Efectivo</option>
-                    <option :value="1">Cuotas</option>
-                    <option :value="2">Tarjeta de crédito</option>
-                    <option :value="3">Tarjeta de débito</option>
-                    <option :value="4">Cheque</option>
-                  </b-select>
-                </b-field>
-              </div>
-            </div>
-
-            <div class="card">
+            <div class="card" style="margin-bottom: 10px;">
               <b-table striped hoverable :data="productEntry.productEntryLines">
                 <template slot-scope="props">
                   <b-table-column field="productId" label="Producto">
@@ -196,17 +154,74 @@
               </b-table>
             </div>
 
-            <div style="margin-top: 10px;">
-              <b-field label="Observaciones">
-                <b-input
-                  v-model="productEntry.observations"
-                  placeholder="Observaciones"
-                  expanded
-                  type="textarea"
-                  size="is-small"
-                >
-                </b-input>
-              </b-field>
+            <div v-if="productEntry.isEntry" class="columns">
+              <div class="column">
+                <b-field label="Proveedor">
+                  <b-select
+                    v-model="productEntry.vendorId"
+                    placeholder="Seleccione un Proveedor"
+                    expanded
+                    required
+                    size="is-small"
+                    validation-message="Seleccione un Proveedor"
+                  >
+                    <option
+                      v-for="vendor in vendors"
+                      :key="vendor.id"
+                      :value="vendor.id"
+                    >
+                      {{ vendor.name }}
+                    </option>
+                  </b-select>
+                </b-field>
+              </div>
+
+              <div class="column">
+                <b-field label="Costo ($)">
+                  <b-input
+                    v-model="productEntry.cost"
+                    type="number"
+                    placeholder="Ingrese el costo de la compra"
+                    size="is-small"
+                    required
+                    validation-message="Debe ingresar el costo de la compra"
+                  ></b-input>
+                </b-field>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column" v-if="productEntry.isEntry">
+                <b-field label="Método de pago:">
+                  <b-select
+                    v-model="productEntry.paymentType"
+                    placeholder="Seleccione un método de pago"
+                    expanded
+                    size="is-small"
+                    required
+                    validation-message="Seleccione un método de pago"
+                  >
+                    <option :value="0">Efectivo</option>
+                    <option :value="1">Cuotas</option>
+                    <option :value="2">Tarjeta de crédito</option>
+                    <option :value="3">Tarjeta de débito</option>
+                    <option :value="4">Cheque</option>
+                  </b-select>
+                </b-field>
+              </div>
+
+              <div class="column">
+                <b-field label="Observaciones">
+                  <b-input
+                    v-model="productEntry.observations"
+                    placeholder="Observaciones"
+                    expanded
+                    type="textarea"
+                    size="is-small"
+                  >
+                  </b-input>
+                </b-field>
+              </div>
             </div>
 
             <div class="buttons">
@@ -237,10 +252,7 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import { NavigatorProductEntryService } from "../../services/product-entry-service";
-import {
-  ProductEntry,
-  ProductEntryForCreation
-} from "../../models/productEntry";
+import { ProductEntry } from "../../models/productEntry";
 import {
   fieldStateValidation,
   formValidation
@@ -259,6 +271,7 @@ export default class EditProductEntry extends Vue {
   public isLoading = false;
   public vendors: Vendor[] = [];
   public prodCodNameDesc: { text: string; focus: boolean }[] = [];
+  public dateFocus = false;
 
   public productEntryService: NavigatorProductEntryService = new NavigatorProductEntryService();
   public productService: NavigatorProductService = new NavigatorProductService();
@@ -281,15 +294,24 @@ export default class EditProductEntry extends Vue {
       return false;
     }
 
-    //Falta
-    // if (this.productEntry) {
-    //   this.fieldState(this.productEntry.vendorId);
-    // }
+    if (
+      this.productEntry.isEntry &&
+      (!this.fieldState(this.productEntry.vendorId) ||
+        !this.fieldState(this.productEntry.cost) ||
+        !this.fieldState(this.productEntry.paymentType))
+    ) {
+      return false;
+    }
 
     const result = formValidation(this.productEntry as never);
-    const nulleableProps = ["", "productEntryLines"];
+    const nulleableProps = [
+      "",
+      "cost",
+      "vendorId",
+      "observations",
+      "productEntryLines"
+    ];
     const splitedResult = result.split(";");
-    console.log(result);
     return splitedResult.every(x => nulleableProps.some(y => y === x));
   }
 
@@ -370,14 +392,14 @@ export default class EditProductEntry extends Vue {
   }
 
   public newProductEntry() {
-    const productEntry: ProductEntryForCreation = {
-      date: this.productEntry.date,
-      isEntry: this.productEntry.isEntry,
-      productEntryLines: this.productEntry.productEntryLines
-    };
+    // const productEntry: ProductEntryForCreation = {
+    //   date: this.productEntry.date,
+    //   isEntry: this.productEntry.isEntry,
+    //   productEntryLines: this.productEntry.productEntryLines
+    // };
     this.isLoading = true;
     this.productEntryService
-      .addProductEntry(productEntry)
+      .addProductEntry(this.productEntry)
       .then(() => {
         this.isLoading = false;
         this.$router.push({ name: "ProductEntryList" });
@@ -401,15 +423,15 @@ export default class EditProductEntry extends Vue {
   }
 
   public updateProductEntry() {
-    const productEntry: ProductEntry = {
-      id: this.productEntry.id,
-      date: this.productEntry.date,
-      isEntry: this.productEntry.isEntry,
-      productEntryLines: this.productEntry.productEntryLines
-    };
+    // const productEntry: ProductEntry = {
+    //   id: this.productEntry.id,
+    //   date: this.productEntry.date,
+    //   isEntry: this.productEntry.isEntry,
+    //   productEntryLines: this.productEntry.productEntryLines
+    // };
     this.isLoading = true;
     this.productEntryService
-      .updateProductEntry(productEntry)
+      .updateProductEntry(this.productEntry)
       .then(() => {
         this.$router.push({ name: "ProductEntryList" });
       })

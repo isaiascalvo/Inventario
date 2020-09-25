@@ -150,6 +150,11 @@ export default class SideBarMenu extends Vue {
       icon: "script-text-outline",
       text: "Reporte Anual",
       url: "/periodic-report"
+    },
+    {
+      icon: "script-text-outline",
+      text: "Reporte de Cuotas",
+      url: "/fees-report"
     }
     //finance
   ];

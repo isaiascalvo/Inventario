@@ -8,6 +8,7 @@ namespace Logic.Interfaces
 {
     public interface IPeriodicReportUseCases
     {
-        Task<IEnumerable<PeriodicReportDto>> GetByYearAndMonth(int year);
+        Task<IEnumerable<PeriodicReportDto>> GetAnnualReport(int year);
+        Task<IEnumerable<FeesReportDto>> GetFeesReport(FeesReportsFiltersDto filtersDto);
     }
 }

@@ -47,6 +47,14 @@
                 editable
               >
               </b-datetimepicker>
+              <p class="control">
+                <b-button
+                  icon-left="close"
+                  type="is-dark"
+                  size="is-small"
+                  @click="productEntryFilters.dateDateFrom = undefined"
+                ></b-button>
+              </p>
             </b-field>
 
             <b-field label-position="on-border" label="Fecha hasta">
@@ -60,6 +68,14 @@
                 editable
               >
               </b-datetimepicker>
+              <p class="control">
+                <b-button
+                  icon-left="close"
+                  type="is-dark"
+                  size="is-small"
+                  @click="productEntryFilters.dateDateTo = undefined"
+                ></b-button>
+              </p>
             </b-field>
 
             <b-field label-position="on-border" label="Tipo de movimiento">
@@ -339,7 +355,7 @@ select {
 }
 
 select {
-  min-width: 90px;
+  min-width: 150px;
 }
 
 input {

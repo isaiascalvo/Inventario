@@ -143,7 +143,6 @@ export default class EditMiscellaneousExpenses extends Vue {
 
   formValid() {
     const result = formValidation(this.miscellaneousExpense as never);
-    console.log(result);
     return result === "" || result === "destination;";
   }
 

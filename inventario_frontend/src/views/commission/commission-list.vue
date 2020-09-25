@@ -85,6 +85,14 @@
                 editable
               >
               </b-datetimepicker>
+              <p class="control">
+                <b-button
+                  icon-left="close"
+                  type="is-dark"
+                  size="is-small"
+                  @click="commissionFilters.dateDateFrom = undefined"
+                ></b-button>
+              </p>
             </b-field>
 
             <b-field label-position="on-border" label="Fecha hasta">
@@ -98,6 +106,14 @@
                 editable
               >
               </b-datetimepicker>
+              <p class="control">
+                <b-button
+                  icon-left="close"
+                  type="is-dark"
+                  size="is-small"
+                  @click="commissionFilters.dateDateTo = undefined"
+                ></b-button>
+              </p>
             </b-field>
 
             <b-field label-position="on-border" label="Forma de pago">

@@ -301,8 +301,17 @@ const routes: Array<RouteConfig> = [
     name: "PeriodicReport",
     component: () =>
       import(
-        /* webpackChunkName: "periodic-report" */
-        "../views/periodic-report/periodic-report-list.vue"
+        /* webpackChunkName: "report" */
+        "../views/reports/periodic-report.vue"
+      )
+  },
+  {
+    path: "/fees-report",
+    name: "FeesReport",
+    component: () =>
+      import(
+        /* webpackChunkName: "report" */
+        "../views/reports/fees-report.vue"
       )
   }
 ];

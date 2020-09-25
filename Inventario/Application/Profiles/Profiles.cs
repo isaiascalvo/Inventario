@@ -150,12 +150,25 @@ namespace Application.Profiles
                     opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
                 );
 
+            CreateMap<FeesReportsFiltersViewModel, FeesReportsFiltersDto>()
+                .ForMember(
+                    dest => dest.DateFrom,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateFrom))
+                )
+                .ForMember(
+                    dest => dest.DateTo,
+                    opt => opt.MapFrom(src => DateTime.Parse(src.DateTo))
+                );
+
             CreateMap<CommissionViewModel, CommissionDto>();
             CreateMap<CommissionDto, CommissionViewModel>();
             CreateMap<CommissionForCreationViewModel, CommissionForCreationDto>();
             
             CreateMap<PeriodicReportViewModel, PeriodicReportDto>();
             CreateMap<PeriodicReportDto, PeriodicReportViewModel>();
+            
+            CreateMap<FeesReportViewModel, FeesReportDto>();
+            CreateMap<FeesReportDto, FeesReportViewModel>();
 
             CreateMap<ClientFiltersViewModel, ClientFiltersDto>();
             CreateMap<VendorFiltersViewModel, VendorFiltersDto>();

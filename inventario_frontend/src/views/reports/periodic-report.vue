@@ -14,7 +14,7 @@
                 size="is-small"
                 type="number"
                 required
-                validation-message="El año es necesario"
+                validation-message=" "
               ></b-input>
               <p class="control">
                 <b-button
@@ -73,13 +73,13 @@
 <script lang="ts">
 import { formattedAmount } from "@/utils/common-functions";
 import { Vue, Component } from "vue-property-decorator";
-import { PeriodicReport } from "../../models/periodicReport";
-import { NavigatorPeriodicReportService } from "../../services/periodic-report-service";
+import { PeriodicReport } from "../../models/reports/periodicReport";
+import { NavigatorReportService } from "../../services/report-service";
 
 @Component
 export default class PeriodicReportList extends Vue {
   public periodicReports: PeriodicReport[] = [];
-  public periodicReportsService: NavigatorPeriodicReportService = new NavigatorPeriodicReportService();
+  public reportsService: NavigatorReportService = new NavigatorReportService();
 
   public isLoading = false;
   public year: number = new Date().getFullYear();
@@ -89,9 +89,23 @@ export default class PeriodicReportList extends Vue {
   }
 
   getPeriodicReport() {
+    if (!this.year) {
+      this.$buefy.dialog.alert({
+        title: "Error",
+        message: "Debe ingresar un año.",
+        type: "is-danger",
+        hasIcon: true,
+        icon: "times-circle",
+        iconPack: "fa",
+        ariaRole: "alertdialog",
+        ariaModal: true
+      });
+      return;
+    }
+
     this.isLoading = true;
-    this.periodicReportsService
-      .getByYear(this.year)
+    this.reportsService
+      .getAnnualReport(this.year)
       .then(response => {
         this.periodicReports = response;
         this.isLoading = false;
