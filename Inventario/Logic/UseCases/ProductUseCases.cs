@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -355,7 +356,6 @@ namespace Logic
                         "<td>Categoría</td>" +
                         "<td>Proveedor</td>" +
                         "<td>Marca</td>" +
-                        "<td>Precio de compra</td>" +
                         "<td>Precio de venta</td>" +
                     "</tr>" +
                     "<dinamic></dinamic>" +
@@ -365,9 +365,8 @@ namespace Logic
                 .AsQueryable().Where(filtersDto.GetExpresion()).OrderBy(x => x.Name);
             foreach (var prod in products)
             {
-                var purchasePrice = (await _priceRepository.GetAll()).Where(p => p.ProductId == prod.Id && p.PriceType == ePriceTypes.PurchasePrice).OrderByDescending(x => x.DateTime).FirstOrDefault();
                 var salePrice = (await _priceRepository.GetAll()).Where(p => p.ProductId == prod.Id && p.PriceType == ePriceTypes.SalePrice).OrderByDescending(x => x.DateTime).FirstOrDefault();
-                htmlStr = AppendDynamicField(htmlStr, prod.Name, prod.Description, prod.Code, prod.Category.Name, prod.Vendor.Name, prod.Brand, purchasePrice.Value, salePrice.Value);
+                htmlStr = AppendDynamicField(htmlStr, prod.Name, prod.Description, prod.Code, prod.Category.Name, prod.Vendor.Name, prod.Brand, salePrice.Value);
             }
             htmlStr.Replace("<dinamic></dinamic>", "");
 
@@ -386,7 +385,7 @@ namespace Logic
             string intermediateDestination = System.IO.Path.GetTempFileName().Split(".")[0] + ".pdf";
             PdfWriter writerIntermedio = new PdfWriter(intermediateDestination);
             PdfDocument pdf = new PdfDocument(writerIntermedio);
-            pdf.SetDefaultPageSize(PageSize.A4);
+            pdf.SetDefaultPageSize(PageSize.A4.Rotate());
             IEventHandler handler = new PdfBasicSchema(pdf, source, _configuration["ResourcesRoute"]);
             pdf.AddEventHandler(PdfDocumentEvent.START_PAGE, handler);
             HtmlConverter.ConvertToPdf(htmlStr, pdf, converterProperties);
@@ -396,9 +395,9 @@ namespace Logic
             PdfBasicSchema.GenerateFooter(intermediateDestination, finalDestination);
         }
 
-        private string AppendDynamicField(string htmlStr, string name, string description, string code, string category, string vendor, string brand, decimal purchasePrice, decimal salePrice)
+        private string AppendDynamicField(string htmlStr, string name, string description, string code, string category, string vendor, string brand, decimal salePrice)
         {
-            string campoDinamico = "<tr class='font-size2 align-center {b}'> <td>{name}</td> <td>{description}</td> <td>{code}</td> <td>{category}</td> <td>{vendor}</td> <td>{brand}</td> <td>${purchasePrice}</td> <td>$ {salePrice}</td> </tr>";
+            string campoDinamico = "<tr class='font-size2 align-center {b}'> <td style='text-align: left;'>{name}</td> <td>{description}</td> <td>{code}</td> <td>{category}</td> <td>{vendor}</td> <td>{brand}</td> <td>$ {salePrice}</td> </tr>";
 
             campoDinamico = campoDinamico.Replace("{name}", name);
             campoDinamico = campoDinamico.Replace("{description}", description);
@@ -406,8 +405,7 @@ namespace Logic
             campoDinamico = campoDinamico.Replace("{category}", category);
             campoDinamico = campoDinamico.Replace("{vendor}", vendor);
             campoDinamico = campoDinamico.Replace("{brand}", brand);
-            campoDinamico = campoDinamico.Replace("{purchasePrice}", purchasePrice.ToString());
-            campoDinamico = campoDinamico.Replace("{salePrice}", salePrice.ToString());
+            campoDinamico = campoDinamico.Replace("{salePrice}", salePrice.ToString("N", CultureInfo.CreateSpecificCulture("es-ES")));
             int index = htmlStr.IndexOf("<dinamic></dinamic>");
             if (index >= 0)
             {

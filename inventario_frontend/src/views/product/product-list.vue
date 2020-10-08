@@ -221,10 +221,10 @@
             {{ props.row.unitOfMeasurement }}
           </b-table-column>
           <b-table-column field="purchasePrice" label="Precio de compra">
-            $ {{ props.row.purchasePrice.value }}
+            $ {{ formattedAmount(props.row.purchasePrice.value) }}
           </b-table-column>
           <b-table-column field="salePrice" label="Precio de venta">
-            $ {{ props.row.salePrice.value }}
+            $ {{ formattedAmount(props.row.salePrice.value) }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
@@ -272,6 +272,7 @@ import { NavigatorCategoryService } from "../../services/category-service";
 import { NavigatorVendorService } from "../../services/vendor-service";
 import { Category } from "../../models/category";
 import { Vendor } from "../../models/vendor";
+import { formattedAmount } from "@/utils/common-functions";
 
 @Component
 export default class ProductList extends Vue {
@@ -289,6 +290,10 @@ export default class ProductList extends Vue {
   public isLoading = false;
   public totalPages = 0;
   public filtersApplied = false;
+
+  formattedAmount(amount: number) {
+    return formattedAmount(amount);
+  }
 
   deleteProduct(product: Product) {
     this.$buefy.dialog.confirm({

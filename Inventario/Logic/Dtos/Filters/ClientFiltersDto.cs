@@ -27,8 +27,7 @@ namespace Logic.Dtos
                 (Lastname == null || x.Lastname.ToLower().Contains(Lastname.ToLower())) &&
                 (Dni == null || x.Dni == Dni) &&
                 (Mail == null || x.Mail != null && x.Mail.ToLower().Contains(Mail.ToLower())) &&
-                (Phone == null || x.Phone.Contains(Phone)) &&
-                (Debtor == null || x.Debtor == Debtor);
+                (Phone == null || x.Phone.Contains(Phone));
         }
     }
 }

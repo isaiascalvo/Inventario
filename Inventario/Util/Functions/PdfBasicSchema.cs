@@ -91,10 +91,11 @@ namespace Util.Functions
             header = header.Replace("{VersionX}", version);
 
             htmlStr = htmlStr.Insert(htmlStr.Count(), header);
+            htmlStr = htmlStr.Insert(htmlStr.Count(), "</body></html>");
             string source = System.IO.Path.GetTempFileName().Split(".")[0] + ".pdf";
             PdfWriter writer = new PdfWriter(source);
             PdfDocument pdfDoc = new PdfDocument(writer);
-            htmlStr = htmlStr.Insert(htmlStr.Count(), "</body></html>");
+            pdfDoc.SetDefaultPageSize(PageSize.A4.Rotate());
             ConverterProperties converterProperties = new ConverterProperties();
             HtmlConverter.ConvertToPdf(htmlStr, pdfDoc, converterProperties);
             pdfDoc.Close();
@@ -106,12 +107,14 @@ namespace Util.Functions
         {
             PdfWriter finalWriter = new PdfWriter(finalDestination);
             PdfDocument pdfDoc = new PdfDocument(new PdfReader(intermediateDestination), finalWriter);
+            pdfDoc.SetDefaultPageSize(PageSize.A4.Rotate()); // orientación horizontal
             Document doc = new Document(pdfDoc);
 
             float xFeet = pdfDoc.GetDefaultPageSize().GetX() + 36;
             float yFeet = pdfDoc.GetDefaultPageSize().GetBottom() + 20;
 
-            float footertWidth = pdfDoc.GetPage(1).GetPageSize().GetWidth() - 80;
+            //float footertWidth = pdfDoc.GetPage(1).GetPageSize().GetWidth() - 80; //orientación vertical
+            float footertWidth = pdfDoc.GetPage(1).GetPageSize().GetWidth() - 72;
             float footerHeight = 15F;
 
             Rectangle footerRectangle = new Rectangle(xFeet, yFeet, footertWidth, footerHeight);
@@ -125,7 +128,8 @@ namespace Util.Functions
 
                 float[] width = { 0.5F };
                 Table footerTable = new Table(width);
-                footerTable.SetWidth(523F);
+                //footerTable.SetWidth(523F);
+                footerTable.SetWidth(footertWidth);
                 footerTable.SetFontSize(10F);
                 footerTable.SetTextAlignment(TextAlignment.RIGHT);
 

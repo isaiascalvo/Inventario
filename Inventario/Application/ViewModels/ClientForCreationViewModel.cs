@@ -12,7 +12,6 @@ namespace Application.ViewModels
         public string Dni { get; set; }
         public string Phone { get; set; }
         public string? Mail { get; set; }
-        public bool Debtor { get; set; }
         public DateTime Birthdate { get; set; }
     }
 }

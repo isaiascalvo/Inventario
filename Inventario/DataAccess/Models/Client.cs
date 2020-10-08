@@ -16,7 +16,6 @@ namespace Data
         public string Phone { get; set; }
         public string? Mail { get; set; }
         [Required]
-        public bool Debtor { get; set; }
         public DateTime Birthdate { get; set; }
     }
 }

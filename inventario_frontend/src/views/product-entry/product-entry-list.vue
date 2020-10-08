@@ -4,7 +4,7 @@
       <div class="hero-head">
         <div class="level">
           <div>
-            <h1 class="title is-6">Lista de Movimientos</h1>
+            <h1 class="title is-6">Movimientos de stock</h1>
           </div>
           <div>
             <b-button

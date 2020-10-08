@@ -70,12 +70,6 @@
               </b-datepicker>
             </b-field>
 
-            <div class="field">
-              <b-switch v-model="client.debtor" disabled>
-                Deudor
-              </b-switch>
-            </div>
-
             <b-button
               native-type="submit"
               class="is-success mr-1"

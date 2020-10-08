@@ -3,6 +3,7 @@ using Data;
 using Infrastructure.Repositories;
 using Logic.Dtos;
 using Logic.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,15 @@ namespace Logic
     public class ClientUseCases : IClientUseCases
     {
         private readonly IClientRepository _clientRepository;
+        private readonly ISaleRepository _saleRepository;
+        private readonly IOwnFeesRepository _ownFeesRepository;
         private readonly IMapper _mapper;
 
-        public ClientUseCases(IClientRepository clientRepository, IMapper mapper)
+        public ClientUseCases(IClientRepository clientRepository, ISaleRepository saleRepository, IOwnFeesRepository ownFeesRepository, IMapper mapper)
         {
             _clientRepository = clientRepository;
+            _saleRepository = saleRepository;
+            _ownFeesRepository = ownFeesRepository;
             _mapper = mapper;
         }
 
@@ -31,7 +36,6 @@ namespace Logic
                 Dni = clientForCreationDto.Dni,
                 Phone = clientForCreationDto.Phone,
                 Mail = clientForCreationDto.Mail,
-                Debtor = clientForCreationDto.Debtor,
                 Birthdate = clientForCreationDto.Birthdate.ToLocalTime(),
                 CreatedBy = userId
             };
@@ -52,15 +56,19 @@ namespace Logic
 
         public async Task<IEnumerable<ClientDto>> GetAll()
         {
-            var client = (await _clientRepository.GetAll()).OrderBy(x => x.Name).ThenBy(x => x.Lastname);
-            var clientDto = _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(client);
-            return clientDto;
+            var clients = (await _clientRepository.GetAll()).OrderBy(x => x.Name).ThenBy(x => x.Lastname);
+            return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
         }
+
         public async Task<IEnumerable<ClientDto>> GetByFilters(ClientFiltersDto filters)
         {
-            var tt = filters.GetExpresion();
-            var clients = (await _clientRepository.GetAll()).AsQueryable().Where(tt).ToList().OrderBy(x => x.Name);
-            return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+            var clients = (await _clientRepository.Find(filters.GetExpresion())).OrderBy(x => x.Name);
+            var clientsDto = _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+            foreach (var clientDto in clientsDto)
+            {
+                clientDto.Debtor = await IsDebtor(clientDto);
+            }
+            return clientsDto.Where(x => filters.Debtor == null || x.Debtor == filters.Debtor);
         }
 
         public async Task<int> GetTotalQty()
@@ -70,24 +78,37 @@ namespace Logic
 
         public async Task<int> GetTotalQtyByFilters(ClientFiltersDto filtersDto)
         {
-            var exp = filtersDto.GetExpresion();
-            return (await _clientRepository.GetAll()).AsQueryable().Where(exp).Count();
+            var clients = await _clientRepository.Find(filtersDto.GetExpresion());
+            var clientsDto = _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+            foreach (var clientDto in clientsDto)
+            {
+                clientDto.Debtor = await IsDebtor(clientDto);
+            }
+            return clientsDto.Where(x => filtersDto.Debtor == null || x.Debtor == filtersDto.Debtor).Count();
         }
 
         public async Task<IEnumerable<ClientDto>> GetByPageAndQty(int skip, int qty)
         {
             var clients = (await _clientRepository.GetAll()).OrderByDescending(x => x.Lastname).ThenByDescending(x => x.Name).Skip(skip).Take(qty);
-            return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+            var clientsDto = _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+            foreach (var clientDto in clientsDto)
+            {
+                clientDto.Debtor = await IsDebtor(clientDto);
+            }
+            return clientsDto;
         }
 
         public async Task<IEnumerable<ClientDto>> GetFilteredByPageAndQty(ClientFiltersDto filtersDto, int skip, int qty)
         {
-            var clients = (await _clientRepository.GetAll())
-                .AsQueryable().Where(filtersDto.GetExpresion()).ToList().OrderByDescending(x => x.Lastname).ThenByDescending(x => x.Name).Skip(skip).Take(qty);
-            return _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+            var clients = (await _clientRepository.Find(filtersDto.GetExpresion()))
+                .OrderByDescending(x => x.Lastname).ThenByDescending(x => x.Name);
+            var clientsDto = _mapper.Map<IEnumerable<Client>, IEnumerable<ClientDto>>(clients);
+            foreach (var clientDto in clientsDto)
+            {
+                clientDto.Debtor = await IsDebtor(clientDto);
+            }
+            return clientsDto.Where(x => filtersDto.Debtor == null || x.Debtor == filtersDto.Debtor).Skip(skip).Take(qty);
         }
-
-
 
         public async Task<ClientDto> GetOne(Guid id)
         {
@@ -95,7 +116,9 @@ namespace Logic
             if (client == null)
                 throw new KeyNotFoundException($"Client with id: {id} not found.");
 
-            return _mapper.Map<Client, ClientDto>(client);
+            var clientDto = _mapper.Map<Client, ClientDto>(client);
+            clientDto.Debtor = await IsDebtor(clientDto);
+            return clientDto;
         }
 
         public async Task Update(Guid id, ClientDto clientDto)
@@ -109,12 +132,32 @@ namespace Logic
             client.Dni = clientDto.Dni;
             client.Phone = clientDto.Phone;
             client.Mail = clientDto.Mail;
-            client.Debtor = clientDto.Debtor;
             client.Birthdate = clientDto.Birthdate.ToLocalTime();
             client.LastModificationBy = clientDto.LastModificationBy;
 
             await _clientRepository.Update(client);
             await _clientRepository.CommitAsync();
+        }
+        private async Task<bool> IsDebtor(ClientDto clientDto)
+        {
+            var ownFeesIds = (await _saleRepository
+                    .Find(
+                            x => x.ClientId == clientDto.Id &&
+                            x.PaymentType == Util.Enums.ePaymentTypes.OwnFees,
+                            x => x.Include(s => s.Payment)
+                         )
+                    )
+                    .Select(x => x.PaymentId);
+
+            var result = (await _ownFeesRepository.Find(x => ownFeesIds.Contains(x.Id), x => x.Include(ow => ow.FeeList))).Select(x => x.FeeList)
+                    .Where(
+                        x => x.Any(
+                            ow => ow.PaymentDate == null &&
+                            ow.ExpirationDate.ToLocalTime() <= DateTime.Now.ToLocalTime()
+                        )
+                    )
+                    .Count() > 0;
+            return result;
         }
     }
 }

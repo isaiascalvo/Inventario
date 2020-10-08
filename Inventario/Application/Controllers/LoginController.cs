@@ -29,6 +29,20 @@ namespace Application.Controllers
             _configuration = configuration;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            try
+            {
+                var userDto = await _userUseCases.GetAll();
+                return Ok(userDto);
+            }
+            catch(Exception e)
+            {
+                return BadRequest("Problema" + e.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginVM)
         {
@@ -46,7 +60,7 @@ namespace Application.Controllers
             }
             catch(Exception e)
             {
-                throw e;
+                return BadRequest(e.Message);
             }
         }
 

@@ -119,43 +119,64 @@ export default class SideBarMenu extends Vue {
     },
     { icon: "shape", text: "Categorías", url: "/category-list" },
     {
-      icon: "truck-delivery-outline",
-      text: "Proveedores",
-      url: "/vendor-list"
+      icon: "account-outline",
+      text: "Entidades",
+      subItems: [
+        {
+          icon: "truck-delivery-outline",
+          text: "Proveedores",
+          url: "/vendor-list"
+        },
+        { icon: "human", text: "Clientes", url: "/client-list" },
+        { icon: "account-group", text: "Usuarios", url: "/user-list" }
+      ]
     },
-    { icon: "human", text: "Clientes", url: "/client-list" },
-    { icon: "account-group", text: "Usuarios", url: "/user-list" },
     {
-      icon: "ballot-recount-outline",
-      text: "Movimientos de Stock",
-      url: "/product-entry-list"
+      icon: "file-chart",
+      text: "Movimientos",
+      // url: "/periodic-report",
+      subItems: [
+        {
+          icon: "ballot-recount-outline",
+          text: "Movimientos de Stock",
+          url: "/product-entry-list"
+        },
+        { icon: "briefcase-outline", text: "Ventas", url: "/sale-list" },
+        {
+          icon: "cash-multiple", //"script-text-outline",
+          text: "Gastos Varios",
+          url: "/miscellaneous-expenses-list"
+        },
+        {
+          icon: "script-text-outline",
+          text: "Comisiones",
+          url: "/commission-list"
+        }
+      ]
     },
-    { icon: "briefcase-outline", text: "Ventas", url: "/sale-list" },
     {
       icon: "buffer",
       text: "Cuotas Aplicables", //tune
       url: "/fee-rule-list"
     },
     {
-      icon: "cash-multiple", //"script-text-outline",
-      text: "Gastos Varios",
-      url: "/miscellaneous-expenses-list"
-    },
-    {
-      icon: "script-text-outline",
-      text: "Comisiones",
-      url: "/commission-list"
-    },
-    {
-      icon: "script-text-outline",
-      text: "Reporte Anual",
-      url: "/periodic-report"
-    },
-    {
-      icon: "script-text-outline",
-      text: "Reporte de Cuotas",
-      url: "/fees-report"
+      icon: "file-chart",
+      text: "Reportes",
+      // url: "/periodic-report",
+      subItems: [
+        {
+          icon: "script-text-outline",
+          text: "Reporte Anual",
+          url: "/periodic-report"
+        },
+        {
+          icon: "script-text-outline",
+          text: "Reporte de Cuotas",
+          url: "/fees-report"
+        }
+      ]
     }
+
     //finance
   ];
 
@@ -185,7 +206,11 @@ export default class SideBarMenu extends Vue {
 
   public getTitle(): string {
     const path = this.$route.path;
-    const item = this.items.find(x => x.url === path);
+    // const item = this.items.find(x => x.url === path);
+    const item = this.items.find(
+      x =>
+        x.url === path || (x.subItems && x.subItems.some(y => y.url === path))
+    );
     if (item) {
       this.title = item.text;
     }

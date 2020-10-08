@@ -9,13 +9,6 @@ import JwtInterceptor from "./interceptors/JwtInterceptor";
 
 Vue.config.productionTip = false;
 
-// parseDate(date: string) {
-//   const dateSplited = date.split("/");
-//   return new Date(
-//     Date.parse(dateSplited[1] + "/" + dateSplited[0] + "/" + dateSplited[2])
-//   );
-// }
-
 Vue.use(Buefy, {
   defaultDateParser: (date: string) => {
     const dateSplited = date.split("/");

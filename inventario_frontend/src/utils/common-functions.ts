@@ -57,5 +57,9 @@ export function dateTimeToLocal(date: Date): string {
 }
 
 export function formattedAmount(amount: number): string {
-  return amount.toFixed(2);
+  // return amount.toFixed(2);
+  return amount.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }

@@ -4,7 +4,7 @@
       <div class="hero-head">
         <div class="level">
           <div>
-            <h1 class="title is-6">Lista de Usuarios</h1>
+            <h1 class="title is-6">Usuarios</h1>
           </div>
           <div>
             <b-button
