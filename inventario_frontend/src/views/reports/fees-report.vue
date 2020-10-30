@@ -80,7 +80,7 @@
               {{ props.row.clientName }}
             </span>
           </b-table-column>
-          <b-table-column field="feesQty" label="Cuotas" centered>
+          <b-table-column field="feesQty" label="Plazo" centered>
             {{ props.row.feesQty }}
           </b-table-column>
           <b-table-column field="totalAmount" label="Monto" centered>

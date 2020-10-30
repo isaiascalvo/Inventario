@@ -28,7 +28,7 @@
               <b-menu-list>
                 <div v-for="item in items" :key="item.id">
                   <b-menu-item
-                    v-if="item.url"
+                    v-if="item.url && validMenu(item)"
                     :label="item.text"
                     tag="router-link"
                     :to="item.url"
@@ -36,7 +36,10 @@
                   >
                   </b-menu-item>
 
-                  <b-menu-item :icon="item.icon" v-if="!item.url">
+                  <b-menu-item
+                    :icon="item.icon"
+                    v-if="!item.url && validMenu(item)"
+                  >
                     <template slot="label" slot-scope="props">
                       <span v-if="!reduce">
                         {{ item.text }}
@@ -115,9 +118,15 @@ export default class SideBarMenu extends Vue {
     {
       icon: "text-box-outline",
       text: "Productos",
-      url: "/product-list"
+      url: "/product-list",
+      rolRequired: false
     },
-    { icon: "shape", text: "Categorías", url: "/category-list" },
+    {
+      icon: "shape",
+      text: "Categorías",
+      url: "/category-list",
+      rolRequired: false
+    },
     {
       icon: "account-outline",
       text: "Entidades",
@@ -129,7 +138,8 @@ export default class SideBarMenu extends Vue {
         },
         { icon: "human", text: "Clientes", url: "/client-list" },
         { icon: "account-group", text: "Usuarios", url: "/user-list" }
-      ]
+      ],
+      rolRequired: false
     },
     {
       icon: "file-chart",
@@ -152,12 +162,14 @@ export default class SideBarMenu extends Vue {
           text: "Comisiones",
           url: "/commission-list"
         }
-      ]
+      ],
+      rolRequired: false
     },
     {
       icon: "buffer",
       text: "Cuotas Aplicables", //tune
-      url: "/fee-rule-list"
+      url: "/fee-rule-list",
+      rolRequired: false
     },
     {
       icon: "file-chart",
@@ -166,18 +178,17 @@ export default class SideBarMenu extends Vue {
       subItems: [
         {
           icon: "script-text-outline",
-          text: "Reporte Anual",
+          text: "Reporte Estado de Resultado",
           url: "/periodic-report"
         },
         {
           icon: "script-text-outline",
-          text: "Reporte de Cuotas",
+          text: "Reporte Financiero",
           url: "/fees-report"
         }
-      ]
+      ],
+      rolRequired: true
     }
-
-    //finance
   ];
 
   public loggedIn() {
@@ -192,10 +203,16 @@ export default class SideBarMenu extends Vue {
   }
 
   public getUserId() {
-    const currentUser: JwtResult = JSON.parse(
-      sessionStorage.getItem("currentUser") ?? ""
-    );
-    return currentUser.id;
+    return this.getUser()?.id;
+  }
+
+  getUser() {
+    const user = sessionStorage.getItem("currentUser");
+    if (user) {
+      const currentUser: JwtResult = JSON.parse(user);
+      return currentUser;
+    }
+    return undefined;
   }
 
   public logOut() {
@@ -217,7 +234,16 @@ export default class SideBarMenu extends Vue {
     return this.title;
   }
 
+  public validMenu(item: any) {
+    return !item.rolRequired || this.getUser()?.isAdmin;
+  }
+
   mounted() {
+    this.setSideMenuHeight();
+    window.onresize = this.resize;
+  }
+
+  setSideMenuHeight() {
     const w = window;
     const e = document.documentElement;
     const g = document.getElementsByTagName("body")[0];
@@ -226,6 +252,10 @@ export default class SideBarMenu extends Vue {
     if (elem) {
       elem.style.height = y + "px";
     }
+  }
+
+  resize() {
+    this.setSideMenuHeight();
   }
 }
 </script>

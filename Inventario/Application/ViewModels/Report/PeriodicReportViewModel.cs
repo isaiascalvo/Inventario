@@ -13,5 +13,6 @@ namespace Application.ViewModels
         public decimal Sales { get; set; }
         public decimal Purchases { get; set; }
         public decimal Commissions { get; set; }
+        public decimal Balance { get { return Sales + Commissions - FixedCosts - VariableCosts - Purchases; } }
     }
 }

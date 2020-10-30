@@ -66,6 +66,15 @@ namespace Logic
                 periodicReports.Add(periodicReport);
             }
 
+            PeriodicReportDto finalResultReport = new PeriodicReportDto();
+            finalResultReport.Period = "Totales";
+            finalResultReport.Sales = periodicReports.Sum(x => x.Sales);
+            finalResultReport.Purchases = periodicReports.Sum(x => x.Purchases);
+            finalResultReport.Commissions = periodicReports.Sum(x => x.Commissions);
+            finalResultReport.FixedCosts = periodicReports.Sum(x => x.FixedCosts);
+            finalResultReport.VariableCosts = periodicReports.Sum(x => x.VariableCosts);
+
+            periodicReports.Add(finalResultReport);
             return periodicReports;
         }
 

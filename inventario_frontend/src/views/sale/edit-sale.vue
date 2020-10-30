@@ -396,7 +396,7 @@
                         </b-field>
                       </b-table-column>
 
-                      <b-table-column field="quantity" label="Número">
+                      <b-table-column field="quantity" label="Número de cheque">
                         <b-field>
                           <b-input
                             v-model="props.row.nro"

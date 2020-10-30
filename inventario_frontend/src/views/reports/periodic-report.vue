@@ -39,6 +39,7 @@
         scrollable
         :data="periodicReports"
         id="my-table"
+        :row-class="(row, index) => index === 12 && 'trColor'"
       >
         <template slot="empty">
           No hay datos registrados
@@ -61,6 +62,14 @@
           </b-table-column>
           <b-table-column field="purchases" label="Compras" centered>
             $ {{ formattedAmount(props.row.purchases) }}
+          </b-table-column>
+          <b-table-column
+            field="balance"
+            label="Saldo"
+            centered
+            :cell-class="props.index !== 12 ? 'balanceColumnClass' : ''"
+          >
+            $ {{ formattedAmount(props.row.balance) }}
           </b-table-column>
         </template>
       </b-table>
@@ -200,5 +209,13 @@ input {
 
 .monthClass {
   background: goldenrod;
+}
+
+.trColor {
+  background: yellow !important;
+}
+
+.balanceColumnClass {
+  background: darkgray !important;
 }
 </style>

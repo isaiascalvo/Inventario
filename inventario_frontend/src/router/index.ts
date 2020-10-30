@@ -30,8 +30,7 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(
         /* webpackChunkName: "product" */ "../views/product/edit-product.vue"
-      ),
-    meta: { requiredAuth: true }
+      )
   },
   {
     path: "/product/modify/:id",
@@ -40,8 +39,7 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "product" */ "../views/product/edit-product.vue"
       ),
-    props: true,
-    meta: { requiredAuth: true }
+    props: true
   },
   {
     path: "/category-list",
@@ -57,8 +55,7 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(
         /* webpackChunkName: "category" */ "../views/category/edit-category.vue"
-      ),
-    meta: { requiredAuth: true }
+      )
   },
   {
     path: "/category/modify/:id",
@@ -67,8 +64,7 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "category" */ "../views/category/edit-category.vue"
       ),
-    props: true,
-    meta: { requiredAuth: true }
+    props: true
   },
   {
     path: "/vendor-list",
@@ -83,8 +79,7 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "vendor" */
         "../views/vendor/edit-vendor.vue"
-      ),
-    meta: { requiredAuth: true }
+      )
   },
   {
     path: "/vendor/modify/:id",
@@ -93,22 +88,19 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "vendor" */ "../views/vendor/edit-vendor.vue"
       ),
-    props: true,
-    meta: { requiredAuth: true }
+    props: true
   },
   {
     path: "/user-list",
     name: "UserList",
     component: () =>
-      import(/* webpackChunkName: "user" */ "../views/user/user-list.vue"),
-    meta: { requiredAuth: true }
+      import(/* webpackChunkName: "user" */ "../views/user/user-list.vue")
   },
   {
     path: "/user/new",
     name: "NewUser",
     component: () =>
-      import(/* webpackChunkName: "user" */ "../views/user/edit-user.vue"),
-    meta: { requiredAuth: true }
+      import(/* webpackChunkName: "user" */ "../views/user/edit-user.vue")
   },
   {
     path: "/user/modify/:id",
@@ -130,8 +122,7 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "client" */
         "../views/client/edit-client.vue"
-      ),
-    meta: { requiredAuth: true }
+      )
   },
   {
     path: "/client/modify/:id",
@@ -140,8 +131,7 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "client" */ "../views/client/edit-client.vue"
       ),
-    props: true,
-    meta: { requiredAuth: true }
+    props: true
   },
   {
     path: "/product-entry-list",
@@ -282,19 +272,6 @@ const routes: Array<RouteConfig> = [
         "../views/commission/edit-commission.vue"
       ),
     props: true
-    // },
-    // {
-    //   path: "/login",
-    //   name: "Login",
-    //   component: () =>
-    //     import(/* webpackChunkName: "login" */ "../views/login.vue")
-    // beforeEnter: (to, from, next) => {
-    //   if (sessionStorage.getItem("currentUser") !== null) {
-    //     next({ name: "Home" });
-    //   } else {
-    //     next();
-    //   }
-    // },
   },
   {
     path: "/periodic-report",
@@ -303,7 +280,8 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "report" */
         "../views/reports/periodic-report.vue"
-      )
+      ),
+    meta: { requiredAuth: true }
   },
   {
     path: "/fees-report",
@@ -312,7 +290,8 @@ const routes: Array<RouteConfig> = [
       import(
         /* webpackChunkName: "report" */
         "../views/reports/fees-report.vue"
-      )
+      ),
+    meta: { requiredAuth: true }
   }
 ];
 
@@ -346,7 +325,7 @@ router.beforeEach((to, from, next) => {
     const currentUser: JwtResult | null = getCurrentUser();
     if (!currentUser || !currentUser.isAdmin) {
       alert("Acceso denegado.\nDebe ser administrador para poder acceder.");
-      next(false);
+      next({ name: "ProductList" });
     } else {
       next();
     }
@@ -357,7 +336,7 @@ router.beforeEach((to, from, next) => {
 
 router.beforeEach((to, from, next) => {
   if (to.path === "/login" && sessionStorage.getItem("currentUser") !== null) {
-    next({ name: "Home" });
+    next({ name: "ProductList" });
   } else {
     next();
   }
