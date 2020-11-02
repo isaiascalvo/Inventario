@@ -122,8 +122,10 @@ export class NavigatorProductService implements ProductService {
 
   public generatePdf(productFilters: ProductFilters): AxiosPromise<Blob> {
     return axios(
-      "https://localhost:44386/api/products/Pdf?" +
-        this.getQueryString(productFilters),
+      process.env.NODE_ENV === "development"
+        ? "https://localhost:44386/api/products/Pdf?"
+        : "http://192.168.1.110:8081/api/products/Pdf?" +
+            this.getQueryString(productFilters),
       {
         method: "GET",
         responseType: "blob"

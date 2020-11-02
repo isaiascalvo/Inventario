@@ -1151,7 +1151,6 @@ export default class EditSale extends Vue {
         .preCreation(this.sale)
         .then(response => {
           this.saleConfirmation = response as Sale;
-          console.log(JSON.parse(JSON.stringify(this.saleConfirmation)));
           this.isLoading = false;
         })
         .catch(error => {
@@ -1212,41 +1211,9 @@ export default class EditSale extends Vue {
       })
       .then(response => {
         this.clients = response;
-        // if (this.sale.id) {
-        //   this.isLoading = true;
-        //   this.saleService.getSale(this.sale.id).then(
-        //     data => {
-        //       this.sale = data as Sale;
-        //       this.sale.date = new Date(this.sale.date ?? "");
-        //       // const pp =
-        //       //   this.products.find(x => x.id === this.sale.productId) ??
-        //       //   new Product();
-        //       // this.prodCodNameDesc =
-        //       //   pp.code + " - " + pp.name + " - " + pp.description;
-        //       this.isLoading = false;
-        //       this.getPriceValue();
-        //     },
-        //     error => {
-        //       this.$buefy.dialog.alert({
-        //         title: "Error",
-        //         message:
-        //           "Un error inesperado ha ocurrido. Por favor inténtelo nuevamente.",
-        //         type: "is-danger",
-        //         hasIcon: true,
-        //         icon: "times-circle",
-        //         iconPack: "fa",
-        //         ariaRole: "alertdialog",
-        //         ariaModal: true
-        //       });
-        //       console.log(error);
-        //       this.isLoading = true;
-        //     }
-        //   );
-        // } else {
         this.sale.date = new Date();
         this.pushDetail();
         this.isLoading = false;
-        // }
       })
       .catch(e => {
         this.isLoading = false;

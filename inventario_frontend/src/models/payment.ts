@@ -1,5 +1,3 @@
-import { FeeRule } from "./feeRule";
-
 export abstract class Payment {
   //Properties
   public amount: number | undefined = undefined;
