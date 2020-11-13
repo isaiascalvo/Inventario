@@ -6,7 +6,7 @@ export const apiClient = axios.create({
   baseURL:
     process.env.NODE_ENV === "development"
       ? "https://localhost:44386/api"
-      : "http://192.168.1.110:8081/api",
+      : "https://localhost:8081/api",
   withCredentials: false,
   headers: {
     Accept: "application/json",
