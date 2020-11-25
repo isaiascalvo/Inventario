@@ -227,7 +227,7 @@ namespace Infrastructure.EFCore
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=InventarioDB;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer(@"Server=GOMEZ-NB;Database=InventarioDB;Trusted_Connection=True;");
         }
     }
 }
