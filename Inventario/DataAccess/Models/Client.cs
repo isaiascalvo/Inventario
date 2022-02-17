@@ -15,7 +15,6 @@ namespace Data
         public string Dni { get; set; }
         public string Phone { get; set; }
         public string? Mail { get; set; }
-        [Required]
-        public DateTime Birthdate { get; set; }
+        public DateTime? Birthdate { get; set; }
     }
 }

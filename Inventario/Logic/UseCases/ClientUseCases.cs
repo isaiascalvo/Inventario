@@ -36,7 +36,7 @@ namespace Logic
                 Dni = clientForCreationDto.Dni,
                 Phone = clientForCreationDto.Phone,
                 Mail = clientForCreationDto.Mail,
-                Birthdate = clientForCreationDto.Birthdate.ToLocalTime(),
+                Birthdate = clientForCreationDto.Birthdate?.ToLocalTime(),
                 CreatedBy = userId
             };
 
@@ -132,7 +132,7 @@ namespace Logic
             client.Dni = clientDto.Dni;
             client.Phone = clientDto.Phone;
             client.Mail = clientDto.Mail;
-            client.Birthdate = clientDto.Birthdate.ToLocalTime();
+            client.Birthdate = clientDto.Birthdate?.ToLocalTime();
             client.LastModificationBy = clientDto.LastModificationBy;
 
             await _clientRepository.Update(client);
