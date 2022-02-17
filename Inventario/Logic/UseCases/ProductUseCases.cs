@@ -268,7 +268,7 @@ namespace Logic
             {
                 var price = new Price()
                 {
-                    Value = productDto.SalePrice.Value,
+                    Value = productDto.PurchasePrice.Value,
                     DateTime = DateTime.Now,
                     ProductId = productDto.Id,
                     CreatedBy = productDto.LastModificationBy.Value,
