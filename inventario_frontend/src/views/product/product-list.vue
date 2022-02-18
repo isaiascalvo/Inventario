@@ -195,7 +195,7 @@
             {{ props.row.brand }}
           </b-table-column>
           <b-table-column field="minimumStock" label="Stock mínimo" centered>
-            {{ props.row.minimumStock }}
+            {{ props.row.minimumStock ? props.row.minimumStock : 0 }}
           </b-table-column>
           <b-table-column field="stock" label="Stock" centered>
             <span
@@ -203,8 +203,9 @@
                 'tag',
                 {
                   'is-danger':
-                    props.row.minimumStock &&
-                    props.row.stock < props.row.minimumStock
+                    (props.row.minimumStock &&
+                      props.row.stock < props.row.minimumStock) ||
+                    props.row.stock <= 0
                 },
                 {
                   'is-success': !(
@@ -221,10 +222,20 @@
             {{ props.row.unitOfMeasurement }}
           </b-table-column>
           <b-table-column field="purchasePrice" label="Precio de compra">
-            $ {{ formattedAmount(props.row.purchasePrice.value) }}
+            $
+            {{
+              props.row.salePrice
+                ? formattedAmount(props.row.purchasePrice.value)
+                : 0
+            }}
           </b-table-column>
           <b-table-column field="salePrice" label="Precio de venta">
-            $ {{ formattedAmount(props.row.salePrice.value) }}
+            $
+            {{
+              props.row.salePrice
+                ? formattedAmount(props.row.salePrice.value)
+                : 0
+            }}
           </b-table-column>
 
           <b-table-column field="action" label="Acciones">
@@ -272,7 +283,7 @@ import { NavigatorCategoryService } from "../../services/category-service";
 import { NavigatorVendorService } from "../../services/vendor-service";
 import { Category } from "../../models/category";
 import { Vendor } from "../../models/vendor";
-import { formattedAmount } from "@/utils/common-functions";
+import { formattedAmount } from "../../utils/common-functions";
 
 @Component
 export default class ProductList extends Vue {
