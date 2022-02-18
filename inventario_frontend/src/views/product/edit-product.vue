@@ -92,6 +92,7 @@
                   <b-input
                     v-model="product.purchasePrice.value"
                     type="number"
+                    step=".01"
                     placeholder="Ingrese el precio de compra del producto"
                     required
                     validation-message="Ingrese el precio de compra del producto"
@@ -104,6 +105,7 @@
                   <b-input
                     v-model="product.salePrice.value"
                     type="number"
+                    step=".01"
                     placeholder="Ingrese el precio de venta del producto"
                     required
                     validation-message="Ingrese el precio de venta del producto"
@@ -118,6 +120,7 @@
                   <b-input
                     v-model="product.stock"
                     type="number"
+                    step=".01"
                     placeholder="Ingrese el stock del producto"
                     disabled
                   ></b-input>
@@ -142,6 +145,7 @@
                   <b-input
                     v-model="product.minimumStock"
                     type="number"
+                    step=".01"
                     placeholder="Ingrese el stock mínimo del producto"
                   ></b-input>
                 </b-field>
@@ -215,6 +219,11 @@ export default class EditProduct extends Vue {
     // );
 
     const result = formValidation(this.product as never);
+    console.log(
+      result,
+      this.product.purchasePrice.value,
+      this.product.salePrice.value
+    );
     const nulleableProps = [
       "",
       "minimumStock",

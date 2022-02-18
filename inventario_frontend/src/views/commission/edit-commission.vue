@@ -88,6 +88,7 @@
               v-model="commission.price"
               placeholder="Ingrese el precio"
               type="number"
+              step=".01"
               required
               validation-message="Debe indicar el precio del producto"
             ></b-input>
@@ -136,6 +137,7 @@
               v-model="commission.value"
               placeholder="Ingrese el monto de la comisión"
               type="number"
+              step=".01"
               required
               validation-message="Debe indicar el monto de la comisión"
             ></b-input>

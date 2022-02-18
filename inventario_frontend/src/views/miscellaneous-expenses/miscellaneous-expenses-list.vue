@@ -97,6 +97,7 @@
                 placeholder="Monto"
                 size="is-small"
                 type="number"
+                step=".01"
                 icon-right="close-circle"
                 icon-right-clickable
                 @icon-right-click="

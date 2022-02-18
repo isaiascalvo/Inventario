@@ -73,6 +73,7 @@
                 placeholder="Porcentage de interés"
                 size="is-small"
                 type="number"
+                step=".01"
                 icon-right="close-circle"
                 icon-right-clickable
                 @icon-right-click="feeRuleFilters.percentage = undefined"

@@ -121,6 +121,7 @@
                         placeholder="Ingrese una cantidad"
                         size="is-small"
                         type="number"
+                        step=".01"
                         required
                         min="1"
                         validation-message="Debe ingresar una cantidad mayor a 0"
@@ -181,6 +182,7 @@
                   <b-input
                     v-model="productEntry.cost"
                     type="number"
+                    step=".01"
                     placeholder="Ingrese el costo de la compra"
                     size="is-small"
                     required

@@ -417,6 +417,7 @@
                             placeholder="Monto del cheque"
                             size="is-small"
                             type="number"
+                            step=".01"
                             required
                             validation-message="Debe ingresar el monto del cheque"
                             @input="forceUpdate()"
